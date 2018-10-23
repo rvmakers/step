@@ -1,0 +1,261 @@
+
+//************************************************************************
+
+//File Name  : create-new-opportunity-stage1.service.ts 
+ 
+
+//Description : It provides Services for Stage1(BD_Stage1.component.ts) for Customer
+ 
+
+//Created By : Agrim Jain
+
+//************************************************************************
+
+
+
+import { Injectable } from '@angular/core';
+import {Http, Response,RequestOptions,Headers} from "@angular/http";
+import {Observable} from "rxjs/Observable";
+import "rxjs/Rx";
+import { ICustomerType } from '../Interface/Customer/CustomerType';
+import { IFiscalYear } from '../Interface/FiscalYear/FiscalYear';
+import {Apiroutes} from '../Services/Apiroutes';
+import {Constant} from '../Constant';
+import { IDealCategory } from '../Interface/DealCategory/DealCategory';
+import { ICluster } from '../Interface/Cluster/Cluster';
+import{IServiceName} from '../Interface/ServiceName/ServiceName';
+import { ICountry } from '../Interface/Country/Country';
+import{IGeography} from '../Interface/Geography/Geography';
+import{IGeographyIP} from '../Interface/Geography/Geographyip';
+import {INewOpportunity} from '../Interface/NewOpportunity/NewOpportunity';
+import { ISU } from '../Interface/ISU/ISU';
+import { IExecutiveSponsor } from '../Interface/ExecutiveSponsor/ExecutiveSponsor';
+import { ICreateNewOpportunity } from '../Interface/CreateNewOpportunity/CreateNewOpportunity';
+import { ICategory } from '../Interface/Category/Category';
+import { IPricingType } from '../Interface/PricingType/PricingType';
+import { IPlatform } from '../Interface/Platform/Platform';
+import { ICompetitor } from '../Interface/Competitor/Competitor';
+import { IBusinessBFS } from '../Interface/BusinessBFS/BusinessBFS';
+import { HttpInterCeptor } from './HttpInterCeptor.Service';
+@Injectable()
+export class OppurtunityStage1Service {
+
+  constructor(private http:Http,private apiroutes:Apiroutes,private constant:Constant) { }
+  Get_MaxStage(OpportunityId): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.Get_MaxStage+"?OpportunityId="+OpportunityId)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+ 
+
+
+  Stage1_Populate_Get_stage1(OpportunityId,strStageId): Observable<INewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.Get_Stage+"?OpportunityId="+OpportunityId + "&strStageId="+strStageId)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  
+
+  Common_Get_TCV_CRM(OpportunityId): Observable<INewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.Get_TCV_CRM+"?OppID="+OpportunityId)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  Stage1_Save_Stage1Opportunity(ObjCreateNewOpportunity:any): Observable<ICreateNewOpportunity[]> {
+    let body = JSON.stringify(ObjCreateNewOpportunity);
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.SaveStage1Opportunity, body, options)
+        .map((response: Response) => <ICreateNewOpportunity[]>response.json())
+        .catch(this.handleError);
+  }
+
+  ProceedNextStage(obj:any):Observable<any>{
+        let body = JSON.stringify(obj);
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let options = new RequestOptions({ headers: headers });
+        return this.http.post(this.apiroutes.ProceedNextStage, body, options)
+            .map((response: Response) => <ICreateNewOpportunity[]>response.json())
+            .catch(this.handleError);
+  }
+
+  GetPricingType(): Observable<IPricingType[]> {
+      
+    return this.http.get(this.apiroutes.PricingType)
+                .map((response: Response) => {
+                return <IPricingType[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+ 
+  GetCategory(): Observable<ICategory[]> {
+      
+    return this.http.get(this.apiroutes.Category)
+                .map((response: Response) => {
+                return <ICategory[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+ 
+  GetgenInfoStage(OpportunityId,strStageId): Observable<ICreateNewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.GetgenInfoStage1+"?OpportunityId="+OpportunityId + "&StageId="+strStageId)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  Get_FnA_stage1(OpportunityId,strStageId): Observable<ICreateNewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.Get_FnA_stage1+"?strOpportunityId="+OpportunityId + "&strStageId="+strStageId)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  GetOpportunity_Stage1_Resource_sp(OpportunityId,strStageId): Observable<ICreateNewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.GetOpportunity_Stage1_Resource_sp+"?Oppid="+OpportunityId + "&StageID="+strStageId)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  Master_Get_OwnerName(EmpID): Observable<ICreateNewOpportunity[]> {
+ 
+    return this.http.get(this.apiroutes.GetOwnerName+"?ownerId="+EmpID)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  GetPlatform(UnitID): Observable<IPlatform[]> {
+      
+    return this.http.get(this.apiroutes.GetPlatform+"?unitID="+UnitID)
+                .map((response: Response) => {
+                return <IPlatform[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  Get_Competitor(UnitID): Observable<ICompetitor[]> {
+      
+    return this.http.get(this.apiroutes.Get_Competitor+"?unitID="+UnitID)
+                .map((response: Response) => {
+                return <ICompetitor[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+ 
+  Get_Business_BFS1(UnitID): Observable<IBusinessBFS[]> {
+      
+    return this.http.get(this.apiroutes.Get_Business_BFS1+"?intUnitid="+UnitID)
+                .map((response: Response) => {
+                return <IBusinessBFS[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  Get_Vertical_Opp_Data(OpportunityId:string): Observable<ICreateNewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.Get_Vertical_Opp_Data+"?strOppId="+OpportunityId)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  Get_PresalesLead_VerticalWise(unitid:any,businessId:any): Observable<ICreateNewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.Get_PresalesLead_VerticalWise+"?intUnitid="+unitid + "&intBusinessId="+businessId)
+                .map((response: Response) => {
+                return <ICreateNewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  
+
+  Save_VerticalOppdate( Model:any): Observable<number> {
+      
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.Save_VerticalOppdate,Model,options)
+                .map((response: Response) => 
+        {
+                return <number>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+
+  Delete_VerticalOppdate( Model:any): Observable<ICreateNewOpportunity[]> {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });  
+    return this.http.post(this.apiroutes.Delete_VerticalOppdate,Model,options)
+                .map((response: Response) => {
+                return <number>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+
+  Get_SelectedOppCompetitors(OpportunityId): Observable<ICompetitor[]> {
+      
+    return this.http.get(this.apiroutes.Get_OppCompetitors+"?OppID="+OpportunityId)
+                .map((response: Response) => {
+                return <ICompetitor[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+
+  Stage1_Save_OppCompetitors( Model:any): Observable<number> {
+      
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.Stage1_Save_OppCompetitors,Model,options)
+                .map((response: Response) => 
+        {
+                return <number>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+
+  Upd_Competitors( Model:any): Observable<number> {
+      
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.Upd_Competitors,Model,options)
+                .map((response: Response) => 
+        {
+                return <number>response.json();
+        })
+        .catch(this.handleError);
+  }
+  GetEmpDetailsMail(userID):Observable<any> {
+      
+        return this.http.get(this.apiroutes.GetEmpDetailsMail+"?empNo="+userID)
+                    .map((response: Response) => {
+                    return <any>response.json();
+            })
+            .catch(this.handleError);
+      }
+
+    
+  private handleError(error: Response) {
+    return Observable.throw(error.statusText);
+}
+}
