@@ -1,0 +1,145 @@
+
+<head>
+    <style id="antiClickjack">body{display:none !important;}</style>
+    <script type="text/javascript">
+      if (self === top) {
+          var antiClickjack = document.getElementById("antiClickjack");
+          antiClickjack.parentNode.removeChild(antiClickjack);
+      } else {
+          top.location = self.location;
+      }
+      </script>
+</head>
+
+<nav *ngIf="showNavBar" class="navbar navbar-fixed-top" role="navigation">
+    
+         <div *ngIf="showNavBar" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pad-55">
+             <div class="navbar-header">
+                 <a class="navbar-brand"  ><img [src]="logo" class="img-responsive" /></a>
+             </div>
+  
+             <div>
+                 <ul class="nav navbar-nav navbar-right cdk">
+                     <li class="pad-15">
+                         <p>Welcome ! {{userName}},{{roleName}}<a title="change unit" (click)="GoToUnitSelection()"><img [src]="user"></a> <a title="logout" (click)="GoToUnitSelection()"><img [src]="logout"></a></p>
+                     </li>
+                 </ul>
+             </div>
+         </div>
+         <div *ngIf="showNavBar" class="pad-55 col-lg-12 col-md-12 col-sm-12 col-xs-12 bg_logo_nav">
+             <ul class="nav navbar-nav abc mar-left-7">
+                 <li class="skewP" *ngFor= "let menu of (Menu | withoutchildmenu)">
+                     <a [routerLink] = "['/'+menu.LinkText,{}]"><div class="skewC">{{menu.MenuText}}</div></a>
+                 </li>
+                 <li class="dropdown skewP slaint" *ngFor= "let parentMenu of Menu | withchildmenu">
+                     <a  routerLink="/newOpp" class="dropdown-toggle" data-toggle="dropdown"><div class="skewC">{{parentMenu.MenuText}}</div></a>
+                     <ul class="dropdown-menu">
+                         <li *ngFor="let childMenu of Menu |childmenufilter:parentMenu">
+                             <a [routerLink] = "['/'+childMenu.LinkText,{}]" style="padding-bottom: 10px;
+                             padding-top: 10px;"><span class="icon"><i class="fa fa-1x fa-file"></i></span><span class="text">{{childMenu.MenuText}}</span></a>
+                         </li>
+                         
+                     </ul>
+                 </li>
+                
+             </ul>
+  
+  
+         </div>
+    
+  </nav>
+  
+  
+  
+  
+  .ts
+  
+  import { Component, OnInit,Input,ViewChild  } from '@angular/core';
+import { IMenu } from '../../Interface/Menu';
+import {MenuFilterPipe} from '../../Filters/MenuFilter.Pipe'
+import {MenuService } from '../../Services/Menu.Service'
+import { GlobalEventsManager } from '../../GlobalEventsManager';
+import { Router} from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+
+declare var $:any;
+
+@Component({
+  selector: 'app-menu-component',
+  templateUrl: './Menu.Component.html',
+  styleUrls: ['./Menu.Component.css']
+})
+
+export class MenuComponent implements OnInit {
+  Menu=[];
+  showNavBar: boolean = false;
+  logo="./assets/RPM_logo.png";
+  createNew="./assets/CreateNew.png";
+
+  user="./assets/user.png";
+  logout="./assets/logout.png";
+  userName:string;
+  roleName:string;
+  
+  constructor(private menu: MenuService,private globalEventsManager:GlobalEventsManager,
+    private router: Router,private cookieService:CookieService) {
+    
+    this.GetMenu();
+
+    this.globalEventsManager.showNavBarEmitter.subscribe((mode)=>{
+      
+      this.showNavBar = mode;
+      if (this.cookieService.get('userId') && this.cookieService.get('userUnit')
+      && this.cookieService.get('userRole')) {
+        // logged in so return true
+        this.showNavBar =true;
+        if(this.cookieService.get('userRole')!=null && this.cookieService.get('userRole') !=undefined)
+        {
+        this.roleName=atob(this.cookieService.get('userRole'));
+        }
+        this.userName="Abhishek";
+        }
+        else 
+        {
+          this.showNavBar =false;
+          
+        }
+      })
+  }
+  
+  ngOnInit() {
+    
+    $('ul.abc li').click(function(){
+      
+       $('ul.abc li').removeClass('active');
+       $(this).addClass('active');
+      
+  });
+
+  }
+
+  GetMenu(): void {
+    this.menu.GetMenu().subscribe(resultArray =>{
+    this.Menu = resultArray;
+    
+    } ,
+    error  =>{ throw error;}
+  )}
+
+GoToUnitSelection():void{
+  
+      this.cookieService.delete("userUnit");
+      this.cookieService.delete("userRole");
+      this.cookieService.delete("userId");
+  
+      window.location.replace('');
+      
+      
+    }
+  }
+     
+
+    
+
+  
+  
