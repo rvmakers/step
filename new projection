@@ -1,0 +1,512 @@
+<mat-dialog-content class="mat-dialog-container1">
+  <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
+    <div class="widget widget-stacked">
+      <div class="widget-content borderbox">
+        <div class="row" style="border:1px solid rgba(20, 20, 20,0.0);margin-left:0px;margin-right:0px">
+          <app-lbl-message [MessageType]="messageType" [Messages]="messages"></app-lbl-message>
+          <div class="row">
+            <div style="background-color:#054f6c;text-align:center">
+              <label>Quarterly Projection</label>
+            </div>
+            <div style="background-color:#054f6c;text-align:center">
+              <label>Total Contract Value (MM USD) :
+                <span>{{totalContractValue}}</span>
+              </label>
+            </div>
+            <div class="table-responsive">
+              <table style="width:100%;" class="table-bordered">
+                <thead style="background: #ccc;border-bottom-width: 0">
+                  <tr style="background-color:#054f6c">
+                    <th>
+                      <label>Select</label>
+                      <br>
+                      <input type="checkbox" name="chkall" id="chkall" [(ngModel)]="modifyProjectionDetails" (change)="CheckAll(modifyProjectionDetails)">
+
+                    </th>
+                    <th>
+                      <label for="name">Expected Revenue Qtr</label>
+                    </th>
+                    <th>
+                      <label for="Year">Year</label>
+                    </th>
+                    <th>
+                      <label for="Expected Revenue">Quarter Revenue (MM USD)</label>
+                    </th>
+                   
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of qtrlyProjectionList;let i=index;">
+                    <td>
+                      <input type="checkbox" name="checkbox"  [checked]="qtrlyProjectionList[i].ProjectionStatus" (change)="qtrlyProjectionList[i].ProjectionStatus=!qtrlyProjectionList[i].ProjectionStatus">
+                    </td>
+                    <td style="width:20%" class="text-center">
+
+                      <select [(ngModel)]="qtrlyProjectionList[i].OppQuarter" class="form-control">
+                        <option [selected]="qtrlyProjectionList[i].OppQuarter=='0'" value="0">--Select--</option>
+                        <option [selected]="qtrlyProjectionList[i].OppQuarter=='1'" value="1">Q1</option>
+                        <option [selected]="qtrlyProjectionList[i].OppQuarter=='2'" value="2">Q2</option>
+                        <option [selected]="qtrlyProjectionList[i].OppQuarter=='3'" value="3">Q3</option>
+                        <option [selected]="qtrlyProjectionList[i].OppQuarter=='4'" value="4">Q4</option>
+                      </select>
+                    </td>
+                    <td style="width:20%">
+                      <select [(ngModel)]="qtrlyProjectionList[i].OppQuarterYear" class="form-control">
+                        <option [selected]="item.OppQuarterYear == years" [value]="years" *ngFor="let years of year_list">
+                          {{years}}
+                        </option>
+                      </select>
+
+                    </td>
+                    <td style="width:20%" class="text-center">
+                      <input type="text" [(ngModel)]="qtrlyProjectionList[i].OppQuarterRev" [value]="item.OppQuarterRev" class="form-control">
+                    </td>
+
+                   
+                  </tr>
+                  <tr style="background-color:#054f6c">
+                    <td>
+
+                    </td>
+                    <td>
+
+                    </td>
+                    <td style="text-align:left ">
+                      <label>Total TCV (MM USD)</label>
+                    </td>
+                    <td style="text-align:left ">
+                      &nbsp;&nbsp;&nbsp;{{NewTcv}}
+                    </td>
+                  </tr>
+                  <tr>
+
+                    <td colspan="5">
+                      <div style="text-align:center">
+                        <button style="color:black" class="deletenewupdate" (click)="AddNewRow()">
+                          <fa name="plus-square-o"></fa>Add Row
+                        </button>
+                        <button style="color:black" class="addnewupdate" (click)="Save()">
+                          <fa name="plus-square-o"></fa>Save
+                        </button>
+                        <button style="color:black" class="deletenewupdate" (click)="Delete()">
+                          <fa name="plus-square-o"></fa>Delete
+                        </button>
+                        <span style="margin-left:20px">
+                          <button type="button" [mat-dialog-close]="true" class="btn btn-primary">Close</button>
+                        </span>
+                      </div>
+                    </td>
+
+
+
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+
+.ts
+
+import { Component, OnInit, Inject } from '@angular/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { FiscalOfferingService } from '../../Services/fiscal-offering.service';
+import { AddQuarterProjectionService } from '../../Services/add-quarter-projection-service.service'
+import { IAddQuarterProjection } from '../../Interface/AddQuarterProjection/add-quarter-projection'
+import { LblMessageComponent } from '../Lbl-message/lbl-message.component';
+import { ValidationMessage } from '../../ValidationMessage/validation-message'
+import { isNullOrUndefined } from 'util';
+import { CookieService } from 'ngx-cookie-service';
+declare var $: any;
+@Component({
+  selector: 'app-add-quarter-projection',
+  templateUrl: './add-quarter-projection.component.html',
+  styleUrls: ['./add-quarter-projection.component.css']
+})
+export class AddQuarterProjectionComponent implements OnInit {
+
+  constructor(private fiscalOfferingService: FiscalOfferingService, private addQuarterProjectionService: AddQuarterProjectionService, @Inject(MAT_DIALOG_DATA) public data: any
+    , private cookieService: CookieService) { }
+  strOpportunityId: string;
+  unit: number;
+  qtrlyProjectionList: IAddQuarterProjection[] = new Array();
+  messageType: string;
+  messages: string;
+  totalContractValue: number;
+  strExpDt: any;
+  strStage: string;
+  year_list: any[] = new Array();
+  NewTcv: number = 0;
+  strUserId: string = atob(this.cookieService.get('userId'));
+  modifyProjectionDetails: boolean;
+  ngOnInit() {
+    if (!this.NullEmptyCheck(this.data.strOppId)) {
+      this.strOpportunityId = this.data.strOppId;
+    }
+    this.strExpDt = this.data.strExpDt;
+    this.totalContractValue = Number(this.data.strContractValue);
+    this.strStage = String(this.data.strStageId);
+
+    this.fiscalOfferingService.FiscalGetOpportunityUnitID(btoa(String(this.strOpportunityId))).subscribe(data => {
+      if (data != undefined) {
+        let unitList: any[] = new Array();
+        unitList = data;
+        if (unitList.length > 0) {
+          this.unit = Number(unitList[0].UnitId);
+        }
+      }
+    });
+    this.LoadYear();
+    this.Populate_QtrlyProjection();
+  }
+
+  CheckAll(modifyProjectionDetails: boolean) {
+    if (modifyProjectionDetails == true) {
+      this.qtrlyProjectionList.forEach(element => {
+
+        element.ProjectionStatus = true;
+      });
+    }
+    if (modifyProjectionDetails == false) {
+      this.qtrlyProjectionList.forEach(element => {
+
+        element.ProjectionStatus = false;
+      });
+    }
+
+  }
+
+  SaveProjectionDetails(ObjProjection: IAddQuarterProjection) {
+    let objProjection = <IAddQuarterProjection>{};
+    let currentOppquarter: Number;
+    this.messages = "";
+    this.messageType = '';
+    if (this.NullEmptyCheck(ObjProjection.OppQuarter)) {
+
+    }
+    else if (this.NullEmptyCheck(ObjProjection.OppQuarterRev)) {
+      if (ObjProjection.OppQuarterRev == "0") {
+        this.messages = ValidationMessage.VAL_PROJECTION_REVENUE;
+        this.messageType = "Danger";
+      }
+      else {
+        this.messages = ValidationMessage.REQ_PROJECTION_REVENUE;
+        this.messageType = "Danger";
+      }
+    }
+    else if (this.NullEmptyCheck(ObjProjection.OppQuarterYear)) {
+
+    }
+    else {
+      let Temptcv: number = 0;
+      this.qtrlyProjectionList.forEach(element => {
+        Temptcv = Temptcv + Number(element.OppQuarterRev)
+      });
+      if (Temptcv > this.totalContractValue) {
+        this.messages = ValidationMessage.Error_PROJECTION_TOTALCONTRACTVALUE;
+        this.messageType = "Danger";
+      }
+      else {
+        currentOppquarter = (Number(ObjProjection.OppQuarterRev) * 1000000.00);
+        objProjection.OpportunityId = this.strOpportunityId;
+        objProjection.OppQTRProjId = ObjProjection.OppQTRProjId;
+        objProjection.OppQuarter = ObjProjection.OppQuarter;
+        objProjection.OppQuarterRev = currentOppquarter;
+        objProjection.OppQuarterYear = ObjProjection.OppQuarterYear;
+        objProjection.EmpId = this.strUserId;
+        // let remaniningTCV=this.totalContractValue-Temptcv;
+        this.addQuarterProjectionService.SaveProjectionDetails(objProjection).subscribe(data => {
+          let result: any;
+          if (data != undefined) {
+            result = data;
+            if (result == 1) {
+              this.messages = ValidationMessage.Suc_PROJECTION;
+              this.messageType = "Success";
+              this.Populate_QtrlyProjection();
+              this.CheckSelectedTCV();
+
+            }
+            else if (result == 0) {
+              this.addQuarterProjectionService.UpdateProjectionDetails(objProjection).subscribe(data => {
+                result = data;
+                if (result == 1) {
+                  this.messages = ValidationMessage.Suc_PROJECTION;
+                  this.messageType = "Success";
+                }
+                this.Populate_QtrlyProjection();
+                this.CheckSelectedTCV();
+              });
+            }
+            
+            // let remaniningTCV=this.totalContractValue-Temptcv;
+
+            // if(remaniningTCV<this.totalContractValue)
+            // {
+            //   this.messages =remaniningTCV+ValidationMessage.REMAINING_PROJECTION_TOTALCONTRACTVALUE;
+            //   this.messageType="Danger";
+            // }
+          }
+        });
+      }
+    }
+  }
+
+  Save() {
+    let objProjection = <IAddQuarterProjection>{};
+    let currentOppquarter: Number;
+    this.messages = "";
+    this.messageType = '';
+    let Temptcv: number = 0;
+    let i=0;
+    this.qtrlyProjectionList.forEach(element => {
+      if (element.ProjectionStatus == true) {
+        Temptcv = Temptcv + Number(element.OppQuarterRev)
+        i=i+1;
+      }
+    });
+    if (i==0)
+    {
+      this.messages = ValidationMessage.SELECTPROJECTIONRECORDS;
+      this.messageType = "Danger";
+      return false;
+    }
+    if (Temptcv > this.totalContractValue) {
+      this.messages = ValidationMessage.Error_PROJECTION_TOTALCONTRACTVALUE;
+      this.messageType = "Danger";
+    }
+    this.qtrlyProjectionList.forEach(element => {
+      if (element.ProjectionStatus == true) {
+        if (this.NullEmptyCheck(element.OppQuarter)) {
+
+        }
+        else if (this.NullEmptyCheck(element.OppQuarterRev)) {
+          if (element.OppQuarterRev == "0") {
+            this.messages = ValidationMessage.VAL_PROJECTION_REVENUE;
+            this.messageType = "Danger";
+          }
+          else {
+            this.messages = ValidationMessage.REQ_PROJECTION_REVENUE;
+            this.messageType = "Danger";
+          }
+        }
+        else if (this.NullEmptyCheck(element.OppQuarterYear)) {
+
+        }
+        // else {
+
+        //   Temptcv = Temptcv + Number(element.OppQuarterRev)
+
+        //   if (Temptcv > this.totalContractValue) {
+        //     this.messages = ValidationMessage.Error_PROJECTION_TOTALCONTRACTVALUE;
+        //     this.messageType = "Danger";
+        //   }
+          else {
+            currentOppquarter = (Number(element.OppQuarterRev) * 1000000.00);
+            objProjection.OpportunityId = this.strOpportunityId;
+            objProjection.OppQTRProjId = element.OppQTRProjId;
+            objProjection.OppQuarter = element.OppQuarter;
+            objProjection.OppQuarterRev = currentOppquarter;
+            objProjection.OppQuarterYear = element.OppQuarterYear;
+            objProjection.EmpId = this.strUserId;
+            // let remaniningTCV=this.totalContractValue-Temptcv;
+            this.addQuarterProjectionService.SaveProjectionDetails(objProjection).subscribe(data => {
+              let result: any;
+              if (data != undefined) {
+                result = data;
+                if (result == 1) {
+                  this.messages = ValidationMessage.Suc_PROJECTION;
+                  this.messageType = "Success";
+                  this.Populate_QtrlyProjection();
+                  this.CheckSelectedTCV();
+
+                }
+                else if (result == 0) {
+                  this.addQuarterProjectionService.UpdateProjectionDetails(objProjection).subscribe(data => {
+                    result = data;
+                    if (result == 1) {
+                      this.messages = ValidationMessage.Suc_PROJECTION;
+                      this.messageType = "Success";
+                    }
+                    this.Populate_QtrlyProjection();
+                    this.CheckSelectedTCV();
+                  });
+                }
+                this.CheckAll(false);
+                $('#chkall').prop('checked', false);
+                // let remaniningTCV=this.totalContractValue-Temptcv;
+
+                // if(remaniningTCV<this.totalContractValue)
+                // {
+                //   this.messages =remaniningTCV+ValidationMessage.REMAINING_PROJECTION_TOTALCONTRACTVALUE;
+                //   this.messageType="Danger";
+                // }
+              }
+            });
+          }
+        
+      }
+    });
+  }
+  AddNewRow() {
+    this.messages = "";
+    let TempDate: Date;
+    let tempMonth: number;
+    let tempyear: number;
+    let obj = <IAddQuarterProjection>{};
+    let tempYearList: any[] = new Array();
+    obj.OppQTRProjId = 0;
+    if (!this.NullEmptyCheck(this.strExpDt)) {
+      TempDate = this.data.strExpDt.date.day;
+      tempMonth = Number(this.data.strExpDt.date.month);
+      tempyear = Number(this.data.strExpDt.date.year);
+    }
+    if (tempMonth >= 4 && tempMonth <= 6) {
+      // this.qtrlyProjectionList[this.qtrlyProjectionList.findIndex(x=>x.OppQTRProjId==0)].OppQuarter="1";
+      obj.OppQuarter = "1";
+    }
+    else if (tempMonth >= 7 && tempMonth <= 9) {
+      obj.OppQuarter = "2";
+      // this.qtrlyProjectionList[this.qtrlyProjectionList.findIndex(x=>x.OppQTRProjId==0)].OppQuarter="2";
+    }
+    else if (tempMonth >= 10 && tempMonth <= 12) {
+      obj.OppQuarter = "3";
+      // this.qtrlyProjectionList[this.qtrlyProjectionList.findIndex(x=>x.OppQTRProjId==0)].OppQuarter="3";
+    }
+    else if (tempMonth >= 1 && tempMonth <= 3) {
+      obj.OppQuarter = "4";
+      // this.qtrlyProjectionList[this.qtrlyProjectionList.findIndex(x=>x.OppQTRProjId==0)].OppQuarter="4";
+    }
+    obj.OppQuarterYear = this.year_list[0];
+    this.qtrlyProjectionList.push(obj);
+
+  }
+  LoadYear() {
+    this.messages = "";
+    let TempDate: Date;
+    let tempyear: number = new Date().getFullYear();
+    let tempYearList: any[] = new Array();
+
+    for (let i = tempyear; i <= new Date().getFullYear() + 10; i++) {
+      let a = i + 1;
+      tempYearList.push(tempyear + "-" + a);
+      this.year_list = tempYearList;
+    }
+  }
+
+  DeleteProjectionDetails(ObjProjection: IAddQuarterProjection) {
+    if (ObjProjection.OppQTRProjId == 0) {
+      this.messages = ValidationMessage.ERROR_DELETE_PROJECTION;
+      this.messageType = "Danger"
+    }
+    else {
+      this.addQuarterProjectionService.DeleteProjectionDetails(this.strUserId, ObjProjection.OppQTRProjId).subscribe(data => {
+        if (data != undefined) {
+          if (data == 1) {
+            this.messages = ValidationMessage.DELETE_PROJECTION;
+            this.messageType = "Success"
+          }
+          //   let index= this.qtrlyProjectionList.indexOf(ObjProjection);
+          //   this.qtrlyProjectionList.splice(index,1);
+
+          // if(this.qtrlyProjectionList.length ==0)
+          // {
+          //   this.AddNewRow();
+          // }
+          this.Populate_QtrlyProjection();
+        }
+      });
+    }
+  }
+
+  Delete() {
+
+    this.qtrlyProjectionList.forEach(element => {
+      if (element.ProjectionStatus == true) {
+      
+    
+    if (element.OppQTRProjId == 0) {
+      this.messages = ValidationMessage.ERROR_DELETE_PROJECTION;
+      this.messageType = "Danger"
+    }
+    else {
+      this.addQuarterProjectionService.DeleteProjectionDetails(this.strUserId, element.OppQTRProjId).subscribe(data => {
+        if (data != undefined) {
+          if (data == 1) {
+            this.messages = ValidationMessage.DELETE_PROJECTION;
+            this.messageType = "Success"
+          }
+          //   let index= this.qtrlyProjectionList.indexOf(ObjProjection);
+          //   this.qtrlyProjectionList.splice(index,1);
+
+          // if(this.qtrlyProjectionList.length ==0)
+          // {
+          //   this.AddNewRow();
+          // }
+          this.Populate_QtrlyProjection();
+        }
+      });
+    }
+  }
+  });
+  }
+
+  NullEmptyCheck(inputVariable: any): boolean {
+
+    if (inputVariable == "" || inputVariable == null || inputVariable == undefined || inputVariable == "0") {
+      return true;
+    }
+    else {
+      return false;
+    }
+
+  }
+  CheckSelectedTCV() {
+    this.addQuarterProjectionService.Populate_QtrlyProjection(this.strOpportunityId).subscribe(data => {
+      if (data != undefined) {
+        this.qtrlyProjectionList = data;
+        if (this.qtrlyProjectionList.length > 0) {
+          this.NewTcv = 0;
+          this.qtrlyProjectionList.forEach(element => {
+            element.OppQuarterRev = String(Number(element.OppQuarterRev) / 1000000.00);
+            this.NewTcv = Number(element.OppQuarterRev) + this.NewTcv;
+          });
+          let remaniningTCV = this.totalContractValue - this.NewTcv;
+          if (remaniningTCV < this.totalContractValue) {
+            this.messages = remaniningTCV + ValidationMessage.REMAINING_PROJECTION_TOTALCONTRACTVALUE;
+            this.messageType = "Danger";
+          }
+        }
+        else {
+          this.AddNewRow();
+        }
+      }
+    });
+  }
+
+  Populate_QtrlyProjection(): void {
+    this.NewTcv = 0;
+    this.addQuarterProjectionService.Populate_QtrlyProjection(this.strOpportunityId).subscribe(data => {
+      if (data != undefined) {
+        this.qtrlyProjectionList = data;
+        if (this.qtrlyProjectionList.length > 0) {
+          this.qtrlyProjectionList.forEach(element => {
+            element.ProjectionStatus=null;
+            element.OppQuarterRev = String(Number(element.OppQuarterRev) / 1000000.00);
+            this.NewTcv = Number(element.OppQuarterRev) + this.NewTcv;
+          });
+        }
+        else {
+          this.AddNewRow();
+        }
+      }
+    });
+  }
+
+}
+
+
