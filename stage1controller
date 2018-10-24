@@ -1,0 +1,118 @@
+//************************************************************************
+//File Name	     : CreateNewOpportunity_Stage1Controller.cs 
+//Created By     : Gnanasigamani,Vinoth,Anand
+//Created Date   : 13-Dec-2017
+//************************************************************************
+using System;
+using System.Collections.Generic;
+using System.Web.Http;
+using RPM_Models;
+using RPM_API.common;
+using RPM_API.lib;
+
+namespace RPM_API.Controllers
+{
+    
+    public class CreateNewOppurtunity_Stage1Controller:ApiController
+    {
+
+        [HttpGet]
+        public List<CreateNewOpportunity> Getstage1(string OpportunityId, string strStageId)
+        {
+            try
+            {
+                List<CreateNewOpportunity> ObjOpportunityUnitID = new List<CreateNewOpportunity>();
+                if (!CheckForNull.IsNullOrEmpty(OpportunityId) && !CheckForNull.IsNullOrEmpty(strStageId))
+                {
+                    ObjOpportunityUnitID = new CreateNewOpportunity().Getstage1(OpportunityId, strStageId);
+                }
+
+                return ObjOpportunityUnitID;
+            }
+
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+        [HttpPost]
+        public List<CreateNewOpportunity> Save_Stage1Opportunity(CreateNewOpportunity ObjCreateNewOpportunity)
+        {
+            try
+            {
+                List<CreateNewOpportunity> strResult = new List<CreateNewOpportunity>();
+                if (!CheckForNull.IsNull(ObjCreateNewOpportunity))
+                {
+                    strResult = new CreateNewOpportunity().Save_Stage1Opportunity(ObjCreateNewOpportunity);
+                }
+                return strResult;
+
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+        [HttpGet]
+        public List<CreateNewOpportunity> GetgenInfoStage1(string OpportunityId, string StageId)
+        {
+            try
+            {
+                List<CreateNewOpportunity> ObjOpportunityUnitID = new List<CreateNewOpportunity>();
+                if (!CheckForNull.IsNullOrEmpty(OpportunityId) && !CheckForNull.IsNullOrEmpty(StageId))
+                {
+                    ObjOpportunityUnitID = new CreateNewOpportunity().GetgenInfoStage1(OpportunityId, StageId);
+                }
+                return ObjOpportunityUnitID;
+            }
+
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+        [HttpGet]
+        public List<CreateNewOpportunity> Get_FnA_stage1(string strOpportunityId, string strStageId)
+        {
+            try
+            {
+                List<CreateNewOpportunity> ObjOpportunityUnitID = new List<CreateNewOpportunity>();
+                if (!CheckForNull.IsNullOrEmpty(strOpportunityId) && !CheckForNull.IsNullOrEmpty(strStageId))
+                {
+                    ObjOpportunityUnitID = new CreateNewOpportunity().Get_FnA_stage1(strOpportunityId, strStageId);
+                }
+                return ObjOpportunityUnitID;
+            }
+
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+        [HttpGet]
+        public List<CreateNewOpportunity> GetOpportunity_Stage1_Resource_sp(string Oppid, int StageID)
+        {
+            try
+            {
+                List<CreateNewOpportunity> ObjOpportunityUnitID = new List<CreateNewOpportunity>();
+                if (!CheckForNull.IsNullOrEmpty(Oppid) )
+                {
+                    ObjOpportunityUnitID = new CreateNewOpportunity().GetOpportunity_Stage1_Resource_sp(Oppid, StageID);
+                }
+                return ObjOpportunityUnitID;
+            }
+
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+
+
+    }
+}
