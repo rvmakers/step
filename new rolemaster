@@ -1,0 +1,255 @@
+
+
+<script>
+  if (self === top) {
+    document.documentElement.style.display = 'block';
+  }
+  else {
+    top.location = self.location;
+  }
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="widget stacked">
+
+        <div class="widget-content">
+          <div class="col-lg-12 col-md-12 col-xs-12">
+            <div *ngIf="isVisible" class="col-md-8 back">
+              <label class="lbl">Role: &nbsp;</label><select [(ngModel)]="roleId" (ngModelChange)="RoleSelection($event)" class="form-control select col-md-3">
+                <option [value]=0>--Select--</option>
+                <option *ngFor="let item of roleList.result" value={{item.Value}}>
+                  {{item.Text}}
+                </option>
+              </select>
+              <div class="col-lg-12 col-md-12 col-xs-12 center clear btndiv">
+                <button type="button" class="btn btn-primary btnpos" (click)="RoleSelected()">Submit</button>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+.ts
+
+import { Component, OnInit } from '@angular/core';
+import { UnitService } from '../Services/Unit-Service';
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { GlobalEventsManager } from '../GlobalEventsManager';
+import { CookieService } from 'ngx-cookie-service';
+import { isNullOrUndefined } from 'util';
+import { Constant } from '../Constant'
+
+@Component({
+  selector: 'app-role-master',
+  templateUrl: './role-master.component.html',
+  styleUrls: ['./role-master.component.css']
+})
+export class RoleMasterComponent implements OnInit {
+
+
+  roleList: any;
+  roleId: any = 0;
+  roleName: any = "";
+  userDetails: any;
+  isVisible: boolean = false;
+  constructor(
+    private unitService: UnitService,
+    private cookieService: CookieService,
+    private router: Router, route: ActivatedRoute,
+    private globalEventsManager: GlobalEventsManager, private constant: Constant) { }
+
+  ngOnInit() {
+    this.globalEventsManager.showNavBar(false);
+    this.SetCookies();
+    this.GetRoles();
+
+  }
+
+  
+
+      
+  SetCookies() {
+    let date = new Date();
+    date.setTime(date.getTime() + (20 * 60 * 1000));
+
+    this.cookieService.set('unitText', btoa(String("CBO")));
+    this.cookieService.set('userUnit', btoa(String("1")));
+    
+  }
+
+
+  GetRoles(): void {
+    
+        this.unitService.GetRoles().subscribe(resultArray => {
+          this.roleList = resultArray;
+
+          if (this.roleList.status == true) {
+
+            let presentRole = this.cookieService.get('userRole');
+            let sessionStorageRole=sessionStorage.getItem('userRole');
+            if (sessionStorageRole == null || sessionStorageRole == undefined || sessionStorageRole == "") {
+              this.AutoSelectRole();
+            }
+            else { this.isVisible = true;}
+          }
+          else {
+            this.cookieService.delete("userRole");
+            this.cookieService.delete("userId");
+            this.cookieService.delete("userName");
+            this.cookieService.delete("unitText");
+            this.cookieService.delete("userUnit");
+
+            sessionStorage.removeItem("userRole");
+            sessionStorage.removeItem("auth-token");
+            window.location.href = this.constant.session ;
+          }
+
+        
+     
+    },
+      error => { throw error; })
+  }
+
+  RoleSelection() {
+
+  }
+
+
+  AutoSelectRole() {
+    if (this.roleList.result.length == 1) {
+
+      if (this.roleList.result[0]["Text"] != undefined && this.roleList.result[0]["Text"] != "") {
+        this.roleName = this.roleList.result[0]["Text"];
+        this.roleId = this.roleList.result[0]["Value"];
+      }
+
+      this.cookieService.set('userRole', btoa(String(this.roleName)));
+      sessionStorage.setItem('userRole', btoa(String(this.roleName)));
+      this.unitService.SetRole(this.roleName);
+    
+      this.unitService.SetRole(this.roleName).subscribe(resultArray => {
+
+        this.unitService.APIAuth().subscribe(result => {
+
+          this.userDetails = result;
+          if (!isNullOrUndefined(this.userDetails) && result.status != false) {
+            let date = new Date();
+            date.setTime(date.getTime() + (20 * 60 * 1000));
+
+            sessionStorage.setItem('auth-token', this.userDetails.result.access_token);
+            this.cookieService.set('userId', btoa(String(this.userDetails.result.UserID)));
+            this.cookieService.set('userName', btoa(String(this.userDetails.result.UserName)));
+
+              this.globalEventsManager.showNavBar(true);
+              this.router.navigate(['Home']);
+          }
+          else {
+            this.cookieService.deleteAll();
+            sessionStorage.clear();
+            window.location.href = this.constant.unAuthorizeURL;
+          }
+
+            },
+              error => { throw error; }
+        )
+      },
+        error => { throw error; }
+      )
+     
+    }
+
+
+    else if (this.roleList.result.length > 1) {
+
+      for (var i = 0; i < this.roleList.result.length; i++) {
+        if (this.roleList.result[i]["Text"] != undefined && this.roleList.result[i]["Text"] != "") {
+          if (this.roleList.result[i]["Text"] == "Administrator") {
+            this.roleName = this.roleList.result[0]["Text"];
+            this.roleId = this.roleList.result[0]["Value"];
+
+            this.cookieService.set('userRole', btoa(String(this.roleName)));
+            sessionStorage.setItem('userRole', btoa(String(this.roleName)));
+             this.unitService.SetRole(this.roleName).subscribe(resultArray => {
+               this.unitService.APIAuth().subscribe(result => {
+
+                 this.userDetails = result;
+                 if (!isNullOrUndefined(this.userDetails) && result.status != false) {
+                   let date = new Date();
+                   date.setTime(date.getTime() + (20 * 60 * 1000));
+
+                   sessionStorage.setItem('auth-token', this.userDetails.result.access_token);
+                   this.cookieService.set('userId', btoa(String(this.userDetails.result.UserID)));
+                   this.cookieService.set('userName', btoa(String(this.userDetails.result.UserName)));
+
+                   this.globalEventsManager.showNavBar(true);
+                   this.router.navigate(['Home']);
+                 }
+                 },
+                 error => { throw error; }
+             )
+            },
+              error => { throw error; }
+             )
+            break;
+          }
+ 
+        }
+      } 
+    }
+  }
+
+  RoleSelected(): void {
+    if (this.roleId != 0 && this.roleId != "" && this.roleId != undefined) {
+      this.SetCookies();
+
+      this.unitService.APIAuth().subscribe(result => {
+
+        this.userDetails = result;
+       
+        if (!isNullOrUndefined(this.userDetails) && result.status != false) {
+          let date = new Date();
+          date.setTime(date.getTime() + (20 * 60 * 1000));
+
+          sessionStorage.setItem('auth-token', this.userDetails.result.access_token);
+          this.cookieService.set('userId', btoa(String(this.userDetails.result.UserID)));
+          this.cookieService.set('userName', btoa(String(this.userDetails.result.UserName)));
+
+          this.roleList.result.forEach((objRole) => {
+            if (objRole.Value == this.roleId) {
+              this.roleName = objRole.Text;
+              this.cookieService.set('userRole', btoa(String(this.roleName)));
+              sessionStorage.setItem('userRole', btoa(String(this.roleName)));
+              this.unitService.SetRole(this.roleName).subscribe(resultArray => {
+
+                this.globalEventsManager.showNavBar(true);
+                this.router.navigate(['Home']);
+              }, error => { throw error; })
+
+            }
+
+          })
+            }
+
+      },
+        error => { throw error; }
+      )
+    }
+  }
+  
+       
+
+      
+
+  
+   
+  
+
+}
