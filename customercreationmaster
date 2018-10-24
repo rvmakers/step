@@ -1,0 +1,441 @@
+<style id="antiClickjack">body{display:none !important;}</style>
+  <script type="text/javascript">
+    if (self === top) {
+        var antiClickjack = document.getElementById("antiClickjack");
+        antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+        top.location = self.location;
+    }
+    </script>
+<div class="wraper">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="col-md-12">
+                <div class="widget stacked">
+                    <ol class="breadcrumb">
+                        <li class="active">
+                            <a class="color-compact">RPM++</a>
+                        </li>
+                        <li class="font-14">{{unitText}}</li>
+                    </ol>
+                    <h1 class="page-header">Customer Master</h1>
+
+                    <div [hidden]="lblError0 =='' ">
+                        <div style="margin-left:-1%" [ngClass]="lblError0=='Success'?'alert alert-success':lblError0=='Danger'?'alert alert-danger':''">
+                            <p class="text-center" style="text-align:left;margin-left:5%" [innerHtml]='successMessage' for="messages">{{successMessage}}</p>
+                        </div>
+                    </div>
+
+
+                    <div class="widget-content borderbox">
+                        <div>
+                            <div class="col-lg-12 col-md-12 col-xs-12">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-2">Customer Name</label>
+                                    <div class="col-md-6">
+
+                                        <input type="text" [(ngModel)]="customerName" class="form-control" maxlength="180" style="margin-left: -6px;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button id="btnSearch" class="btn btn-primary" (click)="SearchCustomerList()" type="button" style="margin-left: 10px;">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">Customer Code</label>
+                                    
+                                        <input type="text" [(ngModel)]="customerCode" class="form-control" maxlength="18">
+                                   
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">Industry Practice</label>
+                                    <app-ddl-industry [(ngModel)]="industryPractice"></app-ddl-industry>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">ISU</label>
+                                    <app-ddlisu [(ngModel)]="isu" [isu]="isu" (ngModelChange)="GetIOU()"></app-ddlisu>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">SUB-IOU</label>
+                                    <app-ddl-sub-iou [(ngModel)]="subiou" [subiou]="subiou" [subiouList]="subiouList"></app-ddl-sub-iou>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-xs-12">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">Customer Type</label>
+                                    <app-customer-type [(ngModel)]="customertype"></app-customer-type>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">Deal Category</label>
+                                    <app-ddl-deal-category [(ngModel)]="dealCategory"></app-ddl-deal-category>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">IOU</label>
+                                    <app-ddliou [(ngModel)]="iou" [iou]="iou" [iouList]="iouList" (ngModelChange)="GetSubIOU()"></app-ddliou>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4">GeographyName</label>
+                                    <app-ddl-geography></app-ddl-geography>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-xs-12 Align_Center">
+
+                                <div class="form-group clearfix">
+
+                                    <button id="btnSave" class="btn btn-primary" (click)="SaveDetails()" type="button">Save</button>
+                                    <button id="btnClear" class="btn btn-default" (click)="Clear()" type="button">Clear</button>
+                                    <button id="btnDelete" class="btn btn-default" (click)="DeleteCustomer()" type="button">Delete</button>
+
+                                </div>
+
+
+                            </div>
+                            <label ID="lblError" class="LABEL_ERRORMSG">{{lblError}}</label>
+                            <label ID="lblSuccess" class="LABEL_SUCCESSMSG">{{lblSuccess}}</label>
+                            <label ID="lblMsg">{{lblMsg}}</label>
+                            <div class="table-responsive" style="text-align: center">
+
+                                <label ID="lblCustList" CssClass="LABEL_CLASS" Font-Bold="True"></label>
+                                <table class="table table-bordered table-striped" name="GridTable">
+                                    <thead style="background: #ccc;border-bottom-width: 0">
+                                        <tr>
+                                            <th>Select</th>
+                                            <th>Customer Name</th>
+                                            <th>Deal Category</th>
+                                            <th>Geography Name</th>
+                                            <th>Customer Type Name</th>
+                                            <th>Industry Practice Name</th>
+                                            <th>ISU Name</th>
+                                            <th>IOU Name</th>
+                                            <th>SUB IOU Name</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr *ngFor="let cust of customerCreationList|paginate:{itemsPerPage:10,currentPage:p,id:'first'}; let i = index">
+                                            <td><input type="checkbox" value="{{cust.CustomerId}}" [(ngModel)]="cust.Customercheckbox"></td>
+                                            <td><a [routerLink]="['/CustomerCreationMaster']" (click)="onLinkSelect(cust)">{{cust.CustomerName}}</a></td>
+                                            <td>{{cust.DealCategoryName}}</td>
+                                            <td>{{cust.GeographyName}}</td>
+                                            <td>{{cust.CustomerTypeName}}</td>
+                                            <td>{{cust.IndustryPraticeName}}</td>
+                                            <td>{{cust.ISUMainName}}</td>
+                                            <td>{{cust.ISUName}}</td>
+                                            <td>{{cust.SubISUName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination-controls (pageChange)="p=$event" id="first"></pagination-controls>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- </form>   -->
+    </div>
+</div>
+
+
+.ts
+
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import {CustomerCreationService} from '../Services/CustomerCreation.Service';
+import { ISU } from '../Interface/ISU/ISU';
+import { ICustomerCreation } from '../Interface/Customer/CustomerCreation';
+import {DdlIOUComponent} from '../UserControls/DdlIOU/DdlIOU.Component';
+import {ISUService} from '../Services/ISU.Service';
+import { CustomerTypeComponent } from '../UserControls/DdlCustomerType/customer-type.component';
+import { DdlIndustryComponent } from '../UserControls/DdlIndustryPractice/ddl-industry.component';
+import { DdlDealCategoryComponent } from '../UserControls/DdlDealCategory/ddl-deal-category.component';
+import { DdlGeographyComponent } from '../UserControls/DdlGeography/ddl-geography.component';
+import { DdlISUComponent } from '../UserControls/ddlISU/ddlISU.Component';
+import { DdlSubIouComponent } from '../UserControls/DdlSubIOU/ddl-sub-iou.component';
+import {Constant} from '../Constant'
+import { CookieService } from 'ngx-cookie-service';
+
+@Component({
+    selector: 'app-customer-creation-master.component',
+    templateUrl: './Customer-Creation-Master.Component.html',
+    styleUrls: ['./Customer-Creation-Master.Component.css']
+})
+export class CustomerCreationMasterComponent implements OnInit {
+    @ViewChild(DdlIOUComponent) IOUComp: DdlIOUComponent;
+    @ViewChild(DdlIndustryComponent) DdlInd: DdlIndustryComponent;
+    @ViewChild(DdlDealCategoryComponent) DealCat: DdlDealCategoryComponent;
+    @ViewChild(CustomerTypeComponent) CustType: CustomerTypeComponent;
+    @ViewChild(DdlGeographyComponent) DdlGeo: DdlGeographyComponent;
+    @ViewChild(DdlISUComponent) DdlISU: DdlISUComponent;
+    @ViewChild(DdlSubIouComponent) DdlSubIOU: DdlSubIouComponent;
+
+
+    industryPractice: number;
+    isu: number;
+    iou: number;
+    customertype: number;
+    subiou: number;
+    isuList: ISU[];
+    iouList: ISU[];
+    subiouList: ISU[];
+    customerCreationList: ICustomerCreation[];
+    status: number;
+    dealCategory: number;
+    customerName: string;
+    customerCode: string;
+    noofCustomer: number;
+    userId: string;
+    p: number;
+    @Input() lblError: string;
+    @Input() lblSuccess: string;
+    @Input() lblMsg: string;
+    lblError0:any;
+    successMessage:any;
+    customerID: number;
+    unitText: string = String(atob(this.cookieService.get(('unitText'))));
+    userUnit:string=String(atob(this.cookieService.get(('userUnit'))));
+    deleteConfirmation:number;
+    constructor(private isuService: ISUService, private customercreationservice: CustomerCreationService,
+        private constant: Constant,  private cookieService: CookieService) { }
+
+    ngOnInit() {
+        ;
+        this.isu = 0;
+        this.iou = 0;
+        this.customertype = 0;
+        this.GetCustomerList();
+        this.lblError = "";
+        this.lblSuccess = "";
+        this.userId = this.cookieService.get('userId');
+        this.lblError0="";
+        
+    }
+
+
+    GetISUMain() {
+
+        this.isuService.GetISUMain(this.userUnit).subscribe(
+
+            resultArray => this.isuList = resultArray,
+             error =>{ throw error;},
+        )
+    }
+
+    GetIOU() {
+
+        this.isuService.GetIOU(this.userUnit,this.isu).subscribe(
+
+            resultArray => this.iouList = resultArray,
+             error =>{ throw error;},
+        )
+    }
+
+    GetSubIOU() {
+
+        this.isuService.GetSubIOU(this.iou).subscribe(
+            resultArray => this.subiouList = resultArray,
+             error =>{ throw error;},
+        )
+    }
+
+
+
+    GetCustomerList(): void {
+        this.customercreationservice.GetCustomerList().subscribe(resultArray => {
+            this.customerCreationList = resultArray;
+            
+        },
+             error =>{ throw error;}
+        )
+    }
+
+    SearchCustomerList() {
+
+        this.lblError = "";
+        this.lblSuccess = "";
+        this.lblError0="";
+        this.customercreationservice.SearchCustomerData(this.customerName, this.DdlInd.industryPractice, this.CustType.customertype, this.DdlGeo.geography,
+            this.iou, this.isu, this.DdlSubIOU.subiou).subscribe(
+            resultArray => this.customerCreationList = resultArray,
+             error =>{ throw error;},
+        )
+        // if (this.customerCreationList.length==0)
+        // {
+        // this.lblSuccess="";
+        // this.lblError="No Records Found.";
+        // this.lblMsg="";
+        // return;
+        // }
+        // else
+        // {
+        //   this.lblSuccess="";
+        //   this.lblError="";
+        // this.lblMsg="List of Closest Match Customers Available in RPM.";
+        // }
+    }
+
+    onLinkSelect(cust: any[]) {
+
+        this.lblError = "";
+        this.lblSuccess = "";
+        this.lblError0="";
+        //cust.forEach(function (value) {
+        this.customerID = cust["CustomerId"];
+        this.customerName = cust["CustomerName"];
+        this.customerCode = cust["CustomerCode"];
+        if (cust["IndustryPracticeID"] != "0")
+            this.DdlInd.ip = cust["IndustryPracticeID"];
+        if (cust["CustomerTypeID"] != "0")
+            this.CustType.custType = cust["CustomerTypeID"];
+        if (cust["DealCategoryID"] != "0")
+            this.DealCat.dealCategory = cust["DealCategoryID"];
+        if (cust["GeographyID"] != "0")
+            this.DdlGeo.geography = cust["GeographyID"];
+        if (cust["ISUMainCD"] != "0")
+            this.isu = cust["ISUMainCD"];
+        if (cust["ISUMainCD"] != "0") {
+            this.GetIOU()
+            this.iou = cust["ISUCD"]
+        }
+        if (cust["ISUCD"] != "0") {
+            this.GetSubIOU()
+            this.DdlSubIOU.subiou = cust["SubISUCD"]
+        }
+
+
+    }
+
+    DeleteCustomer() {
+        this.customerCreationList.forEach(
+            x => {
+                if (x.Customercheckbox != undefined)
+                {
+                    if (x.Customercheckbox = true) 
+                    this.DeleteCustomerData(x.CustomerId)
+                    }
+                console.log(x.Customercheckbox)
+
+            }
+        )
+        this.customerCreationList = [];
+        this.GetCustomerList();
+       if(this.deleteConfirmation==1)
+       {
+        this.lblError0="Success";
+        this.successMessage="Customer Deleted Sucessfully.";
+       }
+    }
+
+    DeleteCustomerData(CustomerID: number) {
+
+        this.customercreationservice.DeleteCustomerData(CustomerID).subscribe(
+            resultArray => this.deleteConfirmation = resultArray,
+             error =>{ throw error;},
+        )
+    }
+
+    checkAll(ev) {
+        this.customerCreationList.forEach(x => x.Customercheckbox = ev.target.checked)
+    }
+
+
+
+    Clear() {
+        this.customerName = "";
+        this.customerCode = "";
+        this.DdlInd.ip = 0;
+        this.CustType.custType = 0;
+        this.DealCat.dealCategory = 0;
+        this.DdlGeo.geography = 0;
+        this.isu = 0;
+        this.iou = 0;
+        this.DdlSubIOU.subiou = 0;
+        this.GetCustomerList();
+    }
+
+    SaveDetails() {
+        if (this.customerName == "" || this.customerName == undefined) {
+            this.lblError0="Danger";
+            this.successMessage = "Please Enter Customer Name";
+          
+            return;
+        }
+        if (this.customerCode == "" || this.customerCode == undefined) {
+            this.lblError0="Danger";
+            this.successMessage = "Please Enter Customer Code";
+          
+            return;
+        }
+        if (this.CustType.custType == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select Customer Type";
+           
+            return;
+        }
+        if (this.DdlInd.ip == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select Industry Practice";
+            return;
+        }
+        if (this.DealCat.dealCategory == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select Deal Category";
+            return;
+        }
+        if (this.isu == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select ISU";
+            return;
+        }
+        if (this.iou == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select IOU";
+            return;
+        }
+        if (this.DdlSubIOU.subiou == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please Enter Sub Iou";
+            return;
+        }
+        if (this.DdlGeo.geography == 0) {
+            this.lblError0="Danger";
+            this.successMessage = "Please select Geography";
+            return;
+        }
+        if (this.customerID == 0 || this.customerID == undefined)
+            this.customerID = -1
+
+        let CustomerDetails: any = {
+            CustomerID: this.customerID, CustomerCode: this.customerCode, CustomerName: this.customerName,
+            GeographyID: this.DdlGeo.geography, IndustryPracticeID: this.DdlInd.ip,
+            CustomerTypeID: this.CustType.custType, ISUCD: this.iou, UserID: this.userId,
+            DealCategoryID: this.DealCat.dealCategory, ISUMainCD: this.isu, SubISUCD: this.DdlSubIOU.subiou
+        }
+
+        this.customercreationservice.InsertCustomerData
+            (this.customerID, this.customerCode, this.customerName, this.DdlInd.ip, this.CustType.custType, this.DdlGeo.geography,
+            this.iou, this.isu, this.DdlSubIOU.subiou, this.DealCat.dealCategory, this.userId)
+            .subscribe(resultArray => {
+               this.status = resultArray;
+                if (this.status == 1) {
+                    this.GetCustomerList();
+                   
+                    this.lblError0="Success";
+                    this.successMessage="Data Inserted Successfully";
+                }
+                if (this.status == 2) {
+                    this.GetCustomerList();
+                   
+                    this.lblError0="Success";
+                    this.successMessage="Data Updated Successfully";
+                }
+            },  error =>{ throw error;}, )
+            this.Clear();
+    }
+
+
+}
+
