@@ -1,0 +1,52 @@
+childmenufilter
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { IMenu } from '../Interface/Menu';
+
+@Pipe({
+  name: 'childmenufilter'
+})
+export class ChildMenuFilterPipe implements PipeTransform {
+
+  transform(childMenu:IMenu[],parentMenu) {
+    return childMenu.filter((childMenu=>childMenu.ParentMenuId==parentMenu.MenuId
+                             &&  childMenu.ChildPresent==false));
+    
+  }
+
+}
+
+
+menufilter
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { IMenu } from '../interface/menu';
+
+@Pipe({
+  name: 'withoutchildmenu'
+})
+export class MenuFilterPipe implements PipeTransform {
+
+  transform(Menu:IMenu[]) {
+    return Menu.filter(Menu=>Menu.ChildPresent==false &&  Menu.ParentMenuId==0);
+  }
+
+}
+
+
+menuwithchildfilter
+
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { IMenu } from '../Interface/Menu';
+
+@Pipe({
+  name: 'withchildmenu'
+})
+export class MenuWithChildFilterPipe implements PipeTransform {
+
+  transform(Menu:IMenu[]) {
+    return Menu.filter((Menu=>Menu.ChildPresent==true &&  Menu.ParentMenuId==0));
+  }
+
+}
