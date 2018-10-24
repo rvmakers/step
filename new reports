@@ -1,0 +1,506 @@
+<style>
+  html {
+    display: none;
+  }
+</style>
+<script>
+  if (self === top) {
+    document.documentElement.style.display = 'block';
+  }
+  else {
+    top.location = self.location;
+  }
+</script>
+<div class="wraper">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+      <div class="posr">
+        <ol class="breadcrumb">
+          <li class="active">
+            <a routerLink="/Home" class="color-compact">Home</a>
+          </li>
+          <li class="font-14">{{unitText}}</li>
+        </ol>
+        <p class="page-header" style="margin-left: 16px;">PreSales Report</p>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="panel  panel-default">
+      <div class="panel-heading">
+        <div class="row mar-top-20">
+          <app-lbl-message [MessageType]="messageType" [Messages]="messages"></app-lbl-message>
+          <div class="col-md-4">
+
+            <div class="btn-group navbar-btn" id="drpdown">
+              <button name="reportType" type="button" class="btn btn-grey">
+                <span id="spnselect">  <i class="fa fa-files-o "></i> Choose a Report</span>
+              </button>
+              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only"></span>
+              </button>
+              <ul class="dropdown-menu">
+
+                <li (click)="SetReportType('Deal Tracker');$event.stopPropagation();">
+                  <a href="javascript:void(0)">
+                    <span>  <i class="fa fa-file-o "></i> Deal Tracker</span>
+                  </a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li (click)="SetReportType('Deal Dump');$event.stopPropagation();">
+                  <a href="javascript:void(0)">
+                    <span>  <i class="fa fa-file-o "></i> Deal Dump</span>
+                  </a>
+                </li>
+
+              </ul>
+            </div>
+
+          </div>
+          <div class="col-md-2">
+
+            <div style="float:left;">
+              <div class="btn-group btn-toggle">
+                <button (click)="CheckReportBy('closed')" id="ReportByClose" class="btn btn-default">Closure</button>
+                <button (click)="CheckReportBy('created')" id="ReportByCreate" class="btn btn-default">Created</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="btn-group" data-toggle="buttons">
+              <my-date-picker name="mydate" [options]="myDatePickerOptions" [(ngModel)]="mydate" (dateChanged)="onDateChanged($event)" required></my-date-picker>
+              <my-date-range-picker name=" mydaterange " [options]="myDateRangePickerOptions " [(ngModel)]="mydaterange" (dateRangeChanged)="onDateRangeChanged($event)" required></my-date-range-picker>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="col-md-3"> <button class="btn btn-success" (click)="GetDealTracker()">Generate</button></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="panel-body">
+        <div class="page-label">Filters</div>
+        <div class="sec-filter">
+          <div class="row">
+            <div class="col-md-3" id="dvFltGeo">
+              <label for="geo">Geography</label>
+              <angular2-multiselect [data]="ddlGeo" name="geo" [(ngModel)]="selectedGeo" [settings]="dropdownSettings"></angular2-multiselect>
+            </div>
+            <div class="col-md-3" id="dvFltIndPr">
+              <label for="industryPractice">Industry Practice</label>
+              <angular2-multiselect name="industryPractice" [data]="ddLIP" [(ngModel)]="selectedIP" [settings]="dropdownSettings"></angular2-multiselect>
+            </div>
+            <div class="col-md-3" id="dvFltTrack">
+              <label for="trackedBy">Tracked By</label>
+              <angular2-multiselect name="trackedBy" [data]="ddLTrackedBy" [(ngModel)]="selectedTrackedBy" [settings]="comboSettings"></angular2-multiselect>
+            </div>
+            <div class="col-md-3" id="dvFltStage">
+              <label for="stage">Stage</label>
+              <angular2-multiselect name="stage" [data]="ddLStage" [(ngModel)]="selectedStage" [settings]="dropdownSettings"></angular2-multiselect>
+            </div>
+          </div>
+
+        </div>
+        <div class="page-label" style="padding-top:10px;"></div>
+        <div class="report-container">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+.ts
+
+//************************************************************************
+//File Name	     : NewOpportunity.Component.ts 
+//Description    : It's for displaying reports based on parameters
+//Created By     : Amul,Chandan 
+//************************************************************************
+
+import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
+import { HttpClient, HttpResponse, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http/src/response';
+import { Subject } from 'rxjs';
+import { map } from 'rxjs/operator/map';
+import { IMyDrpOptions,IMyDateRangeModel } from 'mydaterangepicker';
+import { IMyDpOptions, IMyDateModel } from 'mydatepicker';
+import * as moment from 'moment';
+import { CookieService } from 'ngx-cookie-service';
+import {Apiroutes} from '../Services/Apiroutes';
+import { ValidationMessage } from '../ValidationMessage/validation-message';
+import { DatePipe } from '@angular/common'
+declare var $: any;
+
+
+var dt = 'datatables.net';
+let date = new Date();
+
+@Component({
+  selector: 'app-reports',
+  templateUrl: './reports.component.html',
+  styleUrls: ['./reports.component.css'],
+  encapsulation: ViewEncapsulation.None
+})
+export class ReportsComponent implements OnInit {
+  messageType: string = '';
+  messages: string;
+  rootNode: any;
+  ddlGeo = [];
+  ddLIP = [];
+  ddLStage = [];
+  ddLTrackedBy = [];
+  reportList = [];
+  ddLWinLoss=[];
+  selectedGeo = [];
+  selectedIP = [];
+  selectedStage = [];
+  selectedTrackedBy = [];
+  selectedWinLoss=[];
+  dropdownSettings = {};
+  comboSettings = {};
+  disable: boolean=true;
+
+  
+  unitText: string = String(atob(this.cookieService.get(('unitText'))));
+  userUnit:any = atob(this.cookieService.get('userUnit'));
+  userId:any =  atob(this.cookieService.get('userId'));
+  geographies: any;
+  selected = null;
+  myDateRangePickerOptions: IMyDrpOptions = {
+
+    dateFormat: 'dd.mmm.yyyy',
+  };
+  myDatePickerOptions: IMyDpOptions = {
+
+    dateFormat: 'dd.mmm.yyyy',
+  };
+  public mydaterange: any = {
+    beginDate: { year: moment().year() - 1, month: moment().month() + 1, day: date.getDate()+1 },
+    endDate: { year: date.getFullYear(), month: date.getMonth()+1, day: date.getDate() },
+    
+  };
+  public mydate: any = {
+    date: { year: date.getFullYear() - 1, month: date.getMonth() + 1, day: date.getDate() +1 }
+  };
+  
+  private reportType: any;
+  private reportBy: any;
+
+  
+  constructor(rootnode: ElementRef, private http: HttpClient,private cookieService:CookieService,private apiroutes:Apiroutes,public datepipe: DatePipe) {
+    this.rootNode = rootnode;
+
+  }
+  onDateRangeChanged(event: IMyDateRangeModel) {
+    this.mydaterange.beginJsDate = moment().set({ 'year': this.mydaterange.beginDate.year, 'month': this.mydaterange.beginDate.month - 1, 'date': this.mydaterange.beginDate.day });
+    this.mydaterange.endJsDate = moment().set({ 'year': this.mydaterange.endDate.year, 'month': this.mydaterange.endDate.month - 1, 'date': this.mydaterange.endDate.day });
+
+  }
+  onDateChanged(event: IMyDateModel) {
+    this.mydate.jsDate = moment().set({ 'year': this.mydate.date.year, 'month': this.mydate.date.month - 1, 'date': this.mydate.date.day });
+  }
+  CheckReportBy(e: string) {
+    this.reportBy = e;
+    if (e == 'closed') {
+
+      $('#ReportByClose').removeClass('btn-default');
+      $('#ReportByClose').addClass('btn-primary active');
+      $('#ReportByCreate').removeClass('btn-primary active');
+      $('#ReportByCreate').addClass('btn-default');
+      $('my-date-picker').hide();
+      $('my-date-range-picker').show();
+    }
+
+    else if (e == 'created') {
+
+      $('#ReportByCreate').removeClass('btn-default');
+      $('#ReportByCreate').addClass('btn-primary active');
+      $('#ReportByClose').removeClass('btn-primary active');
+      $('#ReportByClose').addClass('btn-default');
+      $('my-date-picker').show();
+      $('my-date-range-picker').hide();
+    }
+  }
+
+  ngOnInit() {
+    this.userUnit = atob(this.cookieService.get('userUnit'));
+    $('my-date-picker').hide();
+    this.dropdownSettings = {
+      singleSelection: false,
+      text: "Select",
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      enableSearchFilter: false,
+      badgeShowLimit: 1,
+      classes: "myclass .multi-class",
+      labelKey: "item"
+    };
+
+    this.comboSettings = {
+      singleSelection: true,
+      text: "Select",
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      enableSearchFilter: false,
+      classes: "myclass multi-class",
+      labelKey: "item"
+    };
+    $('#ReportByClose').removeClass('btn-default');
+    $('#ReportByClose').addClass('btn-primary active');
+    this.reportBy = "closed";
+    this.http.get(this.apiroutes.geographyapi)
+      .map((resp: Array<any>) => {
+        this.ddlGeo = resp;
+      }).subscribe();
+
+    this.http.get(this.apiroutes.multiselectindustrypracticeapi)
+      .map((resp: Array<any>) => {
+        this.ddLIP = resp;
+      }).subscribe();
+
+    this.http.get(this.apiroutes.GetStageReportApi+"?unit="+this.userUnit)
+      .map((resp: Array<any>) => {
+        this.ddLStage = resp;
+
+        this.selectedStage = this.ddLStage.filter((x) => { return x.id < 9; });
+
+
+
+      }).subscribe();
+
+    this.ddLTrackedBy = [
+      { "id": "NEW", "itemName": "Presales" },
+      { "id": "RAMPUP", "itemName": "Delivery" }
+    ];
+
+    this.mydaterange.beginJsDate = moment().set({ 'year': this.mydaterange.beginDate.year, 'month': this.mydaterange.beginDate.month-1, 'date': this.mydaterange.beginDate.day });
+    this.mydaterange.endJsDate = moment().set({ 'year': this.mydaterange.endDate.year, 'month': this.mydaterange.endDate.month-1, 'date': this.mydaterange.endDate.day });
+    this.mydate.jsDate = moment().set({ 'year': this.mydate.date.year, 'month': this.mydate.date.month - 1, 'date': this.mydate.date.day });
+    
+  this.ddLWinLoss=[
+  
+    {"id":"W","itemName":"WIN"},
+    {"id":"L","itemName":"LOSS"}
+  ]
+  }
+
+  ngAfterViewChecked() {
+
+    
+  }
+
+  SetReportType(report:any){
+    this.reportType=report;
+    $('#drpdown').removeClass('open');
+    
+        if(report=="Deal Tracker")
+        {
+          this.reportType="Deal Tracker";
+          $("#dvFltTrack").show();
+          $("#dvFltStage").show();
+          $('#spnselect').html('<i class="fa fa-file-o "></i> Deal Tracker');
+          $("#dvFltGeo").show();
+          $("#dvFltIndPr").show();
+          $("#dvFltWinLoss").hide();
+        }
+        else if(report=="Deal Dump"){
+          
+          $("#dvFltTrack").hide();
+          $("#dvFltStage").hide();
+          $('#spnselect').html('<i class="fa fa-file-o "></i> Deal Dump');
+          $("#dvFltGeo").show();
+          $("#dvFltIndPr").show();
+          $("#dvFltWinLoss").hide();
+
+        }
+        else if(report=="Win-Loss")
+        {
+          $("#dvFltStage").hide();
+          $("#dvFltTrack").show();
+          $("#dvFltGeo").show();
+          $("#dvFltIndPr").show();
+          $("#dvFltWinLoss").show();
+        }
+        else if(report=="PIBS")
+        {
+          $("#dvFltStage").hide();
+          $("#dvFltTrack").hide();
+          $("#dvFltGeo").hide();
+          $("#dvFltIndPr").hide();
+          $("#dvFltWinLoss").hide();
+        
+  }
+  }
+
+
+  GetDealTracker() {
+    $(".report-container").html('');
+    var startDt, reportTitle;
+    reportTitle = this.reportType;
+    this.messages = '';
+    this.messageType = '';
+    
+    if (reportTitle === undefined) {
+     
+      this.messages = ValidationMessage.Report_Type;
+      this.messageType = ValidationMessage.LBL_MESSAGE_ERROR_TYPE;
+     
+      return;
+    } 
+
+    var table = $.fn.dataTable.fnTables();
+    var startDt;
+    if (table.length > 0) {
+      $(table).empty();
+    }
+    if (this.reportBy == "closed") {
+      
+      startDt = this.datepipe.transform(this.mydaterange.beginJsDate, 'yyyyMMdd');
+      //startDt = moment.unix(this.mydaterange.beginEpoc).format('YYYYMMDD');
+    }
+    else if (this.reportBy == "created") {
+      //startDt = moment.utc(this.mydate.date).format('YYYYMMDD');
+      startDt = this.datepipe.transform(this.mydate.jsDate, 'yyyyMMdd');
+    }
+    else {
+     
+      if(this.mydaterange.endDate !="")
+      {
+      this.messages = ValidationMessage.ClosureDate;
+      this.messageType = ValidationMessage.LBL_MESSAGE_ERROR_TYPE;
+     
+      return;
+    }
+    else{
+      this.messages = '';
+      this.messageType = ''
+    }
+    
+  }
+    if(this.mydaterange.endDate !="" || this.mydaterange.endDate !=undefined)
+    {
+
+      let oppToDate : any;
+      let tDay : any = this.mydaterange.beginDate.day.toString();
+      let tMonth : any = this.mydaterange.beginDate.month.toString();
+      let tYear : any = this.mydaterange.beginDate.year.toString();
+      let dateString = tMonth+'.' + tDay+'.'+ tYear;
+      oppToDate = new Date(dateString);
+      let oppFromDate :any; 
+      tDay  = this.mydaterange.endDate.day.toString();
+      tMonth  = this.mydaterange.endDate.month.toString();
+      tYear  = this.mydaterange.endDate.year.toString();
+      dateString = tMonth+'.' + tDay+'.'+ tYear;
+      oppFromDate = new Date(dateString);
+      let diff: any = new Date(oppFromDate-oppToDate);
+      diff = Math.floor(diff / 1000 / 60 / 60 / 24);
+      if(diff>365){
+        this.messages = ValidationMessage.LBL_ERROR_TIME_PERIOD;
+        this.messageType = ValidationMessage.LBL_MESSAGE_ERROR_TYPE;
+       return;
+      }
+      else{
+        this.messages = '';
+        this.messageType = '';
+      }
+    }
+
+    this.http.post(this.apiroutes.GetClosureDate,
+      {
+
+        reportType: this.reportType,
+        reportBy: this.reportBy,
+        SelectedGeo: this.selectedGeo,
+        SelectedIP: this.selectedIP,
+        SelectedStage: this.selectedStage,
+        SelectedTrackedBy: this.selectedTrackedBy,
+        SelectedWinLoss:this.selectedWinLoss,
+        startDate: startDt,
+        endDate: this.datepipe.transform(this.mydaterange.endJsDate, 'yyyyMMdd'),
+        unitID: this.userUnit,
+        userID: this.userId
+      }
+    )
+      .subscribe(result => {
+        var $data = $('<table id="reporttable" cellspacing="0" width="100%"></table>').addClass('table table-striped table-condensed dataTable cell-border');
+        var header = "<thead><tr></tr></thead>";
+        $data.append(header);
+        $('.report-container').html($data);
+
+        var titlename = this.reportType;
+
+        var filename = titlename + ' ' + moment().format('MMDDYYYYHH:mm');
+        var data, tableName = '#reporttable', columns, str, msg, i
+        columns = [];
+        data = result;
+
+        $.each(data.columns, function (k, colObj) {
+          colObj = colObj.replace(/#/g, ' ');
+          columns.push({ 'data': colObj });
+          str = '<th>' + colObj + '</th>';
+          $(str).appendTo(tableName + '>thead>tr');
+        });
+
+        $(tableName).dataTable({
+          "destroy": true,
+          "columnDefs": [{
+            "defaultContent": "-",
+            "targets": "_all"
+          }],
+          "language": {
+            "emptyTable": "No records available.",
+          },
+          "dom": "<'dt-toolbar'<'col-xs-12 col-sm-6'fB><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+            "t" +
+            "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+
+          "buttons": [
+
+            {
+              extend: 'copyHtml5',
+              text: '<i class="fa fa-files-o fa-2x"></i>',
+              titleAttr: 'Copy'
+            }, {
+              extend: 'csvHtml5',
+              text: '<i class="fa fa-file-text-o fa-2x"></i>',
+              titleAttr: 'CSV',
+              title: filename
+            }, {
+              extend: 'excelHtml5',
+              text: '<i class="fa fa-file-excel-o fa-2x"></i>',
+              titleAttr: 'Excel',
+              filename: filename,
+              title: '',
+              customize: function (xlsx) {
+                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                $('row:first c', sheet).attr('s', '32');
+
+              }
+
+            },
+          ],
+          "scrollY": 400,
+          "scrollX": true,
+          "data": data.data,
+          "columns": columns,
+          "fnInitComplete": function () {
+            // Event handler to be fired when rendering is complete (Turn off Loading gif for example)
+            $('.dataTables_scrollBody thead tr').css({ visibility: 'collapse' });
+
+
+          }
+        });
+
+      }
+
+      );
+
+
+  }
+
+}
+
