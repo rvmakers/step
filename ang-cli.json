@@ -1,0 +1,106 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "RPM++"
+  },
+  "apps": [
+    {
+      "root": "src",
+      "outDir": "RPMPublish",
+      "assets": [
+        "assets",
+        "favicon.ico",
+        "images/background.png",
+        "images/Expired.jpg",
+        "images/fnA_logo.png",
+        "images/info-32.png",
+        "images/info-48.png",
+        "images/itenShared.jpg",
+        "images/loginBg.png",
+        "images/note2.png",
+        "images/NumOfReplies.jpg",
+        "images/password.png",
+        "images/pin.png",
+        "images/PostedQues.jpg",
+        "images/searchicon.png",
+        "images/TataLogo.png",
+        "images/TCSLogo.png",
+        "images/tiny_grid.png",
+        "images/updownArrow.png",
+        "images/user.png",
+        "images/ui-bg_highlight-soft_100_eeeeee_1x100.png",
+        "images/ui-icons_ffffff_256x240.png",
+        "images/table_image.gif",
+        "images/table_bg.gif",
+        "images/table_bg2.gif",
+        "images/table_bg1.gif",
+        "images/table_bg3.gif",
+        "images/info.png",
+        "images/table_bg2.gif",
+        "images/table_bg3.gif",
+        "images/table_bg1.gif",
+        "images/table_bg.gif"
+      ],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/font-awesome/css/font-awesome.css",
+        "styles.css",
+        "css/google-font.css",
+        "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+        "../node_modules/datatables.net-dt/css/jquery.dataTables.css",
+        "../node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css"
+      ],
+      "scripts": [
+        "../node_modules/jquery/dist/jquery.min.js",
+        "../node_modules/bootstrap/dist/js/bootstrap.min.js",
+        "../node_modules/datatables.net/js/jquery.dataTables.js",
+        "../node_modules/datatables.net-buttons/js/dataTables.buttons.js",
+        "../node_modules/jszip/dist/jszip.min.js",
+        
+        "../node_modules/datatables.net-buttons/js/buttons.html5.js",
+        "../node_modules/datatables.net-buttons/js/buttons.print.js"
+        
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "src/tsconfig.app.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "src/tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "e2e/tsconfig.e2e.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "css",
+    "component": {}
+  }
+}
