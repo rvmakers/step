@@ -1,0 +1,277 @@
+import { AppRoutingModule } from "./app-routing.module";
+import { SystemModule } from './system.module';
+import { NgModule, ErrorHandler } from '@angular/core';
+import { AppComponent } from './app.component';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FooterComponent } from './UserControls/Footer.Component/Footer.Component';
+import { MenuComponent } from './UserControls/Menu.Component/Menu.Component';
+import { CustomerCreationMasterComponent } from './Customer-Creation-Master.Component/Customer-Creation-Master.Component';
+import { HomeComponent } from './Home/Home.Component';
+import { NewopportunityComponent } from './NewOpportunity/NewOpportunity.Component';
+import { MenuService } from './Services/Menu.Service';
+import { DdlISUComponent } from './UserControls/ddlISU/ddlISU.Component';
+import { ISUService } from './Services/ISU.Service';
+import { Apiroutes } from './Services/Apiroutes';
+import { DdlIOUComponent } from './UserControls/DdlIOU/DdlIOU.Component';
+import { Constant } from './Constant';
+import { ValidationMessage } from './ValidationMessage/validation-message'
+import { CustomerTypeService } from './Services/CustomerType.service';
+import { PresalesComponent } from './PreSales/presales.component';
+import { CreateNewOpportunityService } from './Services/CreateNewOpportunity.service';
+import { DdlDealCategoryComponent } from './UserControls/DdlDealCategory/ddl-deal-category.component';
+import { DealCategoryService } from './Services/DealCategory.service';
+import { DdlClusterComponent } from './UserControls/DdlCluster/ddl-cluster.component';
+import { ClusterService } from './Services/Cluster.service';
+import { DdlServiceComponent } from './UserControls/DdlService/ddl-service.component';
+import { Service } from './Services/Service.service';
+import { DdlCountryComponent } from './UserControls/DdlCountry/ddl-country.component';
+import { CountryService } from './Services/Country.service';
+import { DdlGeographyComponent } from './UserControls/DdlGeography/ddl-geography.component';
+import { GeographyService } from './Services/Geography.service';
+import { DdlDealOwner1Component } from './UserControls/DdlDealOwner1/ddl-deal-owner1.component';
+import { DealOwner1Service } from './Services/DealOwner1.service';
+import { DdlDealOwner2Component } from './UserControls/DdlDealOwner2/ddl-deal-owner2.component';
+import { DealOwner2Service } from './Services/DealOwner2.service';
+import { GeographySalesOwnerComponent } from './UserControls/DdlGeographySalesOwner/geography-sales-owner.component';
+import { GeographySalesOwnerService } from './Services/GeographySalesOwner.service'
+import { AccountSalesOwnerComponent } from './UserControls/DdlAccountSalesOwner/account-sales-owner.component';
+import { AccountSalesOwnerService } from './Services/AccountSalesOwner.service';
+import { DdlSubIouComponent } from './UserControls/DdlSubIOU/ddl-sub-iou.component';
+import { DdlVerticalComponent } from './UserControls/DdlVertical/ddl-vertical.component'
+import { VerticalService } from './Services/Vertical.service';
+import { DdlBpsofferingComponent } from './UserControls/DdlBPSOffering/ddl-bpsoffering.component'
+import { BpsofferingService } from './Services/BPSOffering.service';
+import { IndustryPracticeComponent } from './UserControls/DdlIndustryPractice/industry-practice.component';
+import { ExecutiveSponsorComponent } from './UserControls/DdlExecutiveSponsor/executive-sponsor.component';
+import { ExecutiveSponsorService } from './Services/ExecutiveSponsor.service';
+import { DdlDealStageComponent } from './UserControls/DdlDealstage/ddl-deal-stage.component';
+import { DdlDealStageService } from './Services/DealStage.service';
+import { DdlOffshorePresalesLeadHorizontalComponent } from './UserControls/Ddloffshorepresalesleadhorizontal/ddl-offshore-presales-lead-horizontal.component';
+import { OffshorePresalesLeadhorizontalService } from './Services/offshore-presales-lead–horizontal.service';
+import { DdlOffshorePresalesLeadVerticalComponent } from './UserControls/Ddloffshorepresalesleadvertical/ddl-offshore-presales-lead-vertical.component';
+import { OffshorePresalesLeadVerticalService } from './Services/offshore-presales-lead-vertical.service';
+import { DdlValusBpsComponent } from './UserControls/DdlValueBPS/ddl-valus-bps.component';
+import { ValueBpsService } from './Services/value-bps.service';
+import { DdlGetDigitalTransformationComponent } from './UserControls/DdlGetDigitalTransformation/ddl-get-digital-transformation.component'
+import { DdlGetDigitalTransformationService } from './Services/ddl-get-digital-transformation.service';
+
+
+import { UnitService } from './Services/Unit-Service';
+import { RestrictedPageComponent } from './RestrictedPage/RestrictedPage.Component';
+import { UserService } from './Services/User.Service';
+import { AuthGuard } from './Guard/Auth.Guard';
+import { GlobalEventsManager } from './GlobalEventsManager'
+
+import { DeliveryMasterService } from './Services/DeliveryMaster.Service';
+
+import { AccessMasterService } from './Services/AccessMaster.Service';
+import { CustomerCreationService } from './Services/CustomerCreation.Service';
+import { IndustryPracticeService } from './Services/IndustryPractice.service';
+import { DdlIndustryComponent } from './UserControls/DdlIndustryPractice/ddl-industry.component';
+import { CustomerTypeComponent } from './UserControls/DdlCustomerType/customer-type.component';
+import { MultiSelectIndustryPractiseComponent } from './UserControls/MultiSelectindustrypractise/industry-practise.component';
+import { MultiSelectCustomerTypeComponent } from './UserControls/MultiSelectCustomerType/customer-type.component';
+import { UnitStatusService } from './Services/unit-status.service';
+import { MultiSelectGeographyComponent } from './UserControls/MultiSelectgeography/geography.component';
+import { MultiSelectKeydealComponent } from './UserControls/MultiSelectkeydeal/keydeal.component';
+import { PresalesService } from './Services/presales.service';
+import { KeyDealService } from './Services/key-deal.service';
+
+import { ConfigurationService } from './Services/Configuration.service';
+import { TicketModuleService } from './Services/TicketModule.service';
+
+import { GroupOwnerMasterService } from './Services/GroupOwnerMaster.service';
+
+import { LblMessageComponent } from './UserControls/Lbl-message/lbl-message.component';
+import { CreateNewOppurtunityStage0Service } from './Services/create-new-oppurtunity-stage0.service';
+import { IMyDpOptions } from 'mydatepicker';
+import { BDStage0Component } from './BD_Stage0/BD_Stage0.Component';
+import { BDStage3Component } from './BD_Stage3/BD_Stage3.component';
+import { InsertErrorLogService } from './Services/InsertErrorLog.service';
+import { ReasonMasterService } from './Services/ReasonMaster.service'
+import { ReportsComponent } from './Reports/reports.component';
+import { FiscalOfferingService } from './Services/fiscal-offering.service';
+import { AddFiscalOfferingComponent } from './UserControls/add-fiscal-offering/add-fiscal-offering.component';
+import { OnHoldComponent } from './OnHold/OnHold.component';
+import { OnHoldService } from './Services/OnHold.service';
+import { BDStage5Component } from './BD_Stage5/BD_Stage5.component';
+import { Stage5Service } from './Services/stage5.service';
+
+import { Stage4Service } from "./Services/stage4.service";
+import { Stage3Service } from './Services/stage3.service';
+import { MenuFilterPipe } from './Filters/MenuFilter.Pipe';
+import { MenuWithChildFilterPipe } from './Filters/MenuWithChildFilter.Pipe';
+import { ChildMenuFilterPipe } from './Filters/ChildMenuFilter.Pipe';
+import { BDStage4Component } from './BD_Stage4/BD_Stage4.component';
+import { BDStage1Component } from './BD_Stage1/BD_Stage1.component';
+import { OppurtunityStage1Service } from './Services/create-new-opportunity-stage1.service';
+import { BDStage2Component } from './BD_Stage2/BD_Stage2.component';
+import { OpportunityStage2Service } from './Services/create-new-opportunity-stage2.service';
+import { DealTrackerReportService } from './Services/deal-tracker-report.service';
+
+
+import { AccessManagementService } from './Services/AccessManagement.Service';
+
+
+
+
+import { ApproverAccessService } from './Services/ApproverAccessService';
+
+
+
+
+import { AddQuarterProjectionComponent } from './UserControls/add-quarter-projection/add-quarter-projection.component';
+import { AddQuarterProjectionService } from './Services/add-quarter-projection-service.service'
+
+
+import { DuplicateRecordService } from './Services/DuplicateRecord.service';
+
+
+import { ResourcingService } from './Services/Resourcing.service';
+import { IdentificationService } from './Services/Identification.service';
+import { Stage7Service } from './Services/stage7.service';
+import { BDStage7Component } from './BD_Stage7/BD_Stage7.component';
+import { BDStage8Component } from './BD_Stage8/BD_Stage8.component';
+import { Stage8Service } from './Services/stage8.service';
+import { BDStage6Component } from './BD_Stage6/BD_Stage6.component';
+import { Stage6Service } from './Services/stage6.service';
+import { BDStage9Component } from './BD_Stage9/BD_Stage9.component';
+import { Stage9Service } from './Services/stage9.service';
+import { BrowserXhr, HttpModule, RequestOptions, XHRBackend, Http } from '@angular/http';
+import { CrmStageComponent } from './UserControls/DdlCRMStage/crmstage.component';
+import { NgProgressModule, NgProgressBrowserXhr, NgProgressInterceptor } from 'ngx-progressbar';
+import {DataTablesModule} from 'angular-datatables';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown/angular2-multiselect-dropdown';
+import { HttpInterCeptor } from './Services/HttpInterCeptor.Service';
+
+import { DatePipe } from '@angular/common';
+import { HttpClientInterCeptor } from './Services/HttpClientInterceptor.Service';
+
+import {RoleMasterComponent} from './role-master/role-master.component';
+
+
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    FooterComponent,
+    MenuComponent,
+    CustomerCreationMasterComponent,
+    HomeComponent,
+    NewopportunityComponent,
+    DdlISUComponent,
+    DdlIOUComponent,
+    PresalesComponent,
+    DdlDealCategoryComponent,
+    DdlClusterComponent,
+    DdlServiceComponent,
+    DdlCountryComponent,
+    DdlGeographyComponent,
+    DdlDealOwner1Component,
+    DdlDealOwner2Component,
+    GeographySalesOwnerComponent,
+    AccountSalesOwnerComponent,
+    DdlSubIouComponent,
+    DdlVerticalComponent,
+    DdlBpsofferingComponent,
+    IndustryPracticeComponent,
+    ExecutiveSponsorComponent,
+    BDStage0Component,
+    BDStage3Component,
+    DdlDealStageComponent,
+    DdlOffshorePresalesLeadHorizontalComponent,
+    DdlOffshorePresalesLeadVerticalComponent,
+    DdlValusBpsComponent,
+    DdlGetDigitalTransformationComponent,
+    RestrictedPageComponent,
+
+    RestrictedPageComponent,
+
+    DdlIndustryComponent,
+    DdlGeographyComponent,
+    CustomerTypeComponent,
+    DdlSubIouComponent,
+    MultiSelectIndustryPractiseComponent,
+    MultiSelectCustomerTypeComponent,
+    MultiSelectGeographyComponent,
+    MultiSelectKeydealComponent,
+    LblMessageComponent,
+
+    AddFiscalOfferingComponent,
+
+    OnHoldComponent,
+    BDStage5Component,
+    ReportsComponent,
+
+    MenuFilterPipe,
+    MenuWithChildFilterPipe,
+    ChildMenuFilterPipe,
+    BDStage4Component,
+    BDStage1Component,
+    BDStage2Component,
+    AddQuarterProjectionComponent,
+
+    BDStage7Component,
+    BDStage8Component,
+    BDStage6Component,
+
+
+    BDStage9Component,
+
+
+    CrmStageComponent,
+  RoleMasterComponent
+
+  ],
+  imports: [
+    AppRoutingModule,
+    SystemModule,
+    HttpClientModule,
+    HttpModule,
+    NgProgressModule,
+    DataTablesModule,
+    AngularMultiSelectModule
+  ],
+
+  providers: [InsertErrorLogService, { provide: BrowserXhr, useClass: NgProgressBrowserXhr },
+    { provide: ErrorHandler, useClass: InsertErrorLogService }, MenuService, ISUService, Apiroutes, Constant,
+    UnitService, UserService, AuthGuard, AccessMasterService
+    , GlobalEventsManager, DeliveryMasterService, CustomerCreationService,
+    CustomerTypeService, IndustryPracticeService, DealCategoryService, GeographyService
+    , CreateNewOpportunityService, ClusterService, Service, CountryService,
+    DealOwner1Service, DealOwner2Service, AccountSalesOwnerService, GeographySalesOwnerService, VerticalService, BpsofferingService,
+    ExecutiveSponsorService, DdlDealStageService, OffshorePresalesLeadhorizontalService,
+    OffshorePresalesLeadVerticalService, ValueBpsService, DdlGetDigitalTransformationService,
+    FiscalOfferingService, TicketModuleService, UnitStatusService, PresalesService, KeyDealService, ConfigurationService, TicketModuleService,
+    GroupOwnerMasterService, CreateNewOppurtunityStage0Service, OnHoldService, Stage5Service, Stage4Service, ReasonMasterService, Stage3Service
+    , OppurtunityStage1Service, OpportunityStage2Service, DealTrackerReportService, AccessManagementService, ApproverAccessService, DuplicateRecordService, ResourcingService, IdentificationService
+    , AddQuarterProjectionService, Stage7Service, Stage8Service
+    , Stage6Service
+    , AddQuarterProjectionService, Stage9Service,DatePipe,
+    { provide: HTTP_INTERCEPTORS, useClass: NgProgressInterceptor, multi: true },
+    {
+      provide: HttpInterCeptor,
+      useFactory:
+        (backend: XHRBackend, defaultOptions: RequestOptions) => {
+        return new HttpInterCeptor(backend, defaultOptions);
+        }, deps: [XHRBackend, RequestOptions]
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpClientInterCeptor,
+      multi: true
+    }
+
+
+  ],
+
+  bootstrap: [AppComponent],
+  entryComponents: [AddFiscalOfferingComponent, AddQuarterProjectionComponent]
+})
+export class AppModule { }
+
+
+
+
+
+
