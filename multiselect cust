@@ -1,0 +1,71 @@
+<!-- <select [(ngModel)]="CustomerId" class="form-control">
+<option value="0">--Select--</option>
+<option *ngFor="let item of CustomerTypeList" [value]="item.CustomerId">
+  {{item.CustomerName}}
+</option>
+</select>
+ -->
+
+ <angular2-multiselect [data]="CustomerTypeList" [(ngModel)]="CustomerType" [settings]="DropdownSettings" 
+ name="skills"></angular2-multiselect>
+
+
+.ts
+
+import { Component, OnInit,Input,Output } from '@angular/core';
+import {ICustomerType} from '../../Interface/Customer/CustomerType';
+import { CustomerTypeService } from '../../Services/CustomerType.service';
+@Component({
+  selector: 'app-customer-type-multi',
+  templateUrl: './customer-type.component.html',
+  styleUrls: ['./customer-type.component.css']
+})
+export class MultiSelectCustomerTypeComponent implements OnInit {
+
+   CustomerTypeList:any[]=new Array();
+   CustomerType:any[]=new Array();
+   DropdownSettings= {};
+  public CustomerId:number;
+  public CustomerName:string;
+
+  constructor(private cutomerTypeService:CustomerTypeService)
+  {
+    // this.cutomerTypeService.GetMultiSelectCustomerType().subscribe(data =>
+    //   {
+
+    // this.CustomerTypeList = data,
+    // this.CustomerTypeList.push({"id":-1,"itemName":"All"})
+    // this.CustomerType.push({"id":-1,"itemName":"All"})
+    //   });
+
+
+   this.DropdownSettings =
+   {
+    singleSelection: false,
+    text: "Select Customer Type.",
+    selectAllText: 'Select All',
+    unSelectAllText: 'UnSelect All',
+    enableSearchFilter: false,
+    classes: "myclass custom-class",
+    maxHeight:100,
+    badgeShowLimit:5
+
+    };
+
+  }
+  ngOnInit()
+  {
+
+
+  };
+
+
+///New design
+
+
+
+
+
+
+
+}
