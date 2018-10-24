@@ -1,0 +1,89 @@
+<div *ngIf="userUnit=='2'">
+  <select [(ngModel)]="bpsoffering" [disabled]="disableCommon" class="form-control" >
+    <option [value]=0>--Select--</option>
+    <option *ngFor="let item of bpsofferingList" value={{item.BPSOfferingId}}>
+      {{item.BPSOfferingName}}
+    </option>
+  </select>
+</div>
+<div *ngIf="userUnit=='1'">
+  <angular2-multiselect [data]="bpsofferingList" [(ngModel)]="bpsoffering" [settings]="dropdownSetting" name="skills">
+  </angular2-multiselect>
+</div>
+
+
+.ts
+
+import { Component, OnInit,  forwardRef,Input} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+import {BpsofferingService} from '../../Services/BPSOffering.service';
+import { IBPSOffering } from '../../Interface/BPSOffering/BPSOffering';
+import { CookieService } from 'ngx-cookie-service';
+@Component({
+  selector: 'app-ddl-bpsoffering',
+  templateUrl: './ddl-bpsoffering.component.html',
+  styleUrls: ['./ddl-bpsoffering.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => DdlBpsofferingComponent),
+      multi: true
+    }
+  ]
+})
+export class DdlBpsofferingComponent implements OnInit {
+ /*dont touch this part*/
+// ControlValueAccessor implementation
+  // ====================================
+  dropdownSetting: any;
+  userUnit:string;
+  private value: string;
+  // call if value was changed inside our component
+  private _onChange = (_: any) => { };
+  // call if input was "touched" .. !
+  private _onTouched = () => { };
+  
+  // incoming change..
+  public writeValue(val: any) {
+    this.value = val;
+  }
+  
+  public registerOnChange(fn: (_: any) => void): void { this._onChange = fn; }
+  public registerOnTouched(fn: () => void): void { this._onTouched = fn; }
+
+ /*dont touch till here*/
+  @Input() disableCommon:boolean;
+  @Input() bpsofferingList:IBPSOffering[];
+  @Input() bpsoffering:number
+  constructor(private cookieService:CookieService) { 
+
+    this.userUnit = this.cookieService.get('userUnit')
+    this.userUnit = atob(this.userUnit);
+  }
+
+  ngOnInit() {
+   // this.bpsoffering=0;
+
+    this.dropdownSetting = {
+
+      singleSelection: false,
+
+      text: "Please Select the BPS Offering",
+
+      selectAllText: 'Select All',
+
+      unSelectAllText: 'UnSelect All',
+
+      enableSearchFilter: false,
+
+      classes: "myclass custom-class",
+
+      maxHeight: 200,
+
+      badgeShowLimit: 5
+
+  }
+  }
+
+
+}
