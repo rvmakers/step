@@ -1,0 +1,1894 @@
+<mat-dialog-content>
+    <div class="">
+      <div class="row">
+        <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
+          <div class="widget widget-stacked">
+              <div class="widget-content borderbox">
+                <div style="background-color:#054f6c;color:white">
+                  <p style="text-align:center">
+                    Add Fiscal Offering
+                   </p>
+                </div>
+                <div class="row" style="border:1px solid rgba(20, 20, 20,0.082);margin-left:0px;margin-right:0px">
+                  <div style="margin-left:0.5;" [hidden]="lblMessage==''" class="alert alert-danger">
+                      <p class="text-center">{{lblMessage}}</p>
+                  </div>
+                  <div style="margin-left:0.5;" [hidden]="warnMessage==''" class="alert alert-info">
+                    <p class="text-center">{{warnMessage}}</p>
+                </div>
+                  <div style="margin-left:0.5;" [hidden]="successMessage==''" class="alert alert-success">
+                      <p class="text-center">{{successMessage}}</p>
+                  </div>
+
+
+
+               <div class="form-group clearfix" style="padding-top:2%">
+                  <div class="row">
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                              <div class="form-group">
+                                      <label for="name">Cluster </label>
+                                      <select class="form-control" [(ngModel)]="business" name="Buisness" [disabled]="checkBusinessStatus" (change)="OnchangeBusiness()">
+                                        <option value=0>--Select--</option>
+                                        <option *ngFor="let item of buisnessTypeList" [value]="item.BusinessID">{{item.BusinessName}}</option>
+                                      </select>
+                             </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                                <div class="form-group">
+                                      <label for="name">Sub-Domain</label>
+                                      <select class="form-control" [(ngModel)]="competency" [disabled]="checkCompetencyStatus"  name="Sub-Domain" (change)="PopulateOffering_New()">
+                                        <option value=0>--Select--</option>
+                                       <option *ngFor="let item of competencyList" [value]="item.CompetencyID">{{item.CompetencyName}}</option>
+                                     </select>
+                              </div>
+                      </div>
+                  </div>
+
+                  <div class="row">
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                            <div class="form-group">
+                                    <label for="name">Main Delivery Location </label>
+                                    <select class="form-control" [(ngModel)]="mainDeliveryLocation" name="MainLocation" (change)="PopulateUpdatedDeliveryCentre()">
+                                      <option value=0>--Select--</option>
+                                      <option *ngFor="let item of mainDeliveryLocationList" [value]="item.MainDCID">{{item.MainDCName}}</option>
+                                    </select>
+                           </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                            <div class="form-group">
+                                    <label for="name">Delivery Centre</label>
+                                    <select class="form-control" [(ngModel)]="deliveryCentre" name="deliveryCentre">
+                                      <option value=0>--Select--</option>
+                                      <option *ngFor="let item of deliveryCentreList" [value]="item.DeliveryCenterID">{{item.DeliveryCenterName}}</option>
+                                    </select>
+                            </div>
+                      </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                          <label for="name">Offering</label>
+                             <select class="form-control" [(ngModel)]="offering" name="offering">
+                                <option value=0>--Select--</option>
+                                <option *ngFor="let item of offeringList" [value]="item.OfferingID">{{item.OfferingName}}</option>
+                              </select>
+                           </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                          <div class="form-group">
+                            <label for="name">Process Type</label>
+                            <select class="form-control" [(ngModel)]="processType" name="processType">
+                              <option value=0>--Select--</option>
+                              <option *ngFor="let item of processTypeList" [value]="item.ProcessTypeID">{{item.ProcessTypeName}}</option>
+                            </select>
+                            </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                          <label for="name">Transcation Type</label>
+                             <select class="form-control" [(ngModel)]="transType" name="Transtype">
+                              <option value=0>--Select--</option>
+                                <option *ngFor="let item of transTypeList" [value]="item.TransipocID">{{item.TransipocName}}</option>
+                              </select>
+                           </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                          <div class="form-group">
+                            <label for="name">Estimated Revenue(in MM USD)</label>
+                             <input type="text" class="form-control" [(ngModel)]="estimatedRevenue" (keypress)='AllowPattern($event)' (keyup)="FormatInputTCV($event)">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                        <div class="form-group">
+                          <label for="name">FTE Count</label>
+                           <input type="text" [(ngModel)]="fTECount" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                           </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                          <div class="form-group">
+                            <label for="name">Seat Requirements</label>
+                            <input type="text" class="form-control" [(ngModel)]="seatReq" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                          </div>
+                    </div>
+                  </div>
+
+                  <div class="row" *ngIf="userUnit=='1'">
+                    <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                        <div class="form-group" >
+                          <label for="name" >Presales Owner</label>
+                            <select class="form-control" [(ngModel)]="offShoreLead" name="Presales Owner">
+                              <option value=0>--Select--</option>
+                              <option *ngFor="let item of offShoreLeadList" [value]="item.Offshore_BDLeadID">{{item.Offshore_BDLeadName}}</option>
+                            </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6" *ngIf="userUnit=='1'">
+                          <div class="form-group">
+                            <label for="name">Practice Owner</label>
+                            <select class="form-control" [(ngModel)]="practiceSalesOwner" name="PracticeOwner">
+                                <option value=0>--Select--</option>
+                                <option *ngFor="let item of practiceSalesOwnerList" [value]="item.PracticeSalesOwnerID">{{item.PracticeSalesOwnerName}}</option>
+                            </select>
+                          </div>
+                    </div>
+                  </div>
+                  <div class="row" *ngIf="showDeliveryOwner">
+                    <div class="col-md-6 col-lg-6 col-sm-6 col-xs-6">
+                    <div class="form-group">
+                      <label>Delivery Owner</label>
+                      <select class="form-control" [(ngModel)]="DeliveryOwnerID" name="DeliveryOwner">
+                        <option value=0>--Select--</option>
+                        <option *ngFor="let item of DeliveryOwnerList" value={{item.Delivery_Owner_ID}}>{{item.Delivery_Owner_Name}}</option>
+                      </select>
+
+                    </div>
+                  </div>
+                </div>
+                </div>
+
+
+
+
+                   <div class="row">
+                     <div class="form-group text-center">
+                        <button type="button" class="btn btn-primary" (click)="OnSave()">Save</button>
+                          <!-- <mat-dialog-actions> -->
+                        <button  type="button" [mat-dialog-close]="true" class="btn btn-primary">Close</button>
+                        <!-- </mat-dialog-actions> -->
+                        <button type="button" class="btn btn-primary" (click) = "Clear()" >Clear</button>
+
+                     </div>
+                   </div>
+                   <div class="row" *ngIf="offeringDetailList.length>0">
+                      <div class="form-group clearfix text-center" style="padding-top:2%">
+                          <div class="col-md-1 col-lg-1 col-xs-1 col-sm-1 col-md-offset-2 col-lg-offset-2 col-sm-offset-2">
+                          <label>Emp Id</label>
+                          </div>
+                          <div class="col-md-2 col-lg-2 col-xs-2 col-sm-2" >
+                          <input type="text" class="form-control" [(ngModel)]="empID" style="width:100%" maxlength="6" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                          </div>
+                          <div class="col-md-2 col-lg-2 col-xs-2 col-sm-2" style="margin-left:-2%">
+                          <button type="button" class="btn btn-md btn-primary" (click)="Triggermail()">Trigger Mail</button>
+                           </div>
+                           <div>
+                            <span class="text-primary" style="font:small;margin-left:-3%"> The mail will be triggered to particular Associate</span>
+                            </div>
+
+                        </div>
+                   </div>
+                   <div class="row">
+                      <div class="table responsive" *ngIf="offeringDetailList.length>0">
+                       <table class="table-bordered table table-striped fixed" style="width: 97%;margin-left: 1.5%">
+
+                         <thead style="background: #ccc;border-bottom-width: 0">
+                           <tr>
+                             <th>
+                                <input type="checkbox"name="checkbox" [checked]="false" [(ngModel)] = "modifyOfferingDetails" (change)="CheckAll(modifyOfferingDetails)">
+                                <label>Select</label>
+                             </th>
+                             <th>
+                               Delivery Center
+                             </th>
+                             <th>
+                              Offering
+                             </th>
+                             <th>
+                               Process Type
+                             </th>
+                             <th>
+                                Transcation Type
+                              </th>
+                              <th>
+                               FTE Count
+                              </th>
+                              <th>
+                                Estimated Revenue( MM USD)
+                              </th>
+                              <th *ngIf="userUnit=='1'">
+                               Presales Owner
+                              </th>
+                              <th *ngIf="userUnit=='1'">
+                                Practice Owner
+                              </th>
+                              <th>
+                                Cluster
+                              </th>
+                              <th>
+                               Sub-Domain
+                            </th>
+                             <th>
+                              Seat Requirements
+                             </th>
+                           </tr>
+
+                         </thead>
+                         <tbody>
+                           <tr *ngFor="let objField of offeringDetailList|paginate:{itemsPerPage:10,currentPage:p,id:'first'};let i=index;">
+                              <td>
+                                  <input type="checkbox"name="checkbox" [checked]="objField.OfferingStatus"  (change)="objField.OfferingStatus=!objField.OfferingStatus">
+                               </td>
+                              <td>
+                               <a (click)="openAddFiscalOffering(objField.OppOfferingID)">{{objField.DeliveryCenterName}}</a>
+                              </td>
+                              <td>
+                                  {{objField.OfferingName}}
+                              </td>
+                              <td>
+                                  {{objField.ProcessTypeName}}
+                              </td>
+                              <td>
+                                  {{objField.TransipocName}}
+                              </td>
+
+                              <td>
+                                  {{objField.EstimatedFteSize}}
+                              </td>
+                              <td>
+                                  {{objField.TotalContractValue}}
+                              </td>
+                              <td *ngIf="userUnit=='1'">
+                                  {{objField.Offshore_BDLeadName}}
+                              </td>
+                              <td *ngIf="userUnit=='1'">
+                                  {{objField.PracticeSalesOwnerName}}
+                              </td>
+                              <td>
+                                  {{objField.BusinessName}}
+                             </td>
+                             <td>
+                                {{objField.CompetencyName}}
+                             </td>
+                             <td>
+                                {{objField.SeatRequirements}}
+                             </td>
+                          </tr>
+                          <tr>
+                            <th>
+                            </th>
+                            <th>
+                            </th>
+                            <th>
+                            </th>
+                            <th>
+                            </th>
+                            <th>
+                              Unspecified FTE :
+                             </th>
+                             <th>
+                              {{tFTECount}}
+                             </th>
+                             <th>
+                              {{tEstimatedRevenue}}
+                             </th>
+                             <th>
+                             </th>
+                             <th>
+                             </th>
+                             <th>
+                             </th>
+                             <th *ngIf="userUnit=='1'">
+                           </th>
+                            <th *ngIf="userUnit=='1'">
+                            </th>
+                          </tr>
+                         </tbody>
+                       </table>
+                       <div  class="col-lg-4 col-md-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-xs-offset-4">
+                       <pagination-controls (pageChange)="p=$event" id="first"> </pagination-controls>
+                       </div>
+                     </div>
+                   </div>
+                   <div class="row" *ngIf="offeringDetailList.length>0">
+                      <div class="form-group text-center">
+                         <button type="button" class="btn btn-primary" (click)="OnDelete()">Delete</button>
+                      </div>
+                   </div>
+                 </div>
+
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+    </mat-dialog-content>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ts
+
+import { Component, OnInit,Inject } from '@angular/core';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import { IFiscalOffering } from '../../Interface/FiscalOffering/FiscalOffering';
+import { Router } from '@angular/router';
+import {ActivatedRoute} from '@angular/router'
+import { FiscalOfferingService } from '../../Services/fiscal-offering.service';
+import { CookieService } from 'ngx-cookie-service';
+import { empty } from 'rxjs/observable/empty';
+import {IEmail} from '../../Interface/Email/IEmail';
+import {ValidationMessage} from "../../ValidationMessage/validation-message"
+import {Constant} from "../../Constant"
+import { ValidationErrors } from '@angular/forms';
+
+@Component({
+  selector: 'app-add-fiscal-offering',
+  templateUrl: './add-fiscal-offering.component.html',
+  styleUrls: ['./add-fiscal-offering.component.css']
+})
+export class AddFiscalOfferingComponent implements OnInit
+{
+  checkBusinessStatus:boolean=false;
+  buisnessTypeList:any[]=new Array();
+  mainDeliveryLocationList:IFiscalOffering[]=new Array();
+  offeringList:IFiscalOffering[]=new Array();
+  transTypeList:IFiscalOffering[]=new Array();
+  offShoreLeadList:IFiscalOffering[]=new Array();
+  competencyList:IFiscalOffering[]=new Array();
+  deliveryCentreList:IFiscalOffering[]=new Array();
+  processTypeList:IFiscalOffering[]=new Array();
+  practiceSalesOwnerList:IFiscalOffering[]=new Array();
+  offeringDetailList:any[]=new Array();
+  checkUnitOpportunityList:IFiscalOffering[]=new Array();
+  tCV_FTEList:IFiscalOffering[]=new Array();
+  business:number;
+  mainDeliveryLocation:number;
+  offering:number;
+  transType:number;
+  fTECount:any;
+  offShoreLead:number;
+  competency:number;
+  deliveryCentre:number;
+  processType:number;
+  estimatedRevenue:any;
+  seatReq:number;
+  practiceSalesOwner:number;
+  tFTECount:number;
+  tEstimatedRevenue:any;
+  empID:number;
+  unitText:string = String(atob(this.cookieService.get('unitText')));
+  strRole:string = String(atob(this.cookieService.get('userRole')));
+  strUserId: string = String(atob(this.cookieService.get('userId')));
+  unit: number = Number(atob(this.cookieService.get('userUnit')));
+  
+  currentUserRole:string=String(atob(this.cookieService.get('userCurrentRole')));
+  constantOfferingId:string;
+  //Querystring.....//Dialog
+  strOpportunityId: string="";
+  strOppOfferingId:string;
+  strStage:number;
+  lblMessage:string="";
+  lblCheck:number;
+  message:string;
+  txtOpManagers:number;
+  txtTeamLeader:number;
+  txtTeamLeader1:number;
+  txtTeamMember:number;
+  checkCompetencyStatus:boolean = false;
+  successMessage:string="";
+  checkTCV:number =0;
+  warnMessage:string="";
+  userUnit: any;
+  DeliveryOwnerID:number=0;
+  DeliveryOwnerList:any[]=[];
+  showDeliveryOwner:boolean=false;
+
+
+
+
+
+  constructor(private cookieService:CookieService,private router:Router ,
+    private fiscalOfferingService:FiscalOfferingService,private activatedRoute: ActivatedRoute,
+    @Inject(MAT_DIALOG_DATA)public data:any,private constant:Constant) {
+      this.userUnit = Number(atob(this.cookieService.get('userUnit')));
+     }
+
+  ngOnInit()
+  {
+    this.business =0;
+    this.competency = 0;
+    this.practiceSalesOwner = 0;
+    this.mainDeliveryLocation =0;
+    this.deliveryCentre = 0;
+    this.transType = 0;
+    this.offShoreLead = 0;
+    this.offering = 0;
+    this.processType = 0 ;
+    this.checkTCV =1;
+    if(this.NullEmptyCheck(this.data.strOppId))
+    {
+      this.strOpportunityId=this.data.strOppId;
+    }
+    this.strOppOfferingId=this.data.strOppOfferingId;
+
+    this.constantOfferingId=this.data.strOppOfferingId;
+    this.strStage=this.data.strStageId;
+
+    if((this.NullEmptyCheck(this.unit.toString()) && this.NullEmptyCheck(this.strUserId)) && (this.strRole == "Administrator" || this.strRole == "Presales" || this.strRole == "Domain Leaders" || this.strRole == "Cluster Administrator"))
+    {
+       this.fiscalOfferingService.FiscalGetOpportunityUnitID(btoa(String(this.strOpportunityId))).subscribe(data=>
+         {
+         if(data!=undefined)
+          {
+           this.checkUnitOpportunityList=data;
+           if(this.checkUnitOpportunityList.length>0)
+           {
+            if(this.NullEmptyCheck(this.checkUnitOpportunityList[0].UnitId.toString()))
+            {
+              this.unit=this.checkUnitOpportunityList[0].UnitId;
+            }
+           }
+          }
+          if(this.NullEmptyCheck(this.strOppOfferingId))
+          {
+          }
+          else
+          {
+            this.strOppOfferingId="-1";
+          }
+
+          this.PopulateBusiness();
+          if(!this.NullEmptyCheck(this.constantOfferingId))
+          {
+            this.fiscalOfferingService.FiscalGetOpportunity(btoa(String(this.strOpportunityId))).subscribe(data=>
+            {
+              if(data!=undefined)
+              {
+                this.tCV_FTEList=data;
+                if(this.tCV_FTEList.length>0)
+                {
+                  if(this.NullEmptyCheck(this.tCV_FTEList[0].EstimatedFteSize))
+                  {
+                    this.fTECount=this.tCV_FTEList[0].EstimatedFteSize;
+                  }
+                  if(this.NullEmptyCheck(this.tCV_FTEList[0].TotalContractValue))
+                  {
+                    this.estimatedRevenue=this.NewFomattedInput((this.tCV_FTEList[0].TotalContractValue).toString());
+                  }
+                  if(!this.NullEmptyCheck(this.tCV_FTEList[0].BusinessID))
+                  {
+                    this.business=0;
+                  }
+                  else
+                  {
+                    this.business=this.tCV_FTEList[0].BusinessID;
+                    this.checkBusinessStatus = true;
+                  }
+                  if(!this.NullEmptyCheck(this.tCV_FTEList[0].PracticeSalesOwnerID))
+                    {
+                      this.practiceSalesOwner=0;
+                    }
+                  else
+                    {
+                      this.practiceSalesOwner = this.tCV_FTEList[0].PracticeSalesOwnerID;
+                    }
+
+                  if(!this.NullEmptyCheck(this.tCV_FTEList[0].Offshore_BDLeadID))
+                    {
+                      this.offShoreLead=0;
+                    }
+                  else
+                    {
+                      this.offShoreLead = this.tCV_FTEList[0].Offshore_BDLeadID;
+                    }
+                  }
+                  if(this.unit==2 || this.unit == 3)
+                  {
+                    this.PopulateCompetency_BFS();
+                  }
+                  else
+                  {
+                    this.PopulateCompetency();
+                  }
+
+              }
+            },error => console.log("Error :: " + error));
+          }
+          this.lblCheck = 1;
+          this.PopulatePracticeSalesOwner();
+       
+          this.PopulateLocation();
+          this.PopulateDeliveryOwner();
+          if(this.NullEmptyCheck(this.constantOfferingId))
+          {
+            this.PopulateDeliveryCenter();
+            this.GetOfferingDetails();
+            this.lblCheck = 2;
+            this.checkBusinessStatus = true;
+          }
+          else
+          {
+            this.strOppOfferingId = "-1"
+          }
+
+          this.fiscalOfferingService.FiscalGetSpecificOfferingDetails((btoa(String(this.strOppOfferingId))),(btoa(String(this.unit)))).subscribe(data=>
+            {
+              if(data!=undefined)
+              {
+                let OpportunitySpecificOffering:IFiscalOffering[]=new Array();
+                OpportunitySpecificOffering = data;
+                if(OpportunitySpecificOffering.length>0)
+                {
+                  this.strOpportunityId=OpportunitySpecificOffering[0].StrOpportunityId;
+                  this.strStage=OpportunitySpecificOffering[0].StageId;
+                }
+              }
+              this.BindGrid();
+              this.GetValues();
+               if(!this.NullEmptyCheck(this.estimatedRevenue))
+               {
+                this.warnMessage=ValidationMessage.REQ_TOTALCONTRACTVALUE_SALES;
+               }
+               else
+               {
+                this.warnMessage ="";
+               }
+               this.PopulateOffering();
+               this.PopulateProcessType();
+               this.PopulateTransactionType();
+
+               if (this.strRole == "Administrator")
+               {
+                  this.PopulateBusiness();
+                  if (( this.unit == 2) || ( this.unit==3))
+                  {
+                    this.PopulateCompetency_BFS();
+
+                  }
+                  else
+                  {
+                    this.PopulateCompetency();
+                  }
+                  this.PopulateOffshoreBDLead_Admin();
+               }
+               else if (this.strRole == "Presales" || this.strRole  == "Domain Leaders" || this.strRole  == "Cluster Administrator")
+               {
+                if (( this.unit == 2) || ( this.unit==3))
+                  {
+                    this.PopulateOffshoreBDLead();
+                  }
+                  else
+                  {
+                    this.PopulateCompetency();
+                    this.SetDefaultValues();
+                    this.PopulateOffshoreBDLead();
+                   }
+               }
+              });
+         },error => console.log("Error :: " + error)
+        );
+    }
+    else
+    {
+      this.router.navigate(['RestrictedPage']);
+    }
+  }
+
+  GetValues():boolean
+  {
+    this.message ="";
+    let flag=true;
+    if(this.unit==2 && flag == true)
+    {
+      if(this.NullEmptyCheck(this.competency))
+      {
+        let statusList:IFiscalOffering[]=new Array();
+       this.fiscalOfferingService.FiscalGetServiceStatus_Fiscal(btoa(String(this.competency))).subscribe(data=>
+       {
+         if(data!=undefined)
+         {
+           statusList=data;
+           if(statusList.length>0)
+           {
+              if(statusList[0].StrSelectedStatus.toString() =="NAC")
+              {
+               flag=false;
+                  this.message=  this.message +=ValidationMessage.VAL_SUBDOMAIN_OFFERING;
+              }
+           }
+         }
+      },error => console.log("Error :: " + error)
+      );
+      }
+    }
+     if(!this.NullEmptyCheck(this.business))
+     {
+       this.message=ValidationMessage.REQ_BUSINESS;
+       flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.competency))
+     {
+       this.message=this.message+ValidationMessage.REQ_COMPETENCY;
+
+       flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.mainDeliveryLocation))
+     {
+      this.message=  this.message += ValidationMessage.REQ_MAINDELIVERYLOCATION;
+      flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.deliveryCentre))
+     {
+      this.message=  this.message += ValidationMessage.REQ_DELIVERYCENTRE;
+      flag=false;
+     }
+
+     else if(!this.NullEmptyCheck(this.offering))
+     {
+      this.message=  this.message += ValidationMessage.REQ_OFFERING;
+      flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.processType))
+     {
+      this.message=  this.message += ValidationMessage.REQ_PROCESSTYPE;
+      flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.transType))
+     {
+      this.message=  this.message += ValidationMessage.REQ_TRANSTYPE;
+      flag=false;
+     }
+
+     else if(!this.NullEmptyCheck(this.fTECount))
+     {
+      if(this.fTECount == "")
+      {
+        this.message=  this.message +=ValidationMessage.REQ_FTECOUNT;
+
+      }
+      else
+      {
+        this.message=  this.message += ValidationMessage.VAL_FTECOUNT;
+      }
+      flag=false;
+     }
+     else if(!this.NullEmptyCheck(this.estimatedRevenue))
+     {
+      this.message=  this.message += ValidationMessage.REQ_TOTALCONTRACTVALUE;
+      flag=false;
+     }
+     else if(this.estimatedRevenue.toString().match(/^[0-9,]{0,13}(\.\d{0,2})?$/g)==null)
+     {
+       this.message=  this.message += "Please enter TCV in proper format.";
+       flag=false;
+      }​
+
+     else if(String(this.seatReq)=="")
+     {
+      this.message=  this.message += ValidationMessage.REQ_SEAT;
+      flag=false;
+     }
+     return flag;
+  }
+  PopulateBusiness():void
+  {
+     this.fiscalOfferingService.FiscalGetBusiness().subscribe(data=>
+     {
+
+       if(data!=undefined)
+       {
+        this.buisnessTypeList=data;
+        if(this.buisnessTypeList.length<1)
+        {
+          this.lblMessage=ValidationMessage.ERR_BUSINESS;
+        }
+       }
+       else
+       {
+         this.lblMessage=ValidationMessage.ERR_BUSINESS;
+       }
+    },error => console.log("Error :: " + error)
+    );
+  }
+  OnchangeBusiness():void
+  {
+    this.lblMessage = '';
+    this.successMessage = '';
+    this.competency = 0;
+    if(this.business == 0)
+    {
+      this.competencyList = [];
+    }
+    else
+    {
+      if(this.unit == 2 || this.unit ==3)
+      {
+        this.PopulateCompetency_BFS();
+      }
+    }
+  }
+
+  PopulateCompetency():void
+  {
+    this.fiscalOfferingService.FiscalGetCompetency(btoa(String(this.unit))).subscribe(data=>
+      {
+
+      // let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+         this.competencyList=data;
+         if(this.competencyList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_COMPETENCY;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_COMPETENCY;
+        }
+      },error => console.log("Error :: " + error));
+  }
+  PopulateCompetency_BFS():void
+  {
+    this.fiscalOfferingService.FiscalGet_ClusterSubDomainDependency(btoa(String(this.business))).subscribe(data=>
+      {
+        if(data!=undefined)
+        {
+         this.competencyList=data;
+         if(this.competencyList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_COMPETENCY;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_COMPETENCY;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+
+  PopulatePracticeSalesOwner():void
+  {
+
+    this.fiscalOfferingService.FiscalGetPracticeSalesOwner().subscribe(data=>
+      {
+
+        if(data!=undefined)
+        {
+         this.practiceSalesOwnerList=data;
+         if(this.practiceSalesOwnerList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_PRACTICESALESOWNER;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_PRACTICESALESOWNER;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+
+  PopulateLocation():void
+  {
+
+    this.fiscalOfferingService.FiscalGetMainDeliveryCentre().subscribe(data=>
+      {
+        let model = <IFiscalOffering>{};
+
+        if(data!=undefined)
+        {
+          let MainDeliveryList:any=new Array();
+          MainDeliveryList=data;
+         if(MainDeliveryList.length<1)
+         {
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE;
+         }
+         else
+         {
+            this.mainDeliveryLocationList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE;
+        }
+      },error => console.log("Error :: " + error));
+  }
+  PopulateUpdatedDeliveryCentre():void
+  {
+    this.lblMessage = '';
+    this.successMessage = '';
+    let MainLocationName:string;
+    let LocationObject:IFiscalOffering;
+    LocationObject = this.mainDeliveryLocationList.find(x=>x.MainDCID == this.mainDeliveryLocation);
+    MainLocationName = btoa(String(LocationObject.MainDCName));
+    this.fiscalOfferingService.FiscalGetUpdatedDeliveryCentre(MainLocationName).subscribe(data=>
+      {
+        let model = <IFiscalOffering>{};
+        this.deliveryCentreList =[];
+        if(data!=undefined)
+        {
+          let DeliveryList:any=new Array();
+          DeliveryList=data;
+         if(DeliveryList.length<1)
+         {
+           this.deliveryCentre = 0;
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE_OFFERINGDETAILS;
+         }
+         else
+         {
+            this.deliveryCentreList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE_OFFERINGDETAILS;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+  PopulateDeliveryCenter():void
+  {
+    this.fiscalOfferingService.FiscalGetDeliveryCentre().subscribe(data=>
+      {
+
+        let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+          let DeliveryList:any=new Array();
+          DeliveryList=data;
+         if(DeliveryList.length<1)
+         {
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE_OFFERINGDETAILS;
+         }
+         else
+         {
+            this.deliveryCentreList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_DELIVERYCENTRE_OFFERINGDETAILS;
+        }
+      },error => console.log("Error :: " + error));
+  }
+  PopulateOffshoreBDLead():void
+  {
+    this.fiscalOfferingService.FiscalGetOffshoreBDLead(btoa(String(this.unit))).subscribe(data=>
+      {
+
+        if(data!=undefined)
+        {
+         this.offShoreLeadList=data;
+         if(this.offShoreLeadList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_OFFSHOREBDLEAD;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_OFFSHOREBDLEAD;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+  PopulateOffshoreBDLead_Admin():void
+  {
+    this.fiscalOfferingService.FiscalGetOffshoreBDLeadAdmin().subscribe(data=>
+      {
+
+        if(data!=undefined)
+        {
+         this.offShoreLeadList=data;
+         if(this.offShoreLeadList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_OFFSHOREBDLEAD;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_OFFSHOREBDLEAD;
+        }
+      },error => console.log("Error :: " + error));
+  }
+  PopulateOffering():void
+  {
+    this.fiscalOfferingService.FiscalGetOffering(btoa(String(this.unit))).subscribe(data=>
+      {
+
+         let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+          let offeringList:any=new Array();
+          offeringList=data;
+         if(offeringList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_OFFERING_OFFERING;
+         }
+         else
+         {
+          this.offeringList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_OFFERING_OFFERING;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+
+  PopulateOffering_New():void
+  {
+    this.fiscalOfferingService.FiscalGetOffering_New(btoa(String(this.unit)),(btoa(String(this.competency)))).subscribe(data=>
+      {
+
+         let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+          let offeringList:any=new Array();
+          offeringList=data;
+         if(offeringList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_OFFERING_OFFERING;
+         }
+         else
+         {
+          this.offeringList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_OFFERING_OFFERING;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+  PopulateProcessType():void
+  {
+    this.fiscalOfferingService.FiscalProcessType().subscribe(data=>
+      {
+
+         let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+          let processTypeList:any=new Array();
+          processTypeList=data;
+         if(processTypeList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_PROCESSTYPE_OFFERING;
+         }
+         else
+         {
+          this.processTypeList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_PROCESSTYPE_OFFERING;
+        }
+      },error => console.log("Error :: " + error));
+  }
+  PopulateTransactionType():void
+  {
+    this.fiscalOfferingService.FiscalGetTrans_SIPOC().subscribe(data=>
+      {
+
+         let model = <IFiscalOffering>{};
+        if(data!=undefined)
+        {
+          let transTypeList:any=new Array();
+          transTypeList=data;
+         if(transTypeList.length<1)
+         {
+           this.lblMessage=ValidationMessage.ERR_TRANSACTION_OFFERING;
+         }
+         else
+         {
+          this.transTypeList=data;
+         }
+        }
+        else
+        {
+          this.lblMessage=ValidationMessage.ERR_TRANSACTION_OFFERING;
+        }
+      },error => console.log("Error :: " + error));
+  }
+
+  GetOfferingDetails():void
+  {
+    this.PopulatePracticeSalesOwner();
+    this.PopulateOffshoreBDLead();
+    this.PopulateDeliveryOwner();
+    
+    this.fiscalOfferingService.FiscalGetSpecificOfferingDetails(btoa(String(this.strOppOfferingId)),(btoa(String(this.unit)))).subscribe(data=>
+    {
+       if(data!=undefined)
+       {
+        let OpportunitySpecificOffering:IFiscalOffering[]=new Array();
+        OpportunitySpecificOffering = data;
+        if(OpportunitySpecificOffering.length>0)
+        {
+          this.PopulateDeliveryCenter();
+          this.deliveryCentre=OpportunitySpecificOffering[0].DeliveryCenterID;
+          this.PopulateLocation();
+          this.mainDeliveryLocation=OpportunitySpecificOffering[0].MainDCID;
+          this.PopulateOffering();
+          this.offering=OpportunitySpecificOffering[0].OfferingID;
+          this.PopulateProcessType();
+          this.processType=OpportunitySpecificOffering[0].ProcessTypeID;
+          this.PopulateTransactionType();
+          this.transType=OpportunitySpecificOffering[0].TransipocID;
+          this.PopulateDeliveryOwner();
+          this.DeliveryOwnerID=OpportunitySpecificOffering[0].Delivery_Owner_ID;
+          this.seatReq=OpportunitySpecificOffering[0].SeatRequirements;
+          this.PopulatePracticeSalesOwner();
+          this.practiceSalesOwner=OpportunitySpecificOffering[0].PracticeSalesOwnerID;
+          this.fTECount=this.tCV_FTEList[0].EstimatedFteSize;
+          this.estimatedRevenue=this.NewFomattedInput((this.tCV_FTEList[0].TotalContractValue));
+          this.txtOpManagers=OpportunitySpecificOffering[0].SOC_1_LEADERSHIP;
+          this.txtTeamLeader=OpportunitySpecificOffering[0].SOC_1_TL;
+          this.txtTeamLeader1=OpportunitySpecificOffering[0].SOC_2_TL;
+          this.txtTeamMember=OpportunitySpecificOffering[0].SOC_2_TM;
+           this.txtOpManagers = this.tCV_FTEList[0].SOC_1_LEADERSHIP;
+          this.txtTeamLeader = this.tCV_FTEList[0].SOC_1_TL;
+         
+          if(!this.NullEmptyCheck(this.tCV_FTEList[0].PracticeSalesOwnerID))
+          {
+
+            this.practiceSalesOwner=0;
+          }
+          else
+          {
+            this.practiceSalesOwner=this.tCV_FTEList[0].PracticeSalesOwnerID;
+          }
+          if(!this.NullEmptyCheck(this.tCV_FTEList[0].Offshore_BDLeadID))
+          {
+
+             this.offShoreLead=0;
+          }
+          else
+          {
+            this.offShoreLead=this.tCV_FTEList[0].Offshore_BDLeadID;
+          }
+          if(this.NullEmptyCheck(this.tCV_FTEList[0].BusinessID))
+          {
+            this.business=this.tCV_FTEList[0].BusinessID;
+          }
+          if (this.unit == 1)
+          {
+            this.PopulateCompetency();
+          }
+          else if ((this.unit == 2) || (this.unit==3))
+          {
+            this.PopulateCompetency_BFS();
+          }
+          if(this.NullEmptyCheck(this.tCV_FTEList[0].CompetencyID))
+          {
+              this.competency=this.tCV_FTEList[0].CompetencyID;
+              this.PopulateOffering_New();
+          }
+          if(this.NullEmptyCheck(this.tCV_FTEList[0].SeatRequirements))
+          {
+              this.seatReq=this.tCV_FTEList[0].SeatRequirements;
+          }
+
+        }
+        else
+        {
+        }
+       }
+      },error => console.log("Error :: " + error));
+  }
+
+  BindGrid()
+  {
+
+    this.lblMessage = '';
+    let model=<IFiscalOffering>{};
+    model.StrOpportunityId=this.strOpportunityId;
+    model.StageId=this.strStage;
+    model.StrUnit=btoa(String(this.unit));
+    let offeringList:IFiscalOffering[]=new Array();
+    this.fiscalOfferingService.FiscalGetOfferingDetails(model).subscribe(data=>
+    {
+      if(data!=undefined)
+      {
+        offeringList=data;
+        if(offeringList.length>0)
+        {
+         offeringList.forEach(x=>x.TotalContractValue=x.TotalContractValue);
+         this.offeringDetailList=offeringList;
+     
+        }
+        else
+        {
+          this.offeringDetailList = [];
+          this.fiscalOfferingService.FiscalGetOpportunity(btoa(String(this.strOpportunityId))).subscribe(data=>
+            {
+              if(data!=undefined)
+              {
+                this.tCV_FTEList=data;
+                if(this.tCV_FTEList.length>0)
+                {
+                  if(this.NullEmptyCheck(this.tCV_FTEList[0].EstimatedFteSize))
+                  {
+                    this.fTECount=this.tCV_FTEList[0].EstimatedFteSize;
+                  }
+                  else
+                  {
+                  }
+                  if(this.NullEmptyCheck(this.tCV_FTEList[0].TotalContractValue))
+                  {
+                    this.estimatedRevenue=this.NewFomattedInput((this.tCV_FTEList[0].TotalContractValue));
+                  }
+                  else
+                  {
+                  }
+                }
+                else
+                {
+                }
+              }
+            },error => console.log("Error :: " + error));
+     
+
+        }
+        this.fiscalOfferingService.FiscalGetOpportunity(btoa(String(this.strOpportunityId))).subscribe(data=>
+          {
+            let strFTESize:string="0";
+            let strEstimatedRevenue:string= "0";
+            if(data!=undefined)
+            {
+              this.tCV_FTEList=data;
+              if(this.tCV_FTEList.length>0)
+              {
+                if(this.NullEmptyCheck(this.tCV_FTEList[0].EstimatedFteSize))
+                {
+                  strFTESize=String(data[0].EstimatedFteSize)
+                }
+                else
+                {
+                  strFTESize="0";
+                }
+                if(this.NullEmptyCheck(this.tCV_FTEList[0].TotalContractValue))
+                {
+                  strEstimatedRevenue=String(data[0].TotalContractValue)
+                }
+                else
+                {
+                  strEstimatedRevenue="0";
+                }
+              }
+
+            }
+
+
+
+
+        ////Footer.......
+        this.fiscalOfferingService.FiscalGetOfferingDetails(model).subscribe(data=>
+          {
+            let intFTECount:number=0;
+            let intEstRevenue:number=0;
+             let GridList:IFiscalOffering[]=new Array();
+            if(data!=undefined)
+            {
+              GridList=data;
+              GridList.forEach(element =>
+              {
+                if(this.NullEmptyCheck(element.EstimatedFteSize))
+                {
+                  intFTECount = intFTECount+Number(element.EstimatedFteSize);
+                }
+                if(this.NullEmptyCheck(element.TotalContractValue))
+                {
+                  intEstRevenue = intEstRevenue+Number(element.TotalContractValue);
+                }
+              });
+            }
+            if(this.NullEmptyCheck(strFTESize))
+            {
+               this.tFTECount= Number(strFTESize) - intFTECount;
+                  //set same value to textbox
+                if(!(this.NullEmptyCheck(this.constantOfferingId)))
+                {
+                  this.fTECount = Number(strFTESize) - intFTECount;
+                }
+            }
+            else
+            {
+              this.tFTECount=  intFTECount;
+              //set same value to textbox
+              if(!(this.NullEmptyCheck(this.constantOfferingId)))
+              {
+                this.fTECount = intFTECount;
+              }
+
+            }
+            if(this.NullEmptyCheck(strEstimatedRevenue))
+            {
+               this.tEstimatedRevenue = ((Number(strEstimatedRevenue)-intEstRevenue));
+               if(!(this.NullEmptyCheck(this.constantOfferingId)))
+                {
+                  this.estimatedRevenue = this.NewFomattedInput(((Number(strEstimatedRevenue)-intEstRevenue)));
+                    if(!this.NullEmptyCheck(this.estimatedRevenue) && this.checkTCV == 1)
+                    {
+                     this.warnMessage ="Please Enter Total Contract Value in Sales Stage";
+
+                      this.checkTCV = 0;
+                    }
+                    else
+                    {
+                      this.warnMessage ="";
+                      this.checkTCV = 0;
+                    }
+                }
+            }
+            else
+            {
+               this.tEstimatedRevenue = (intEstRevenue) ;
+              if(!(this.NullEmptyCheck(this.constantOfferingId)))
+               {
+                 this.estimatedRevenue =this.NewFomattedInput(((intEstRevenue)));
+                  if(!this.NullEmptyCheck(this.estimatedRevenue) && this.checkTCV == 1)
+                  {
+               this.warnMessage =ValidationMessage.REQ_TOTALCONTRACTVALUE_SALES;
+
+                    this.checkTCV = 0;
+                  }
+                  else
+                  {
+                    this.checkTCV = 0;
+                      this.warnMessage ="";
+                  }
+               }
+            }
+
+        },error => console.log("Error :: " + error));
+       },error => console.log("Error :: " + error));
+      }
+    },error =>
+    {
+    console.log("Error :: " + error);
+
+    });
+
+
+    }
+
+  OnDelete()
+  {
+
+    this.lblMessage = '';
+    this.successMessage = '';
+    let check = 0;
+    this.offeringDetailList.forEach(element=>
+    {
+      if(element.OfferingStatus == true)
+      {
+        let model:any;
+        model=
+        {
+            StrOpportunityId:this.strOpportunityId,
+            StageId:this.strStage,
+            OppOfferingID:element.OppOfferingID,
+            StrCreatedBy:this.strUserId
+        }
+        this.fiscalOfferingService.FiscalDeleteOfferingDetail(model).subscribe(response=>
+        {
+          this.BindGrid();
+        },error => console.log("Error :: " + error));
+        check = 1;
+      }
+    });
+    if(check==0)
+    {
+      this.lblMessage = ValidationMessage.REQ_DELETEFISCAL;
+    }
+    else
+    {
+    }
+
+  }
+  changewarning(item:any)
+  {
+    if(item.target.value!=null||item.target.value!="")
+    {
+      this.warnMessage="";
+    }
+  }
+  AllowPattern(event)
+    {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[0-9.-]");
+        if (regex.test(key)) {
+          if(key!=null||key!="")
+          {
+            this.warnMessage="";
+          }
+          return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+    }
+  OnSave()
+  {
+
+    this.lblMessage = '';
+    this.successMessage = '';
+    this.warnMessage="";
+    let intTotalFTE:number = 0, intActFTE:number = 0, intFalseFTE:number = 0, intBlankTCV:number = 0,
+    douTotalTCV:number = 0, douActTCV:number = 0, douFalseTCV:number = 0,
+    intFTEinput:number = 0, intBusinessID:number = 0, intCompetencyID:number = 0, intSeatRequirement:number = 0,
+    dblTCVinput:number=0,intOffringId:number = 0, intdeliveryId:number = 0;
+    let conditioncheck:number=0, dblPreTotalTCV:number=0;
+    if(this.GetValues() != true)
+    {
+      this.lblMessage=this.message;
+    }
+    else
+    {
+
+      if (!this.NullEmptyCheck(this.estimatedRevenue))
+      {
+        this.lblMessage = ValidationMessage.REQ_TOTALCONTRACTVALUE;
+      }
+      else
+      {
+    
+        let model=<IFiscalOffering>{};
+        model.StrOpportunityId=this.strOpportunityId;
+        model.StageId=this.strStage;
+        model.StrUnit=btoa(String(this.unit));
+        this.fiscalOfferingService.FiscalGetOfferingDetails(model).subscribe(data=>
+          {
+            let offeringList:IFiscalOffering[]=new Array();
+
+            if(this.lblCheck ==1)
+            {
+              if(data!=undefined)
+              {
+                offeringList=data;
+                if(offeringList.length>0)
+                {
+                  offeringList.forEach(element =>
+                  {
+                    if(this.offering==element.OfferingID && this.deliveryCentre==element.DeliveryCenterID)
+                    {
+                      this.lblMessage =ValidationMessage.VAL_LOCATION_OFFERING;
+                      conditioncheck = 1;
+                      return;
+                    }
+                  });
+                }
+              }
+            }
+            if(conditioncheck==0)
+            {
+              if(offeringList.length>0)
+              {
+                offeringList.forEach(element=>
+                {
+                  intTotalFTE =intTotalFTE +element.EstimatedFteSize;
+                  douTotalTCV=douTotalTCV+element.TotalContractValue;
+
+                });
+              }
+              let Model:any;
+              Model=
+              {
+                StrOpportunityId:this.strOpportunityId,
+                StageId:this.strStage
+              }
+              this.fiscalOfferingService.FiscalGetFTECount(Model).subscribe(data=>
+              {
+                let dstGetFTE:IFiscalOffering[]=new Array();
+                if(data!=undefined)
+                {
+                  dstGetFTE=data;
+                  if(dstGetFTE.length>0)
+                  {
+                    intActFTE=dstGetFTE[0].EstimatedFteSize;
+                    douActTCV=dstGetFTE[0].TotalContractValue;
+                  }
+                }
+                intFTEinput=this.fTECount;
+                var total=this.estimatedRevenue.replace(/\,/g,"");
+                dblTCVinput=Number(total);
+
+                if(dstGetFTE.length>0)
+                {
+                  if (!this.NullEmptyCheck(dstGetFTE[0].TotalContractValue))
+                  {
+                      intBlankTCV = 1;
+                  }
+                }
+                else
+                {
+                  intBlankTCV = 1;
+                }
+
+                if ((Number(intTotalFTE) > Number(intActFTE)) || Number((intFTEinput) > Number(intActFTE)))
+                {
+                    intFalseFTE = 1;
+                }
+                if (Number((douTotalTCV) > Number(douActTCV)) || Number((dblTCVinput) > Number(douActTCV)))
+                {
+                    douFalseTCV = 1;
+                }
+                let strSeatRequirements:number=0;
+                let intValidation:number = 0;
+                strSeatRequirements=this.seatReq;
+                if(this.NullEmptyCheck(strSeatRequirements))
+                {
+                  intSeatRequirement=strSeatRequirements;
+                }
+                if ((Number(intSeatRequirement) > Number(intFTEinput)) || (Number(intFTEinput) == 0))
+                {
+                  intValidation = 1;
+                }
+                if(intValidation==0)
+                {
+                  if (intFalseFTE == 0 && douFalseTCV == 0 && intBlankTCV == 0)
+                  {
+                    let strDC = this.deliveryCentre;
+                    let strMainDC = this.mainDeliveryLocation;
+                    let strOffering = this.offering;
+                    let strProcessType = this.processType;
+                    let strFTE = this.fTECount;
+                    let Revenue = 0;
+                    let strPracticeOwner:number;
+                    let strBDOwner:number;
+                    let intDeliveryOwner:number;
+                    let strTransactionType=this.transType;
+                    let strBusinessID = this.business;
+                    let strCompetencyID = this.competency;
+                    var total=this.estimatedRevenue.replace(/\,/g,"");
+                    Revenue = Number(total); 
+                    
+                    if(this.NullEmptyCheck(this.practiceSalesOwner))
+                    {
+                      strPracticeOwner = this.practiceSalesOwner;
+                    }
+                    else
+                    {
+                      strPracticeOwner =0;
+                    }
+                    if(this.NullEmptyCheck(this.offShoreLead))
+                    {
+                      strBDOwner = this.offShoreLead;
+                    }
+                    else
+                    {
+                      strBDOwner =0;
+                    }
+                    if(this.NullEmptyCheck(this.DeliveryOwnerID)&& this.DeliveryOwnerID!=0)
+                    {
+                      intDeliveryOwner=this.DeliveryOwnerID;
+                    }
+                    let model:any;
+
+                    let result=0;
+                    if(this.strOppOfferingId =="-1")
+                    {
+                      model=
+                      {
+                        StrOpportunityId:this.strOpportunityId,
+                        StageId:this.strStage,
+                        OppOfferingID:this.strOppOfferingId,
+                        DeliveryCenterID:strDC,
+                        MainDCID:strMainDC,
+                        OfferingID:strOffering,
+                        ProcessTypeID:strProcessType,
+                        TransipocID:strTransactionType,
+                        EstimatedFteSize:strFTE,
+                        TotalContractValue:Revenue,
+                        BDOwner:strBDOwner,
+                        PracticeOwner:strPracticeOwner,
+                        SOC_1_LEADERSHIP:this.txtOpManagers,
+                        SOC_1_TL:this.txtTeamLeader,
+                        SOC_2_TL:this.txtTeamLeader1,
+                        SOC_2_TM:this.txtTeamMember,
+                        StrCreatedBy:btoa(String(this.strUserId)),
+                        BusinessID:strBusinessID,
+                        CompetencyID:strCompetencyID,
+                        SeatRequirements:intSeatRequirement,
+                        Delivery_Owner_ID:intDeliveryOwner
+                      }
+                  
+                      this.fiscalOfferingService.FiscalPostOfferingDetail(model).subscribe(data=>
+                      {
+                    
+                        if(data!=undefined)
+                        {
+                          result=data;
+                        }
+                        if(result==1)
+                        {
+                          this.successMessage = ValidationMessage.SUC_SUCCESS;
+                          this.BindGrid();
+                          if ((this.unit == 2) || (this.unit == 3))
+                          {
+                          }
+                        }
+                      },error =>
+                      {
+                        console.log("Error :: " + error);
+                    
+                      });
+                    }
+                    else
+                    {
+                      if(this.NullEmptyCheck(this.constantOfferingId))
+                      {
+                        this.strOppOfferingId = this.constantOfferingId;
+                      }
+                      model=
+                      {
+                        StrOpportunityId:this.strOpportunityId,
+                        StageId:this.strStage,
+                        OppOfferingID:this.strOppOfferingId,
+                        DeliveryCenterID:strDC,
+                        MainDCID:strMainDC,
+                        OfferingID:strOffering,
+                        ProcessTypeID:strProcessType,
+                        TransipocID:strTransactionType,
+                        EstimatedFteSize:strFTE,
+                        TotalContractValue:Revenue,
+                        BDOwner:strBDOwner,
+                        PracticeOwner:strPracticeOwner,
+                        SOC_1_LEADERSHIP:this.txtOpManagers,
+                        SOC_1_TL:this.txtTeamLeader,
+                        SOC_2_TL:this.txtTeamLeader1,
+                        SOC_2_TM:this.txtTeamMember,
+                        StrCreatedBy:btoa(String(this.strUserId)),
+                        BusinessID:strBusinessID,
+                        CompetencyID:strCompetencyID,
+                        SeatRequirements:intSeatRequirement,
+                        Delivery_Owner_ID:intDeliveryOwner
+                     }
+                 
+                     this.fiscalOfferingService.FiscalPostOfferingDetail(model).subscribe(data=>
+                      {
+                    
+                        if(data!=undefined)
+                        {
+                          result=data;
+                        }
+                        if(result==1)
+                        {
+                          this.lblMessage = ValidationMessage.SUC_SUCCESS;
+                          this.BindGrid();
+
+                          if ((this.unit == 2) || (this.unit == 3))
+                          {
+                          }
+                        }
+                      },error =>
+                      {
+                    
+                        console.log("Error :: " + error)
+                      });
+                    }
+                  }
+                  if (intBlankTCV == 1)
+                  {
+                    this.lblMessage = ValidationMessage.VAL_NOTCV_OPPORTUNITY;
+                  }
+                  else
+                  {
+
+                    if (intFalseFTE == 1)
+                    {
+                      this.lblMessage = ValidationMessage.VAL_FTE_OPPORTUNITY;
+
+                    }
+                    if (douFalseTCV == 1)
+                    {
+                      this.lblMessage = ValidationMessage.VAL_TCV_OPPORTUNITY;
+
+                    }
+                    if (intFalseFTE == 1 && douFalseTCV == 1)
+                    {
+                      this.lblMessage= ValidationMessage.VAL_TCV_FTE_OPPORTUNITY;
+                    }
+                  }
+              
+                }
+                else
+                {
+                  if (intFTEinput == 0)
+                  {
+                    this.lblMessage= ValidationMessage.ERR_FTE;
+
+                  }
+                  else
+                  {
+                    this.lblMessage= ValidationMessage.VAL_SEAT_FTE;
+                  }
+              
+                }
+              },error => console.log("Error :: " + error));
+            }
+          },error => console.log("Error :: " + error));
+      
+      }
+
+    }
+
+  }
+  CheckAll(modifyOfferingDetails:boolean)
+  {
+    if(modifyOfferingDetails == true)
+    {
+      this.offeringDetailList.forEach(element=>
+        {
+
+          element.OfferingStatus=true;
+        });
+    }
+    if(modifyOfferingDetails == false)
+    {
+      this.offeringDetailList.forEach(element=>
+        {
+
+          element.OfferingStatus=false;
+        });
+    }
+
+  }
+  Triggermail()
+  {
+    this.lblMessage = '';
+    this.successMessage = '';
+    if(this.NullEmptyCheck(this.empID))
+    {
+      let strSendMailEmpID:string = null;
+      let strSendMailName:string = null;
+      let strSendMailEmail:string = null;
+      let strUserLoginFullName:string = null;
+      let EmpList:any[]=new Array();
+      let OppDetailsList:any[]=new Array();
+      strSendMailEmpID = String(this.empID);
+      let  strOppDesc = "";
+      let  strCustomerName ="";
+      let  strDealstage ="";
+      let  strCreatedBy ="";
+      let  strEventType:string = this.constant.FISCAL_EVENTTYPE;
+      let intApplicationId:number = this.constant.FISCAL_APPLICATIONID;
+      let strTemplateType:string = this.constant.FISCAL_TEMPLATETYPE;
+      this.fiscalOfferingService.GetEmployeeDetails(btoa(String(this.strOpportunityId)),btoa(String(this.empID)),btoa(String(this.strUserId))).subscribe(data=>
+      {
+    
+        if(data!=undefined)
+         {
+           if(data[1]!=undefined)
+           {
+            EmpList=data[1];
+            if(EmpList.length>0)
+            {
+             strSendMailEmail = EmpList[0].EmpEmail;
+             strSendMailName =  EmpList[0].FullName;
+            }
+           }
+           if(data[0]!=undefined)
+           {
+              OppDetailsList=data[0];
+              if(OppDetailsList.length>0)
+              {
+                strOppDesc = OppDetailsList[0].StrOpportunityDescription;
+                strCustomerName = OppDetailsList[0].StrCustName;
+                strDealstage = OppDetailsList[0].StrStageName;
+                strCreatedBy = OppDetailsList[0].StrCreatedBy;
+              }
+           }
+            this.fiscalOfferingService.GetEmailEmployeeDetail(btoa(String(strCreatedBy))).subscribe(data=>
+            {
+
+
+
+             strUserLoginFullName =  EmpList[0].FullName;
+           if(this.NullEmptyCheck(this.strUserId))
+           {
+              if(this.NullEmptyCheck(strSendMailEmail))
+              {
+            
+                let Model=<IEmail>{};
+                Model.strEventType =strEventType;
+                Model.strTemplateType=strTemplateType;
+                Model.intApplicationId =intApplicationId;
+                Model.strSendMailEmpID=strSendMailEmpID;
+                Model.strSendMailName =strSendMailName;
+                Model.strSendMailEmail =strSendMailEmail;
+                Model.strUserLoginFullName=strUserLoginFullName;
+                Model.strOppId =this.strOpportunityId;
+                Model.strOppDesc=strOppDesc;
+                Model.strCustomerName=strCustomerName;
+                Model.strDealstage =strDealstage;
+                this.fiscalOfferingService.EmailAlertOffering_TrefCreation(Model).subscribe(data=>
+                {
+                this.successMessage = ValidationMessage.SUC_MAIL;
+            
+                },error =>
+                {
+            
+                });
+              }
+           }
+          });
+        }
+    
+      },error => console.log("Error :: " + error));
+  
+    }
+    else
+    {
+      this.lblMessage = ValidationMessage.VAL_EMPLOYEEID;
+    }
+
+  }
+
+  ResetCombos():void
+  {
+
+    this.deliveryCentre = 0;
+    this.mainDeliveryLocation =0;
+    this.offering = 0;
+    this.processType = 0;
+    this.offShoreLead = 0;
+    this.practiceSalesOwner = 0;
+    this.transType = 0;
+    this.seatReq = 0;
+    if (this.strRole == "Administrator")
+    {
+    this.competency = 0;
+    this.checkCompetencyStatus =false;
+    }
+    else if (this.strRole == "Presales" || this.strRole == "Domain Leaders" || this.strRole == "Cluster Administrator")
+    {
+      if ((this.unit == 2) || (this.unit == 3))
+      {
+        this.competencyList = [];
+      }
+      else
+      {
+          this.SetDefaultValues();
+      }
+    }
+  }
+  Clear():void
+  {
+
+    this.deliveryCentre = 0;
+    this.mainDeliveryLocation =0;
+    this.offering = 0;
+    this.processType = 0;
+    this.offShoreLead = 0;
+    this.practiceSalesOwner = 0;
+    this.transType = 0;
+    if (this.strRole == "Administrator")
+    {
+    this.competency = 0;
+    this.checkCompetencyStatus =false;
+    this.checkBusinessStatus = false;
+    }
+    else if (this.strRole == "Presales" || this.strRole == "Domain Leaders" || this.strRole == "Cluster Administrator")
+    {
+      if ((this.unit == 2) || (this.unit == 3))
+      {
+        this.competencyList = [];
+      }
+      else
+      {
+          this.SetDefaultValues();
+      }
+    }
+
+  }
+  SetDefaultValues():void
+  {
+    if(this.competencyList.length>0)
+    {
+      this.competency = this.competencyList[1].CompetencyID;
+      this.checkCompetencyStatus = true;
+      this.checkBusinessStatus = true;
+    }
+
+  }
+  NullEmptyCheck(inputtext: any): any
+  {
+    if (inputtext == null || inputtext == undefined || inputtext == '' || inputtext == 0 || inputtext == '0')
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+  }
+
+
+  PopulateDeliveryOwner(){
+
+    if(this.unit==2)
+    {
+      this.showDeliveryOwner=true;
+      this.fiscalOfferingService.GetDeliveryOwnerMaster().subscribe(result=>{
+
+        this.DeliveryOwnerList=result;
+      },error => console.log("Error :: " + error))
+    }
+
+  }
+
+
+  openAddFiscalOffering(id:any) {
+   this.strOppOfferingId=id;
+   this.GetOfferingDetails();
+}
+
+
+FormatInputTCV(event:any)
+    {
+        
+        var $this = $( event.target );
+        var input=event.target.value;
+        var input = input.replace(/[\D\s\._\-]+/g, "");
+        input = input ? parseInt( input, 10 ) : 0;
+        $this.val( function() {
+            return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
+        } );
+    }
+
+    NewFomattedInput(input:any){
+
+        var input = input.replace(/[\D\s\._\-]+/g, "");
+        input = input ? parseInt( input, 10 ) : 0;
+       
+        return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
+       
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
