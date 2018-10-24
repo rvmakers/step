@@ -1,0 +1,109 @@
+<app-menu-component></app-menu-component>
+<head>
+  <style>
+    html {
+      display: none;
+    }
+  </style>
+  <script>
+    if (self === top) {
+      document.documentElement.style.display = 'block';
+    }
+    else {
+      top.location = self.location;
+    }
+  </script>
+</head>
+<div class="body-content">
+<router-outlet></router-outlet>
+</div>
+<ng-progress></ng-progress>
+<div class="overlay">
+<div class="overlay-text">Loading data. Please wait...</div>
+
+</div>
+<app-footer-component></app-footer-component>
+<a *ngIf='isLoggedIn==true' id="back-to-top" href="javascript:void();" class="btn btn-primary btn-lg back-to-top" role="button"  data-toggle="tooltip" style="float:right;margin-bottom:66px" data-placement="right">
+        <fa name="chevron-up"></fa>
+    </a>
+
+
+
+
+ 
+.ts
+
+import { Component, TemplateRef, HostListener, OnDestroy,OnInit } from '@angular/core';
+
+import { ActivatedRoute, Router } from '@angular/router';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { CookieService } from 'ngx-cookie-service';
+
+declare var $: any;
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styles: [
+    `.logo {
+      max-height: 30px;
+      padding-bottom: 5px;
+    }`
+  ]
+})
+export class AppComponent implements OnInit  {
+  title: string;
+  modalService: any;
+  public modalRef: BsModalRef;
+  name: string = '';
+  isRefreshed: boolean = false;
+  isLoggedIn:boolean=false;
+
+ 
+
+  constructor(private router: Router, private cookieService: CookieService) { }
+  ngOnInit() {
+    if (this.cookieService.get('userId') && this.cookieService.get('userUnit')&& this.cookieService.get('userRole')) {
+   this.isLoggedIn=true;
+    
+    }
+
+    $(document).ready(function () {
+      $(window).scroll(function () {
+        if ($(this).scrollTop() > 50) {
+          $('#back-to-top').fadeIn();
+        } else {
+          $('#back-to-top').fadeOut();
+        }
+      });
+      // scroll body to 0px on click
+      $('#back-to-top').click(function () {
+        $('#back-to-top').tooltip('hide');
+        $('body,html').animate({
+          scrollTop: 0
+        }, 800);
+        return false;
+      });
+
+      $('#back-to-top').tooltip('show');
+
+    });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  public beforeunloadHandler($event) {
+
+    // this.cookieService.delete("userUnit");
+    // this.cookieService.delete("userRole");
+    // this.cookieService.delete("userId");
+
+  }
+
+
+  public openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template);
+  }
+
+  
+
+}
