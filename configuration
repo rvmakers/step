@@ -1,0 +1,269 @@
+<div class="wraper">
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+      <div class="posr">
+        <ol class="breadcrumb">
+          <li class="active">
+            <a href="#" class="color-compact">Master</a>
+          </li>
+          <li class="font-14">Domain BPS</li>
+        </ol>
+        <p class="page-header">Configuration Manager</p>
+      </div>
+    </div>
+  </div>
+  <!-- <div [hidden]="Messagetype =='' " style="margin-left:-1%" [ngClass]="Messagetype=='Success'?'alert alert-success':Messagetype=='Danger'?'alert alert-danger':''">
+    <p class="text-center" for="messages">{{Messages}}</p>
+  </div> -->
+  <app-lbl-message [MessageType]="messageType" [Messages]="messages"></app-lbl-message>
+  <div class="row">
+     <div class="table responsive">
+      <table class="table-bordered table table-striped fixed">
+
+        <thead style="background: #ccc;border-bottom-width: 0">
+          <tr>
+            <th>
+              SNo
+            </th>
+            <th>
+              Field Name
+            </th>
+            <th>
+              Descriptive
+            </th>
+            <th>
+              Status
+            </th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let objField of fieldList|paginate:{itemsPerPage:10,currentPage:p,id:'first'};let i=index;">
+
+              <td>
+                {{i+1}}
+              </td>
+              <td>
+                <!-- <td *ngFor="let object of ConfigurationList" > -->
+                  {{objField.field}}
+              </td>
+              <td>
+                {{objField.descriptive}}
+                <!-- <div *ngIf="objField.Status==1;then Enable else Disable"></div>
+                <ng-template #Disable>
+                  Disable
+                </ng-template>
+                <ng-template #Enable>
+                  Enable
+                </ng-template> -->
+
+              </td>
+              <td>
+            <!-- <input type="checkbox" [checked]="objField.Status==1" (click)="objField.Status==0?objField.Status=1:objField.Status=0"> -->
+            <input type="checkbox"name="checkbox" [checked]="objField.status==1" (click)="CheckSequence($event,objField)">
+
+              </td>
+
+          </tr>
+
+
+        </tbody>
+      </table>
+
+      <div  class="col-lg-4 col-md-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-xs-offset-4">
+      <pagination-controls (pageChange)="p=$event" id="first"> </pagination-controls>
+      </div>
+      <div class="row">
+          <div class="col-md-4 col-lg-4 col-sm-4 col-md-offset-5 col-lg-offset-5 col-sm-offset-5">
+            <button class="btn btn-primary" (click)="OnSubmit()">Save</button>
+          </div>
+        </div>
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <table border="2px">
+      <tr>
+        <th ng-repeat="th in keys">{{th}}</th>
+      </tr>
+      <tr ng-repeat="x in data">
+        <td ng-repeat="th in keys">
+            {{ x[th]}}
+        </td>
+      </tr>
+    </table>
+
+  var keys = Object.keys(myObject); -->
+<!-- <div class="col-md-12 col-lg-12 col-lg-sm-12">
+    <div class="col-md-4 col-lg-4 col-sm-4 col-md-offset-4 col-lg-offset-4 col-sm-offset-4">
+        <button type="button" class="btn btn-success" (click)="OnSubmit()">
+    </div>
+  </div> -->
+
+
+
+.ts
+
+import { Component, OnInit } from '@angular/core';
+import {IConfiguration} from '../Interface/Configuration/configuration';
+import {ConfigurationService} from '../Services/Configuration.service';
+import {CookieService} from 'ngx-cookie-service';
+import {LblMessageComponent} from '../UserControls/Lbl-message/lbl-message.component';
+
+@Component({
+  selector: 'app-configuration',
+  templateUrl: './configuration.component.html',
+  styleUrls: ['./configuration.component.css']
+})
+export class ConfigurationComponent implements OnInit {
+
+  configurationList:IConfiguration[]= new Array();
+  headerList:string[];
+  unitID: number;
+  loginID:number;
+  messages:string;
+  messageType:string;
+  fieldList:IConfiguration[]= new Array();
+  p:number;
+
+  constructor(private configurationservice:ConfigurationService,
+  private cookieservice:CookieService) { }
+
+  ngOnInit()
+  {
+
+
+    this.unitID = Number(atob(this.cookieservice.get('userUnit')));
+    this.loginID = Number(atob(this.cookieservice.get('userId')));
+    this.messageType= "" ;
+
+
+this.configurationservice.GetOpportunityField(this.unitID).subscribe(data=>
+  {
+  if(data != undefined)
+  {
+    this.fieldList = data;
+
+  }
+  });
+
+  }
+
+  OnSubmit()
+  {
+    // this.configurationList[0].loginID=this.loginID;
+    // this.configurationList[0].unitID=this.unitID;
+
+   let ObjConfiguration:any;
+   ObjConfiguration =
+   {
+    unitID:this.unitID,
+    loginID:this.loginID,
+    fieldconfigurationList:this.fieldList
+   }
+
+   this.messageType = '' ;
+    this.configurationservice.PostOpportunityField(ObjConfiguration).subscribe(data=>
+    {
+    let result:number;
+   if (data !== undefined)
+   {
+    result = data.result;
+    this.fieldList = data.fieldconfigurationList;
+   }
+   if (result === 1)
+   {
+     this.messages = 'Added successfully..';
+     this.messageType = 'Success';
+   }
+   else if (result === 2)
+   {
+    this.messages = 'Updated successfully..';
+    this.messageType = 'Success';
+   }
+   else
+   {
+    this.messages = 'Technical issue contact Admin..';
+    this.messageType = 'Danger';
+   }
+
+    });
+  }
+
+
+  Checksequence( event: any , objField:IConfiguration): any
+  {
+
+    this.messageType = '';
+    let index:number;
+    let copyfieldList:IConfiguration[];
+    copyfieldList = this.fieldList;
+    let check:number;
+    check = 0;
+    if (objField.status === 0)
+      {
+        objField.status = 1;
+      }
+      else
+      {
+        objField.status = 0;
+      }
+
+    if (objField.status === 0)
+    {
+      copyfieldList.forEach(element =>
+        {
+          if (element.group === objField.group && element.sequence > objField.sequence && element.status === 1)
+          {
+            check = 1;
+            index = copyfieldList.findIndex(x => x.fieldID === objField.fieldID);
+            copyfieldList[index].status = 1 ;
+            this.messages = 'Please Uncheck the lower sequence first.';
+            this.messageType = 'Danger';
+            this.fieldList = copyfieldList;
+            event.preventDefault();
+          }
+        });
+    }
+    if (check === 0)
+    {
+      copyfieldList.forEach(element =>
+        {
+          if (element.fieldID === objField.fieldID)
+          {
+            index = copyfieldList.findIndex(x => x.fieldID === objField.fieldID);
+            copyfieldList[index].status = objField.status;
+            this.fieldList = copyfieldList;
+          }
+        });
+    }
+
+    this.fieldList = copyfieldList;
+  }
+
+}
+//  Unit: number = Number(atob(this.cookieService.get('userUnit')));
+
+
+
+
+
