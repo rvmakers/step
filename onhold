@@ -1,0 +1,3808 @@
+<style id="antiClickjack">body{display:none !important;}</style>
+  <script type="text/javascript">
+    if (self === top) {
+        var antiClickjack = document.getElementById("antiClickjack");
+        antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+        top.location = self.location;
+    }
+    </script>
+<div class="wraper">
+    <div class="row">
+       <div class="col-md-12">
+          <div class="widget stacked">
+            <ol class="breadcrumb">
+                <li class="active">
+                    <a  class="color-compact">RPM++</a>
+                </li>
+                <li class="font-14">{{unitText}}</li>
+            </ol>
+            <h1 class="page-header">{{presalesStage}}</h1>
+            <div [hidden]="messageType =='' ">
+                <div style="margin-left:-1%" [ngClass]="messageType=='Success'?'alert alert-success':messageType=='Danger'?'alert alert-danger':''">                      
+                    <p class="text-center" for="messages">{{validationMessage}}</p>                      
+                </div>                       
+            </div>
+            <div class="widget-content">
+              <div class="row borderbox">
+              <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="form-group clearfix">
+                    <label class="col-md-4">Opportunity Id<span style="color: #ff0000">*</span></label>
+                    <div class="col-md-8">
+                      <span>{{opportunityId}}</span>
+                    </div>
+                </div> 
+                <div *ngIf="loss1" class="form-group clearfix">
+                    <label class="col-md-4">RFP Loss feedback received from?<span style="color: #ff0000">*</span></label>
+                    <div class="col-md-8">
+                        <select [(ngModel)]="lossFeedback"  class="form-control">
+                            <option value="0">--Select--</option>
+                            <option *ngFor="let item of lossFeedbackList" value={{item.Value}}>
+                                  {{item.Text}}
+                              </option>
+                        </select>
+                    </div>
+                </div>
+                <div *ngIf="loss2" class="form-group clearfix">
+                    <label class="col-md-4">LOSS Reasons<span style="color: #ff0000">*</span></label>
+                    <div class="col-md-8">
+                        <angular2-multiselect [data]="lossReasonList" [(ngModel)]="lossReason" [settings]="dropdownSettings" (onSelect)="onItemSelect($event)"
+                        (onDeSelect)="OnItemDeSelect($event)" (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)"  name="skills">
+                      </angular2-multiselect>
+                    </div>
+                </div>
+                <div *ngIf="loss3" class="form-group clearfix">
+                    <label class="col-md-4">{{LOSS_Verbatim}}<span style="color: #ff0000">*</span> </label>
+                    <div class="col-md-8">
+                      <textarea [(ngModel)]="lossVerbatim" (keypress)="BlockSpecialChar($event)"  maxlength="50" rows="4" cols="39"></textarea>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                  <label class="col-md-4">{{Reason}}</label>
+                  <div class="col-md-8">
+                    <textarea [(ngModel)]="reason" (keypress)="BlockSpecialChar($event)"  maxlength="50" rows="4" cols="39"></textarea>
+                  </div>
+                </div>
+                <div class="form-group clearfix">
+                  <label class="col-md-4">Was Proposal Factory support taken on this deal<span style="color: #ff0000">*</span></label>
+                  <div class="col-md-8">
+                    <div class="btn-group btn-toggle">
+                      <button id=PFActive (click)="ActivePF(1)"   class="btn btn-default">Yes</button>
+                      <button id=PFInActive (click)="InActivePF(0)"   class="btn btn-default">No</button>
+                    </div>
+                    <div *ngIf="proactiveProposalVisible">
+                        <select [(ngModel)]="proactiveProposal"  class="form-control">
+                            <option value="0">--Select--</option>
+                            <option *ngFor="let item of proactiveProposalList" value={{item.Value}}>
+                                  {{item.Text}}
+                              </option>
+                        </select>
+                    </div>  
+                  </div>
+                </div>   
+                
+                <!-- <div class="form-group clearfix">
+                        <label>Offering Type<span style="color: #ff0000">*</span></label>
+                        <div class="col-md-8">
+                        <select [(ngModel)]="OfferingTypeID" class="form-control">
+                            <option value="0">--Select--</option>
+                            <option *ngFor="let item of iOfferingType" value={{item.offeringType}}>
+                                {{item.offeringTypeName}}
+                            </option>
+                        </select>
+                    </div> -->
+               				
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="form-group clearfix">
+                    <label class="col-md-4">{{lblFiscalYear}}<span style="color: #ff0000">*</span></label>
+                    <div class="col-md-8">
+                          <my-date-picker  [options]="myDatePickerOptions" 
+                          [(ngModel)]="FYDate" required></my-date-picker>
+                    </div>
+                </div>
+                <div *ngIf="loss1" class="form-group clearfix">
+                    <label class="col-md-4">Lost to Competition<span style="color: #ff0000">*</span></label>
+                    <div class="col-md-8">
+                      <div class="btn-group btn-toggle">
+                        <button id="LossCompActive" (click)="ActiveLossComp('1')"   class="btn btn-default">Yes</button>
+                        <button id="LossCompInActive" (click)="InActiveLossComp('0')"   class="btn btn-default">No</button>
+                      </div>
+                      <div *ngIf="competitionVisible">
+                          <angular2-multiselect [data]="lostCompetitionList" [(ngModel)]="lostCompetition" [settings]="dropdownSetting" (onSelect)="onItemSelect($event)"
+                          (onDeSelect)="OnItemDeSelect($event)" (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)"  name="skills">
+                        </angular2-multiselect>
+                      </div>  
+                    </div>
+                </div>   
+                <div *ngIf="othersVisible" class="form-group clearfix">
+                    <label class="col-md-4"></label>
+                    <div class="col-md-8">
+                          <textarea [(ngModel)]="others" (keypress)="BlockSpecialChar($event)"  maxlength="50" rows="4" cols="39"></textarea>
+                    </div>
+                </div>
+                <div *ngIf="loss2" class="form-group clearfix">
+                    <label class="col-md-4">{{Lessons_Learnt}}<span style="color: #ff0000">*</span> </label>
+                    <div class="col-md-8">
+                      <textarea [(ngModel)]="leasonLearnt" (keypress)="BlockSpecialChar($event)"  maxlength="50" rows="4" cols="39"></textarea>
+                    </div>
+                </div>     
+                <div class="form-group clearfix">
+                  <label class="col-md-4">{{comments_onhold}}</label>
+                  <div class="col-md-8">
+                    <textarea [(ngModel)]="comments" (keypress)="BlockSpecialChar($event)" placeholder="Your feedback would be deeply appreciated"  maxlength="50" rows="4" cols="39"></textarea>
+                  </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-md-4">Actual Close Date</label>
+                    <div class="col-md-8">
+                        <my-date-picker  [options]="myDatePickerOptions" 
+                        [(ngModel)]="actualclosedate" [disabled]="true" required></my-date-picker>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-md-4">Deal Closure Reason</label>
+                    <div class="col-md-8">
+                        <textarea class="form-control" [(ngModel)]="dealClosureReason" id="closereason"></textarea>
+                    </div>
+                </div>
+  
+                <div *ngIf="stage13Visible" class="form-group clearfix">
+                    <label class="col-md-4">Send To Stage </label>
+                    <div class="col-md-8">               
+                        <select [(ngModel)]="DealStage" class="form-control" >
+                            <option [value]=-1>--Select--</option>
+                            <option *ngFor="let item of DealStageList" value={{item.StageID}}>
+                              {{item.STAGE_NAME}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div  class="form-group clearfix">
+                      <label class="col-md-4"> </label>
+                      <label class="col-md-4"> </label>
+                      <label class="col-md-4"> </label>
+                      <label class="col-md-4"> </label>
+                      <label class="col-md-4"> </label>
+                      <div class="col-md-8">               
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <div *ngIf="lossComp=='No'">
+                          <br>
+                          <br>
+                        </div>
+                      </div>
+                      <label class="col-md-4"> </label>
+                      <label class="col-md-4"> </label>
+                </div>
+               
+                <div class="form-group clearfix">
+                    <label class="col-md-4"></label>
+                    <div class="col-md-8">
+                     
+                    </div>
+                </div> 
+                <div class="form-group clearfix">
+                    <label class="col-md-4"></label>
+                    <label class="col-md-4"></label>
+                    <div class="col-md-8">
+                     
+                    </div>
+                </div>
+               
+                
+              </div>
+              <div *ngIf="loss4" class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4" *ngIf="userUnit=='2'">
+                    <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                        <div class="col-md-8 form-group clearfix">
+                            <label style="color: #db3e00fb;text-decoration:underline;" >Reasons</label>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <div *ngIf="loss4" class="row">
+                  <div class="col-lg-4 col-md-4 col-sm-4" *ngIf="userUnit=='2'">
+                      <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                          <div class="col-md-8 form-group clearfix">
+                              <label >Reason 1<span style="color: #ff0000">*</span></label>
+                              <select [(ngModel)]="reason1"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of reasonList" value={{item.DEAL_REASON_ID}}>
+                                      {{item.DEAL_REASON_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4" *ngIf="userUnit=='2'">
+                      <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                          <div class="col-md-8 form-group clearfix">
+                              <label >Reason 2<span style="color: #ff0000">*</span></label>
+                              <select [(ngModel)]="reason2"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of reasonList" value={{item.DEAL_REASON_ID}}>
+                                      {{item.DEAL_REASON_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+              </div> 
+              <div *ngIf="loss4" class="row">
+                  <div class="col-lg-4 col-md-4 col-sm-4" *ngIf="userUnit=='2'">
+                      <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                          <div class="col-md-8 form-group clearfix">
+                              <label >Reason 3<span style="color: #ff0000">*</span></label>
+                              <select [(ngModel)]="reason3"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of reasonList" value={{item.DEAL_REASON_ID}}>
+                                      {{item.DEAL_REASON_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="row" *ngIf="btnSubmitVisible">
+                <div class="col-md-12">
+                    <div class="form-group text-center mar-top-20">                      
+                            <button type="button" class="btn btn-primary" [disabled]="disableSubmit"  (click)="Save()">Submit</button>                    
+                    </div>
+                </div> 
+              </div>   
+              <div class="row" *ngIf="btnListVisible">
+                  <div class="col-md-12">   
+                      <div class="form-group text-center mar-top-20">   
+                          <div *ngIf="showStage13">                  
+                           <button type="button" class="btn btn-primary" [disabled]="disableStage13"  (click)="Submit()">Submit</button>
+                           </div>
+                           <div>
+                           <button type="button" class="btn btn-primary" [disabled]="disableList" (click)="GotoList()">Go to Opportunity List</button>
+                           </div>
+                      </div>
+                  </div> 
+              </div>        
+              <!-- </div> -->
+              <div>
+                <br>
+              </div>
+              <div *ngIf="opportunityVisible" class="row borderbox">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Deal Owner1  </label>
+                        <app-ddl-deal-owner1  [disableCommon]="disableCommon"></app-ddl-deal-owner1>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                        <label >Deal Owner2</label>
+                        <app-ddl-deal-owner2 [disableCommon]="disableCommon" ></app-ddl-deal-owner2>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                      <div class="form-group">
+                          <label>Deal Stage</label>
+                          <app-ddl-deal-stage [disableCommon]="disableCommon"></app-ddl-deal-stage>
+                      </div>
+                  </div>
+                  <div class="col-md-3">
+                      <div class="form-group">
+                          <label for="name">Customer Type</label>
+                          <app-customer-type [disabled]="disabled"></app-customer-type>
+                      </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                          <label>Customer Name</label>
+                          <select [(ngModel)]="customer" [disabled]="disableCommon" class="form-control">
+                                <option [value]=0>--Select--</option>
+                                <option *ngFor="let item of customerNameList" value={{item.CustomerId}}>
+                                    {{item.CustomerName}}
+                                </option>
+                          </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                          <label>IP Name </label>
+                          <app-industry-practice  [disabledIP]="disabledIP"></app-industry-practice>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Country</label>
+                            <app-ddl-country [disableCommon]="disableCommon" ></app-ddl-country>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Geography</label>
+                            <app-ddl-geography  [disabledgeo]="disabledgeo"></app-ddl-geography>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                          <label>ISU Name</label>
+                          <app-ddlisu [disableCommon]="disableCommon" ></app-ddlisu>
+                      </div>
+                    </div>
+                                         
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Vertical                                    
+                            </label>
+                            <app-ddl-vertical [disableCommon]="disableCommon" [(ngModel)]="vertical" [vertical]="vertical" [verticalList]="verticalList" ></app-ddl-vertical>
+                        </div>
+                    </div>
+                                        
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Account/Sales Owner</label>
+                            <app-account-sales-owner [disableCommon]="disableCommon"></app-account-sales-owner>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Geography Sales Owner</label>
+                            <app-geography-sales-owner [disableCommon]="disableCommon"></app-geography-sales-owner>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Offshore Presales Lead– Horizontal</label>
+                            <app-ddl-offshore-presales-lead-horizontal [disableCommon]="disableCommon"></app-ddl-offshore-presales-lead-horizontal>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Offshore Presales Lead – Vertical</label>
+                            <app-ddl-offshore-presales-lead-vertical [disableCommon]="disableCommon"></app-ddl-offshore-presales-lead-vertical>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Executive Sponsor</label>
+                              <app-executive-sponsor [disableCommon]="disableCommon"></app-executive-sponsor>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>ISU Owner</label>
+                              <select [(ngModel)]="ISUOwner" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of ISUOwnerList" value={{item.ISCCD}}>
+                                      {{item.ISCName}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Opportunity Date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="opportunityDate" required></my-date-picker>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                              <div class="form-group">
+                                  <label> Deal Closure Expected Date</label>
+                                  <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                                  [(ngModel)]="closureDate" required></my-date-picker>
+                              </div>
+                          </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                IOU Name
+        
+                            </label>
+                            <app-ddliou [(ngModel)]="iou" [iou]="iou" [disableIOU]="disableIOU" [iouList]="iouList"></app-ddliou>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                SUB IOU
+                               
+                            </label>
+                            <app-ddl-sub-iou [subiou]="subiou" [disableSubIOU]="disableSubIOU" [subiouList]="subiouList"></app-ddl-sub-iou>
+                        </div>
+                      </div>
+                      
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Offshore Practice Owner</label>
+                              <select [(ngModel)]="offshorePracticeOwner" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of offshorePracticeOwnerList	" value={{item.PRACTICE_SALES_OWNER_ID}}>
+                                      {{item.PRACTICE_SALES_OWNER_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Opportunity Flag</label>
+                              <select [(ngModel)]="opportunityFlag" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of opportunityFlagList" value={{item.Category_Id}}>
+                                      {{item.Category_Name}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Currency</label>
+                              <select [(ngModel)]="currency" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of currencyList" value={{item.CurrencyID}}>
+                                      {{item.CurrencyName}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Pricing Type</label>
+                              <select [(ngModel)]="pricingType" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of pricingTypeList" value={{item.PRICING_TYPE_ID}}>
+                                      {{item.PRICING_TYPE_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>BCP / DRP Location</label>
+                              <select [(ngModel)]="BCPorDRPLocation" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of BCPorDRPLocationList" value={{item.LOCATION_ID}}>
+                                      {{item.LOCATION_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Operation Window</label>
+                              <select [(ngModel)]="opportunityWindow" [disabled]="disableCommon" class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of opportunityWindowList" value={{item.OPEATION_WINDOW_ID}}>
+                                      {{item.OPERATION_WINDOW_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Area</label>
+                              <select [(ngModel)]="area" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of areaList" value={{item.AreaID}}>
+                                      {{item.AreaName}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Types of Seat</label>
+                              <select [(ngModel)]="typesofseat" [disabled]="disableCommon"  class="form-control">
+                                  <option value=0>--Select--</option>
+                                  <option *ngFor="let item of seatList" value={{item.TYPES_OF_SEAT_ID}}>
+                                      {{item.TYPES_OF_SEAT_NAME}}
+                                  </option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Expected Revenue Qtr - FY                      
+                            </label>                            
+                            <select [disabled]="disableCommon"  [(ngModel)]="expectedRevenueQtrYr" class="form-control">
+                                <option value="0">--Select--</option>
+                                <option *ngFor="let item of expectedRevenueQtrYrList" value={{item.FiscalYear}}>{{item.FiscalYear}}</option>
+                            </select>                        
+                        </div>
+                    </div>    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>	Annual Sale Value</label>
+                            <input type="text" [(ngModel)]="AnnualSaleValue" [disabled]="disableCommon" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>	FTE size</label>
+                            <input type="text" [(ngModel)]="FTEsize" [disabled]="disableCommon" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>	No. of FTE Offshore</label>
+                            <input type="text" [(ngModel)]="FTEOffshore" [disabled]="disableCommon" class="form-control"/>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>No. of FTE Onsite</label>
+                              <input type="text" [(ngModel)]="FTEonsite" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Deal Term(Months)</label>
+                              <input type="text" [(ngModel)]="dealTerm" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>	Duration of Training(Days)</label>
+                              <input type="text" [(ngModel)]="durationofTraining" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Total Contract Value(in USD)</label>
+                              <input type="text" [(ngModel)]="TCV" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>No of associates for onsite training</label>
+                              <input type="text" [(ngModel)]="onsiteTraining" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>No of days in this stage</label>
+                              <input type="text" [(ngModel)]="noofdaysStage" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Opportunity Tracked By                     
+                            </label>
+                            <br>
+                            <div class="btn-group btn-toggle pull-left" id="yesno" style="margin: 4px;">
+                                <button [disabled]="disableCommon"  id='TrackedByYes' class="btn btn-default">Presales</button>
+                                <button [disabled]="disableCommon"  id='TrackedByNo' class="btn btn-default">Delivery</button>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Proactive Proposal                              
+                            </label>
+                            <br>
+                            <div class="btn-group btn-toggle pull-left" id="yesno" style="margin: 4px;">
+                                <button [disabled]="disableCommon"  id='proactiveProposalY' class="btn btn-default">Proactive</button>
+                                <button [disabled]="disableCommon"  id='proactiveProposalN' class="btn btn-default">Reactive</button>
+                            </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>RFI Received date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="RFIReceivedDate" required></my-date-picker>
+                             
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Actual RFI Submission date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="actualRFISubmissiondate" required></my-date-picker>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Probable RFI Submission date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="RFIProbableSubmissionDate" required></my-date-picker>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Shortlist date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="shortlistDate" required></my-date-picker>
+                          </div>
+                      </div>              
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">                         
+                            <label>RFP Received date</label>       
+                            <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                            [(ngModel)]="RFPReceiveddate" required></my-date-picker>                             
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Actual RFP submission date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="actualRFPsubmissiondate" required></my-date-picker>                
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Probable RFP submission date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="probableRFPsubmissiondate" required></my-date-picker> 
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                            <label>
+                                Services                               
+                            </label>
+                            <app-ddl-service [(ngModel)]="service" [disableCommon]="disableCommon" ></app-ddl-service>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>	Probability of WIN %</label>
+                              <input type="text" [(ngModel)]="probofWin" [disabled]="disableCommon" class="form-control"/>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">                         
+                            <label>Contract Negotiation date</label>  
+                            <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                            [(ngModel)]="contractNegotiationdate" required></my-date-picker>                                  
+                           
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Days Elapsed Since Opportunity DT</label>
+                              <input type="text" [(ngModel)]="daysElapsed" [disabled]="disableCommon"  class="form-control"/>
+                          </div>
+                      </div>        
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Next Step Due Date</label>
+                              <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                              [(ngModel)]="nextStepDueDT" required></my-date-picker>    
+                             
+                          </div>
+                      </div>      
+                     
+                  </div>
+                  <div class="row">
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Opportunity Description</label>
+                              <textarea [(ngModel)]="opportunityDescription" [disabled]="disableCommon"
+                              (keypress)="BlockSpecialChar($event)" class="form-control" 
+                              ></textarea>
+                          </div>
+                      </div> 
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Next Step</label>
+                              <textarea [(ngModel)]="nextStep" [disabled]="disableCommon"
+                              (keypress)="BlockSpecialChar($event)" class="form-control"  
+                              ></textarea>
+                          </div>
+                      </div>            
+                      <div class="col-md-3">
+                          <div class="form-group">
+                              <label>Remarks</label>
+                              <textarea [(ngModel)]="remarks" [disabled]="disableCommon"
+                              (keypress)="BlockSpecialChar($event)" class="form-control" 
+                              ></textarea>
+                          </div>
+                      </div>
+                      <div class="col-md-3">
+                          <div class="form-group">                         
+                            <label>Status Update</label>                                    
+                            <textarea [(ngModel)]="statusUpdate" [disabled]="disableCommon"
+                            (keypress)="BlockSpecialChar($event)" class="form-control"   
+                            ></textarea>
+                          </div>
+                      </div>                      
+                  </div>
+                  <div class="row">
+                          <div class="col-md-3">
+                              <div class="form-group">
+                                  <label>Product/Domain</label>
+                                  <select [(ngModel)]="productorDomain" [disabled]="disableCommon" class="form-control">
+                                      <option value=0>--Select--</option>
+                                      <option *ngFor="let item of productorDomainList" value={{item.PRODUCT_ID}}>
+                                          {{item.PRODUCT_NAME}}
+                                      </option>
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        BPS Offering                                     
+                                    </label>
+                                    <app-ddl-bpsoffering [(ngModel)]="bpsoffering" [disableCommon]="disableCommon" [bpsoffering]="bpsoffering" [bpsofferingList]="bpsofferingList"></app-ddl-bpsoffering>
+                                </div>
+                          </div>
+                          <div class="col-md-3">
+                                  <div class="form-group">
+                                      <label>Selection Date</label>
+                                      <my-date-picker  [options]="myDatePickerOptions" [disabled]="disableCommon"
+                                      [(ngModel)]="selectionDate" required></my-date-picker>    
+                                     
+                                  </div>
+                          </div>   
+                          <div class="col-md-3">            
+                              <div class="form-group">
+                                <label class="col-md-12"></label>       
+                                <label class="col-md-12"></label>     
+                                <label class="col-md-12"></label>       
+                                <label class="col-md-12"></label>                       
+                                <input type="checkbox" [disabled]="disableCommon" [(ngModel)]="platform"/>
+                                <label>Platform</label>
+                                <input type="checkbox" [disabled]="disableCommon" [(ngModel)]="nonPlatform" />
+                                <label>Non-Platform</label>
+                                <label class="col-md-12"></label>  
+                                <label class="col-md-12"></label>                         
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row">           
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        PIBS™                                       
+                                    </label>
+                                    <br>
+                                    <div class="btn-group btn-toggle" id="yesno">
+                                        <button [disabled]="disableCommon" id="yesPIBS"  class="btn btn-default">Yes</button>
+                                        <button [disabled]="disableCommon" id="noPIBS"  class="btn btn-default">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Multi-tower Deal
+                                    </label>
+                                    <br>
+                                    <div class="btn-group btn-toggle" id="yesno" style="margin: 4px;">
+                                        <button [disabled]="disableCommon" id='YMultitowerDeal' class="btn btn-default">YES</button>
+                                        <button [disabled]="disableCommon" id='NMultitowerDeal' class="btn btn-default">NO</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group ">
+                                    <label >Contract Renewal</label>
+                                    <br>
+                                    <div class="btn-group btn-toggle">
+                                        <button [disabled]="disableCommon" id="ContractRenewalActive"  class="btn btn-default">Yes</button>
+                                        <button [disabled]="disableCommon" id="ContractRenewalInActive" class="btn btn-default">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label> Renewal TCV(MM USD)</label>
+                                    <input type="text" [disabled]="disableCommon" [(ngModel)]="ContractRenewalValue" id="ContractRenewalValue" class="form-control">
+                                </div>
+                            </div>
+                      </div>
+                      <div class="row">
+                            <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label> CRM ID</label>
+                                        <input type="text" [disabled]="disableCommon" [(ngModel)]="cRMid"  class="form-control" />
+                                    </div>
+                            </div>
+                            <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label> CRM Stage</label>
+                                        <input type="text" [disabled]="disableCommon" [(ngModel)]="cRMStage"  class="form-control" />
+                                    </div>
+                            </div>
+                            <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label> CRM TCV</label>
+                                        <input type="text" [disabled]="disableCommon" [(ngModel)]="cRMTCV"  class="form-control" />
+                                    </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Last Updated By                                       
+                                    </label>
+                                    <br>
+                                    <label>{{lastUpdatedby}}</label>
+                                </div>
+                            </div>
+                           
+                      </div>
+                      <div class="row" *ngIf="userUnit==0">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Cluster</label>
+                                    <app-ddl-cluster [disableCommon]="disableCommon" [(ngModel)]="cluster"></app-ddl-cluster>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>IT IS Scope </label>
+                                    <br>
+                                    <div class="btn-group btn-toggle">
+                                        <button [disabled]="disableCommon" id="ITISScopeActive" class="btn btn-default">Yes</button>
+                                        <button [disabled]="disableCommon" id="ITISScopeInActive"  class="btn btn-default">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>
+                                        Tata Group Account
+                                    </label>
+                                    <br>
+                                    <div class="btn-group btn-toggle">
+                                        <button [disabled]="disableCommon" id="yesTGA"  class="btn btn-default">Yes</button>
+                                        <button [disabled]="disableCommon" id="noTGA"  class="btn btn-default">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>CRM TCV Beacon(MM USD)</label>
+                                    <input type="text" [disabled]="disableCommon" [(ngModel)]="cRMBeacon"  class="form-control" />
+                                </div>
+                            </div>
+                      </div>
+                      <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Select Digital Transformation Value</label>
+                                    <app-ddl-get-digital-transformation [disableCommon]="disableCommon" [(ngModel)]="getDigital"  [getDigital]="getDigital"></app-ddl-get-digital-transformation>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Other Digital Transformation Value</label>
+                                    <input type="text" [disabled]="disableCommon" [(ngModel)]="otherDigitalTransformationValue" id="OtherDigitalTransValue" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="name">Digital TCV(MM USD)</label>
+                                        <input type="text" [disabled]="disableCommon" [(ngModel)]="digitalTcv" id="digitalTcv"  class="form-control" />
+                                    </div>   
+                            </div>
+                      </div>
+                  <div class="row">
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label style="color: #db3e00fb;text-decoration:underline;" >System Requirements</label>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label>PCs required</label>        
+                                  <input type="text" [(ngModel)]="PCRequired" [disabled]="disableCommon" class="form-control"/>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label>Desks required</label>        
+                                  <input type="text" [(ngModel)]="desksRequired" [disabled]="disableCommon" class="form-control"/>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label>Phones required</label>                                    
+                                  <input type="text" [(ngModel)]="phonesRequired" [disabled]="disableCommon" class="form-control"/>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label>Cabins required</label>                                    
+                                  <input type="text" [(ngModel)]="cabinsRequired" [disabled]="disableCommon" class="form-control"/>
+                              </div>
+                          </div>
+                      </div>   
+                  </div>
+                  <div class="row">
+                      <div class="col-lg-4 col-md-4 col-sm-4">
+                          <div class="col-lg-12 col-md-12 col-sm-12">                                                     
+                              <div class="col-md-8 form-group clearfix">
+                                  <label>Laptops required required</label>                                    
+                                  <input type="text" [(ngModel)]="laptopsRequired" [disabled]="disableCommon" class="form-control"/>
+                              </div>
+                          </div>
+                      </div>   
+                  </div>
+              </div>
+            </div>
+          </div> 
+       </div>
+    </div>
+  </div>
+  
+  
+  
+  .ts
+  
+  //************************************************************************
+//File Name	     : OnHold.Component.ts 
+//Description    : It's for stage 10 and above 
+//Created By     : Vinoth,Rajat 
+//************************************************************************
+import { Component, OnInit,Compiler,ViewChild } from '@angular/core';
+import {UserService} from '../Services/User.Service';
+import { CookieService } from 'ngx-cookie-service';
+import { isNullOrUndefined } from 'util';
+import {OnHoldService} from '../Services/OnHold.service';
+import { CreateNewOpportunityService } from '../Services/CreateNewOpportunity.service';
+import { DatePipe } from '@angular/common';
+import { ILossReason } from '../Interface/LossReason/LossReason';
+import { ICompetency } from '../Interface/Competency/Competency';
+import { ICustomerType } from '../Interface/Customer/CustomerType';
+import { DdlISUComponent } from '../UserControls/ddlISU/ddlISU.Component';
+import { DdlDealOwner1Component } from '../UserControls/DdlDealOwner1/ddl-deal-owner1.component'
+import { DdlDealOwner2Component } from '../UserControls/DdlDealOwner2/ddl-deal-owner2.component'
+import { DdlDealStageComponent } from '../UserControls/DdlDealstage/ddl-deal-stage.component'
+import { CustomerTypeComponent } from '../UserControls/DdlCustomerType/customer-type.component'
+import { IndustryPracticeComponent } from '../UserControls/DdlIndustryPractice/industry-practice.component'
+import { DdlCountryComponent } from '../UserControls/DdlCountry/ddl-country.component'
+import { DdlGeographyComponent } from '../UserControls/DdlGeography/ddl-geography.component';
+import { GeographySalesOwnerComponent } from '../UserControls/DdlGeographySalesOwner/geography-sales-owner.component'
+import { AccountSalesOwnerComponent } from '../UserControls/DdlAccountSalesOwner/account-sales-owner.component'
+import { DdlServiceComponent } from '../UserControls/DdlService/ddl-service.component'
+import { DdlOffshorePresalesLeadHorizontalComponent } from '../UserControls/Ddloffshorepresalesleadhorizontal/ddl-offshore-presales-lead-horizontal.component'
+import { DdlOffshorePresalesLeadVerticalComponent } from '../UserControls/Ddloffshorepresalesleadvertical/ddl-offshore-presales-lead-vertical.component'
+import { ExecutiveSponsorComponent } from '../UserControls/DdlExecutiveSponsor/executive-sponsor.component'
+import { parse } from 'querystring';
+import { ActivatedRoute } from '@angular/router';
+import {IMyDpOptions} from 'mydatepicker';
+import { DdlIOUComponent } from '../UserControls/DdlIOU/DdlIOU.Component';
+import { DdlSubIouComponent } from '../UserControls/DdlSubIOU/ddl-sub-iou.component';
+import { DdlBpsofferingComponent } from '../UserControls/DdlBPSOffering/ddl-bpsoffering.component'
+import { DdlVerticalComponent } from '../UserControls/DdlVertical/ddl-vertical.component'
+import { DdlClusterComponent } from '../UserControls/DdlCluster/ddl-cluster.component'
+import { DdlGetDigitalTransformationComponent } from '../UserControls/DdlGetDigitalTransformation/ddl-get-digital-transformation.component'
+import { ISUService } from '../Services/ISU.Service';
+import { BpsofferingService } from '../Services/BPSOffering.service';
+import { ISU } from '../Interface/ISU/ISU';
+import { IBPSOffering } from '../Interface/BPSOffering/BPSOffering';
+import { IVertical } from '../Interface/Vertical/vertical';
+import { VerticalService } from '../Services/Vertical.service';
+import { DdlDealStageService } from '../Services/DealStage.service';
+import { IDealStage } from '../Interface/DealStage/DealStage';
+import { Router } from '@angular/router';
+import {escape} from 'lodash';
+import {OfferingType} from '../Interface/OfferingType/OfferingType';
+declare var $:any;
+import * as moment from 'moment';
+
+@Component({
+  selector: 'app-on-hold',
+  templateUrl: './OnHold.component.html',
+  styleUrls: ['./OnHold.component.css'],
+  providers: [DatePipe]
+})
+export class OnHoldComponent implements OnInit {
+  @ViewChild(DdlISUComponent) ISUComp: DdlISUComponent;
+  @ViewChild(DdlGeographyComponent) GeographyComponent: DdlGeographyComponent;
+  @ViewChild(AccountSalesOwnerComponent) AccountSalesOwner: AccountSalesOwnerComponent
+  @ViewChild(DdlOffshorePresalesLeadHorizontalComponent) OffshorePresalesLeadHorizontal: DdlOffshorePresalesLeadHorizontalComponent
+  @ViewChild(DdlOffshorePresalesLeadVerticalComponent) OffshorePresalesLeadVertical: DdlOffshorePresalesLeadVerticalComponent
+  @ViewChild(CustomerTypeComponent) CustomerType: CustomerTypeComponent
+  @ViewChild(DdlDealOwner1Component) DdlDealOwner1: DdlDealOwner1Component
+  @ViewChild(GeographySalesOwnerComponent) GeographySalesOwner: GeographySalesOwnerComponent
+  @ViewChild(IndustryPracticeComponent) IndustryPractice: IndustryPracticeComponent
+  @ViewChild(DdlServiceComponent) DdlService: DdlServiceComponent
+  @ViewChild(DdlDealOwner2Component) DdlDealOwner2: DdlDealOwner2Component
+  @ViewChild(DdlCountryComponent) DdlCountry: DdlCountryComponent
+  @ViewChild(DdlDealStageComponent) DealStagecomp: DdlDealStageComponent
+  @ViewChild(ExecutiveSponsorComponent) ExecutiveSponsor: ExecutiveSponsorComponent
+  @ViewChild(DdlIOUComponent) DdlIOU: DdlIOUComponent
+  @ViewChild(DdlSubIouComponent) SubIouComp: DdlSubIouComponent;
+  @ViewChild(DdlBpsofferingComponent) DdlBpsoffering: DdlBpsofferingComponent
+  @ViewChild(DdlVerticalComponent) DdlVertical: DdlVerticalComponent
+  @ViewChild(DdlClusterComponent) DdlCluster: DdlClusterComponent
+  @ViewChild(DdlGetDigitalTransformationComponent) getDigitalTransformation: DdlGetDigitalTransformationComponent
+
+  intCurrentStageId:number
+  disabledgeo:boolean;
+  disabledIP:boolean;
+  disabled:boolean;
+  platform:boolean;
+  nonPlatform:boolean;
+  intCompID:number;
+  disableCommon:boolean;
+  ISUOwnerList:any;
+  intWINLossID:number;
+  customerNameList: ICustomerType[];
+  saveCompetitor:any[]=new Array();
+  saveLossReason:any[]=new Array();
+  intFYDate:number;
+  opportunityDate:any;
+  date:any;
+  opportunityVisible:boolean;
+  month:any;
+  year:any;
+  daysElapsed:any;
+  lossComp:string="No";
+  PFSelect:string=null;
+  strRPFFeedback:string;
+  strLostToComp:string;
+  iOfferingType: OfferingType[];		
+  OfferingTypeID:any;
+  strLessonsLearnt:string; 
+  strLossVerbatim:string; 
+  strDealReason1:string;
+  strDealReason2:string;
+  strDealReason3:string;
+  strProposalfactory:string; 
+  strProposalfactoryOptions:string; 
+  strProposalComments:string;
+  othersVisible:boolean;
+  others:string
+  comments:string;
+  proactiveProposal:string;
+  proactiveProposalVisible:boolean;
+  competitionVisible:boolean;
+  reason1:number;
+  reason2:number;
+  reason3:number;
+  proactiveProposalList:any;
+  lossVerbatim:string;
+  lossFeedback:string;
+  leasonLearnt:string;
+  loss1:boolean;
+  loss2:boolean;
+  loss3:boolean;
+  loss4:boolean;
+  stage13Visible:boolean;
+  btnListVisible:boolean;
+  btnSubmitVisible:boolean;
+  disableSubmit:boolean;
+  disableList:boolean;
+  disableStage13:boolean;
+  strIPvalue:string;
+  intIP:number;
+  strEventType:string;
+  strEmpName:string;
+  strEmpMail:string;
+  strCustomerId:string;
+  strGeographyValue:string;
+  validationMessage:string;
+  messageType:string;
+  intResultTRON:number;
+  intResult:number;
+  strCRMChk:string;
+  intCRMChk:number;
+  intNextStageCRM:number;
+  reason:string;
+  strReason:string;
+  strGoToStage:string;
+  selectionDate:any;
+  nextStepDueDT:any;
+  dealTerm:number;
+  statusUpdate:any;
+  noVisa:any;
+  opportunityFlag:any;
+  closureDate:any;
+  desksRequired:number;
+  PCRequired:number;
+  phonesRequired:number;
+  cabinsRequired:number;
+  laptopsRequired:number;
+  productorDomain:any;
+  nextStep:any;
+  typesofseat:any;
+  area:any;
+  noofdaysStage:any;
+  durationofTraining:any;
+  opportunityWindow:any;
+  onsiteTraining:any;
+  pricingType:any;
+  BCPorDRPLocation:any;
+  contractNegotiationdate:any;
+  TCV:any;
+  i:number;
+  currency:any;
+  shortlistDate:any;
+  actualRFPsubmissiondate:any;
+  probableRFPsubmissiondate:any;
+  opportunityDescription:string;
+  FTEsize:any;
+  FTEOffshore:any;
+  FTEonsite:any;
+  offshorePracticeOwner:any;
+  probofWin:any;
+  remarks:any;
+  RFIReceivedDate:any;
+  RFIProbableSubmissionDate:any;
+  actualRFISubmissiondate:any;
+  RFPReceiveddate:any;
+  stage9List:any[]=new Array();
+  lostCompetitionList:any[]=new Array();
+  dropdownSettings = {};
+  dropdownSetting={};
+  seatList:any[]=new Array();set
+  reasonList:any[]=new Array();
+  BCPorDRPLocationList:any[]=new Array();
+  areaList:any[]=new Array();
+  opportunityWindowList:any[]=new Array();
+  opportunityFlagList:any[]=new Array();
+  pricingTypeList:any[]=new Array();
+  currencyList:any[]=new Array();
+  offshorePracticeOwnerList:any[]=new Array();
+  productorDomainList:any[]=new Array();
+  lossReason:any[]=new Array();
+  FYDate:any;
+  lostCompetition:any[]=new Array();
+  lossReasonList:any[]=new Array();
+  opportunityId:string;
+  lblFiscalYear:string;
+  presalesStage:string;
+  strStake:string;
+  strStage:string;
+  strDisable:string;
+  strOppId:string;
+  lossFeedbackList:any;
+  userUnit:string;
+  userRole:string;
+  userId:string;
+  currentUrl:string;
+  currentPageQuery:string;
+  hostAddress:string;
+  customer:number;
+  ISUOwner:number;
+  intCustomerId:number
+  intGeography:number
+  strISUCD:string;
+  strCustName:any;
+  strOppDesc:any;
+  strTCV:any;
+  strExpectedDate:any;
+  strEstimatedFTE:any;
+  strPrevStage:any;
+  strDealterm:any;
+  stake:any;
+  StageId:any;
+  strRemark:any;
+  isu: number;
+  expectedRevenueQtr: string;
+  expectedRevenueFY: any;
+  service: number;
+  lastUpdatedby: any;
+  cRMStage: any;
+  cRMTCV: any;
+  cRMBeacon: any;
+  subSPId: number;
+  ContractRenewalValue: any;
+  digitalTcv: number;
+  otherDigitalTransformationValue: string;
+  expectedRevenueQtrYr: any;
+  iouList: ISU[];
+  iou: number;
+  bpsofferingList: IBPSOffering[];
+  bpsoffering: number;
+  subiouList: ISU[];
+  disableIOU: boolean;
+  disableSubIOU:boolean;
+  verticalList: IVertical[];
+  expectedRevenueQtrYrList: any;
+  cRMid:any;
+  DealStageList:IDealStage[];
+  DealStage:any;
+  showStage13:boolean;
+  actualclosedate:any;
+  stractualclosedate:any;
+  dealClosureReason:any;
+  LOSS_Verbatim:any;
+  Reason:any;
+  Lessons_Learnt:any;
+  comments_onhold:any;
+  myDatePickerOptions: IMyDpOptions = {
+    // other options...
+    dateFormat: 'dd.mm.yyyy',
+};
+
+unitText: string = String(atob(this.cookieService.get(('unitText'))));
+  constructor(private router: Router,private DealStageService:DdlDealStageService,private verticalService:VerticalService,private bpsofferingService: BpsofferingService,private isuService: ISUService,private activatedroute: ActivatedRoute,private datepipe:DatePipe, private createNewOpportunityService:CreateNewOpportunityService,private onHoldService:OnHoldService,private _compiler: Compiler,private userService:UserService,private cookieService: CookieService) {
+
+    this._compiler.clearCache();
+    
+      this.userId = this.cookieService.get('userId');
+      this.userUnit = this.cookieService.get('userUnit')
+      this.userUnit = atob(this.userUnit);
+      this.userRole = this.cookieService.get('userRole')
+      this.userRole = atob(this.userRole);  
+      this.activatedroute.params.subscribe(params => {
+            this.opportunityId = atob(params['strOppId'])
+            this.StageId = atob(params['strStage'])
+            this.stake = atob(params['strStake'])
+            this.strRemark=atob(params['strRemark'])
+            this.strCustName=params['strCustName']
+            this.strOppDesc=params['strOppDesc']
+            this.strTCV=params['strTCV']
+            this.strExpectedDate=params['strExpectedDate']
+            this.strDealterm=params['strDealterm']
+            this.strEstimatedFTE=params['strEstimatedFTE']
+            this.strPrevStage=params['strPrevStage']
+      });
+      if(!isNullOrUndefined(this.strCustName)&&this.strCustName!="")
+      {
+        this.strCustName=decodeURIComponent(escape(atob(this.strCustName)))
+      }
+      if(!isNullOrUndefined(this.strOppDesc)&&this.strOppDesc!="")
+      {
+        this.strOppDesc=atob(this.strOppDesc)
+      }
+      if(!isNullOrUndefined(this.strTCV)&&this.strTCV!="")
+      {
+        this.strTCV=atob(this.strTCV)
+      }
+      if(!isNullOrUndefined(this.strExpectedDate)&&this.strExpectedDate!="")
+      {
+        this.strExpectedDate=atob(this.strExpectedDate)
+      }
+      if(!isNullOrUndefined(this.strDealterm)&&this.strDealterm!="")
+      {
+        this.strDealterm=atob(this.strDealterm)
+      }
+      if(!isNullOrUndefined(this.strEstimatedFTE)&&this.strEstimatedFTE!="")
+      {
+        this.strEstimatedFTE=atob(this.strEstimatedFTE)
+      }
+      if(!isNullOrUndefined(this.strPrevStage)&&this.strPrevStage!="")
+      {
+        this.strPrevStage=atob(this.strPrevStage)
+      }
+    if (this.userUnit != null && this.userUnit !=undefined && this.userRole!=null && this.userRole!=undefined)
+    
+        
+        this.userService.LogUserAccess(this.userId,btoa(this.currentUrl),btoa(this.currentPageQuery),btoa(this.hostAddress)).subscribe(resultArray =>{
+        
+        
+        })
+    }
+
+  
+
+  ngOnInit() {
+    this.actualclosedate={ date:{ day:new Date().getDate(), month:new Date().getMonth()+1, year :new Date().getFullYear() }};
+    this.PopulateDealStage();
+    this.DealStage=0;
+    this.GetVertical();
+    this.disableIOU = true;
+    this.disableSubIOU=true;
+    this.reason1=0;
+    this.reason2=0;
+    this.reason3=0;
+    if(this.userUnit=="2")
+    {
+      this.LOSS_Verbatim="LOSS Verbatim";
+      this.Reason="Reason";
+      this.Lessons_Learnt="Lessons Learnt";
+      this.comments_onhold="Comments";
+    }
+    else
+    {
+      this.LOSS_Verbatim="Detailed Reason";
+      this.Reason="Improvement Measures";
+      this.Lessons_Learnt="Mitigation Plan";
+      this.comments_onhold="Risk Involved";
+    }
+    this.lossFeedback="0";
+    this.proactiveProposal="0";
+    this.GetofferingType();
+    this.OfferingTypeID=0;
+    this.customer=0;
+    this.ISUOwner=0;
+    this.offshorePracticeOwner=0;
+    this.opportunityFlag=0;
+    this.currency=0;
+    this.pricingType=0;
+    this.BCPorDRPLocation=0;
+    this.opportunityWindow=0;
+    this.area=0;
+    this.typesofseat=0;
+    this.productorDomain=0;
+    this.opportunityVisible=true;
+    this.othersVisible=false;
+    $('.btn-toggle').click(function() {
+        $(this).find('.btn').toggleClass('active');
+        if ($(this).find('.btn-primary').length > 0) {
+        $(this).find('.btn').toggleClass('btn-primary');
+        }           
+    });
+    this.dropdownSetting={
+       singleSelection: false,
+      text: "Select Lost to Competition",
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      enableSearchFilter: false,
+      classes: "myclass custom-class",
+      maxHeight: 100,
+      badgeShowLimit: 5
+    }
+    this.dropdownSettings =
+    {
+      singleSelection: false,
+      text: "Select Loss Reason",
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      enableSearchFilter: false,
+      classes: "myclass custom-class",
+      maxHeight: 100,
+      badgeShowLimit: 5
+    };
+  
+    this.userId=atob(this.userId);
+    this.strOppId=this.opportunityId;
+    this.strStake=this.stake;
+    this.strStage=this.StageId;
+    this.strDisable=this.strRemark;
+    if(this.userRole== "Administrator" || this.userRole=="Presales" || this.userRole == "Domain Leaders" || this.userRole == "Cluster Administrator")
+    {
+      this.onHoldService.GetOpportunityUnitID(btoa(this.strOppId)).subscribe(
+        resultArray => {
+          if(!isNullOrUndefined(resultArray[0].UnitId))
+          {
+             this.userUnit=resultArray[0].UnitId;
+          }
+          if(this.strStage=="10")
+          {
+             this.presalesStage="Presales Stage 10";
+             this.lblFiscalYear="Lost Date";
+          }
+          else if(this.strStage=="11")
+          {
+            this.presalesStage="Presales Stage 11";
+            this.lblFiscalYear="Scrapped Date";
+          }
+          else if(this.strStage=="12")
+          {
+            this.presalesStage="Presales Stage 12";
+            this.lblFiscalYear="Shelved Date";
+          }
+          else if(this.strStage=="13")
+          {
+            this.presalesStage="Presales Stage 13";
+            this.lblFiscalYear="Hold Date";
+          }
+          this.FYDate = { date:{ day:new Date().getDate(), month:new Date().getMonth()+1, year :new Date().getFullYear() }};
+          this.DisableControlforAllStages();
+          if(this.strDisable=="disable")
+          {
+            this.btnSubmitVisible=false;
+            this.btnListVisible=false;
+            if(this.strStage=="10")
+            {
+              this.stage13Visible=false;
+              this.validationMessage="Opportunity " + this.strOppId + " has been marked as LOST and cannot be restored.";
+              this.messageType="Success"
+              this.PopulateLossReason();
+              this.PopulateLostCompetitor();
+            }
+            else if(this.strStage=="11")
+            {
+              this.stage13Visible=false;
+              this.validationMessage="Opportunity " + this.strOppId + " has been marked as SCRAPPED and cannot be restored.";
+              this.messageType="Success"
+            }
+            else if(this.strStage=="12")
+            {
+              this.stage13Visible=false;
+              this.validationMessage="Opportunity " + this.strOppId + "has been marked as SHELVED and cannot be restored.";
+              this.messageType="Success"
+            }
+            else if(this.strStage=="13")
+            {
+              this.btnListVisible=true;
+              this.showStage13=true;
+              this.disableList=true;
+              this.stage13Visible=true;
+              this.GetStage13();
+
+            }   
+            this.PopulateProactiveProposal();
+            this.PopulateLossFeedback();
+            this.PopulateISUOwner();
+            this.PopulateCustomerName();             
+            this.PopulateProduct();
+            this.PopulatePracticeOwner();
+            this.PopulateCategory();
+            this.PopulateCurrency();
+            this.PopulatePricingType();
+            this.PopulateOperationWindow();
+            this.PopulateArea();
+            this.PopulateBCP();
+            this.PopulateTypesofseat();
+            this.PopulateReason();
+            this.GetStage9();
+            this.GetRemarks();
+          }
+          else
+          {
+              if ((this.lossVerbatim == ""))
+              {
+                this.validationMessage="Request you to fill in all the mandatory fields and SAVE to declare it as a LOST/SCRAPPED/ON HOLD/SHELVED Deal.";
+                this.messageType="Danger";    
+                return false;            
+              }
+              this.btnSubmitVisible = true;
+              this.btnListVisible=true;
+              this.disableStage13=true;
+              this.showStage13=false;
+              this.disableList=true;
+              this.GetStage();
+              this.PopulateProactiveProposal();
+              this.opportunityVisible = false;           
+              this.PopulateReason();
+
+          }
+
+        },
+         error =>{ throw error;},
+        )
+        
+    }
+    
+  }
+  GotoList()
+  {
+    this.router.navigate(['Presales']);
+  }
+  DisableControlforAllStages()
+  {
+    this.disableCommon=true;
+    this.disabledgeo=true;
+    this.disabledIP=true;
+    this.disabled=true;
+  }
+  PopulateProactiveProposal()
+  {
+    this.onHoldService.GetProactiveProposal().subscribe(
+
+      resultArray => this.proactiveProposalList = resultArray,
+       error =>{ throw error;},
+
+  )
+  }
+  PopulateLossFeedback()
+  {
+    this.onHoldService.GetLossFeedback().subscribe(
+
+      resultArray => this.lossFeedbackList = resultArray,
+       error =>{ throw error;},
+
+  )
+  }
+  PopulateCustomerName() {
+    this.createNewOpportunityService.GetCustomerName(this.userUnit).subscribe(
+
+        resultArray => this.customerNameList = resultArray,
+         error =>{ throw error;},
+
+    )
+
+}
+  PopulateLossReason()
+  {
+    this.onHoldService.GetLossReason().subscribe(
+      resultArray => {
+       this.lossReasonList=resultArray      
+          this.onHoldService.GetOppWinLossReason(this.strOppId).subscribe(
+            resultArray => 
+            {
+              for(this.i=0;this.i<resultArray.length;this.i++)
+              {
+                this.lossReason.push(this.lossReasonList.find(x=>x.id==resultArray[this.i].id));
+              }
+            },
+             error =>{ throw error;},
+            )
+      },
+       error =>{ throw error;},
+      )
+  }
+ 
+  PopulateProduct()
+  {
+    this.onHoldService.GetProduct().subscribe(
+      resultArray => {
+       this.productorDomainList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulatePracticeOwner()
+  {
+    this.onHoldService.GetPracticeSalesOwner().subscribe(
+      resultArray => {
+       this.offshorePracticeOwnerList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateCategory()
+  {
+    this.onHoldService.GetCategory().subscribe(
+      resultArray => {
+       this.opportunityFlagList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateCurrency()
+  {
+    this.onHoldService.GetCurrency().subscribe(
+      resultArray => {
+       this.currencyList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulatePricingType()
+  {
+    this.onHoldService.GetPricingType().subscribe(
+      resultArray => {
+       this.pricingTypeList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateOperationWindow()
+  {
+    this.onHoldService.GetOperationWindow().subscribe(
+      resultArray => {
+       this.opportunityWindowList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateArea()
+  {
+    this.onHoldService.GetArea().subscribe(
+      resultArray => {
+       this.areaList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateISUOwner()
+  {
+    this.onHoldService.GetISUOwner().subscribe(
+      resultArray => {
+       this.ISUOwnerList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateDealStage()
+  {
+    this.DealStageService.GetDealStage().subscribe(
+      
+      resultArray => this.DealStageList = resultArray ,
+       error =>{ throw error;}
+     )
+  }
+  PopulateBCP()
+  {
+    this.onHoldService.GetBCP().subscribe(
+      resultArray => {
+       this.BCPorDRPLocationList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateTypesofseat()
+  {
+    this.onHoldService.GetTypesOfSeat().subscribe(
+      resultArray => {
+       this.seatList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateLostCompetitor()
+  {
+    this.onHoldService.GetCompetitor().subscribe(
+      resultArray => {
+       this.lostCompetitionList=resultArray,
+       this.onHoldService.GetOppCompetitors(this.strOppId).subscribe(
+        resultArray => 
+        {
+          if(this.strDisable=="disable")
+          {
+            this.lostCompetition=resultArray
+          }   
+        },
+         error =>{ throw error;},
+        )
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateReason()
+  {
+    this.onHoldService.GetDealReason().subscribe(
+      resultArray => {
+       this.reasonList=resultArray
+      },
+       error =>{ throw error;},
+      )
+  }
+  PopulateStage13()
+  {
+    if(this.DealStagecomp.DealStageList.length==13)
+    {
+      this.DealStagecomp.DealStageList.pop();
+    }
+  }
+  SaveLossReasons()
+  {
+    this.onHoldService.GetOppWinLossReason(this.strOppId).subscribe(
+      resultArray => 
+      {
+        for(this.i=0;this.i<resultArray.length;this.i++)
+        {
+          this.saveLossReason.push(this.lossReasonList.find(x=>x.id==resultArray[this.i].id));
+        }
+        for(let k=0;k<this.saveLossReason.length;k++)
+        {
+          for(let i=0;i<this.lossReason.length;i++)
+          {
+            if(this.lossReason[i].id==this.saveLossReason[k].id)
+            {
+              this.intWINLossID=parseInt(this.lossReason[i].id);
+              let obj:any={
+                OpportunityId:this.strOppId,
+                WIN_LOSS_REASON_ID:this.intWINLossID,
+                UserLogin:this.userId
+              }
+              this.onHoldService.PutWinLossReason(obj).subscribe(
+                resultArray=>{
+                 
+                },
+                 error =>{ throw error;},
+              )
+            }
+          }
+        }
+        for(let j=0;j<this.lossReason.length;j++)
+        {        
+            this.intWINLossID=parseInt(this.lossReason[j].id); 
+            let obj1:any={
+              OpportunityId:this.strOppId,
+              WIN_LOSS_REASON_ID:this.intWINLossID,
+              UserLogin:this.userId
+            }
+            this.onHoldService.PostOppWINLossReason(obj1).subscribe(
+              resultArray=>{ },
+               error =>{ throw error;},
+            )      
+        }
+      },
+       error =>{ throw error;},
+      )
+  }
+  SaveCompetitors()
+  {
+    this.onHoldService.PutCompetitors(this.strOppId).subscribe(data=>{
+
+      if(data!=undefined)
+      {
+        for(let j=0;j<this.lostCompetition.length;j++)
+        {        
+            this.intCompID=parseInt(this.lostCompetition[j].id); 
+            let obj1:any={
+              OpportunityId:this.strOppId,
+              COMPETITOR_ID:this.intCompID,
+              UserLogin:this.userId
+            }
+            this.onHoldService.PostOppCompetitors(obj1).subscribe(
+              resultArray=>{},
+               error =>{ throw error;},
+            )      
+        }
+      }
+    }
+     
+        
+      
+      )
+  }
+  GetStage13()
+  {
+    if(this.strStage=="13")
+    {
+      //this.PopulateStage13();
+    }
+    else{
+      this.stage13Visible=false;
+      this.btnListVisible=false;
+      if (this.strStage=="10")
+      {
+        this.validationMessage="The opportunity " + this.strOppId + " has been Lost and cannot be restored.";
+        this.messageType="Success";
+      }
+      else if (this.strStage=="11")
+      {
+        this.validationMessage="The opportunity " + this.strOppId + " has been Scrapped and cannot be restored.";
+        this.messageType="Success";
+      }
+      else if (this.strStage=="12")
+      {
+        this.validationMessage="The opportunity " + this.strOppId + " has been Shelved and cannot be restored.";
+        this.messageType="Success";
+      }
+      this.onHoldService.GetOpportunityLost(this.strOppId,this.strStage).subscribe(
+        resultArray => {
+         this.reason=resultArray[0].Remark;
+         if(this.strStage=="10")
+         {
+            this.loss1=true;
+            this.loss2=true;
+            this.loss3=true;
+            this.loss4=true;
+            this.reason=resultArray[0].Remark;
+            this.lossFeedback=resultArray[0].RFPLostFeedback;
+            //this.LostCompetition=resultArray[0].LostToCompetition;
+            this.leasonLearnt=resultArray[0].LessonsLearnt;
+            this.lossVerbatim=resultArray[0].WinLossVerbatum;
+            this.reason1=resultArray[0].DEALREASON1;
+            this.reason2=resultArray[0].DEALREASON2;
+            this.reason3=resultArray[0].DEALREASON3;
+         }
+         else
+         {
+          this.loss1=false;
+          this.loss2=false;
+          this.loss3=false;
+          this.loss4=false;
+         }
+        },
+         error =>{ throw error;},
+        )
+    }
+  }
+  GetIOU(isuId: number) {
+    if (isuId != 0) {
+        this.isuService.GetIOU(this.userUnit, isuId).subscribe(
+            resultArray => this.iouList = resultArray,
+             error =>{ throw error;},
+        )
+    }
+    else {
+        this.iouList = null;
+        this.iou = 0;
+    }
+  }
+  GetBPSOffering() {
+
+    if (this.service != -1) {
+        this.bpsofferingService.GetBPSOfferingName(this.service, this.userUnit).subscribe(
+
+            resultArray => this.bpsofferingList = resultArray,
+             error =>{ throw error;},
+
+        )
+    }
+    else {
+        this.bpsofferingList = null;
+        this.bpsoffering = 0;
+    }
+
+}
+GetsatgeGetSubIOU(strIsuCd: string) {
+  if (strIsuCd != "" || !isNullOrUndefined(strIsuCd)) {
+      this.isuService.GetSubIOU(strIsuCd).subscribe(
+          resultArray => this.subiouList = resultArray,
+           error =>{ throw error;},
+      )
+  }
+  else {
+      this.SubIouComp.subiouList = null;
+      this.SubIouComp.subiou = 0;
+  }
+
+}
+GetVertical() {
+
+  this.verticalService.GetVerticalWithoutID(btoa(this.userUnit)).subscribe(
+
+      resultArray => this.verticalList = resultArray,
+
+       error =>{ throw error;},
+
+  )
+}
+ChangeFYQTR(event: any) {
+  let qtr: number;
+  let fys: number;
+  let fye: number;
+  if (event != 0) {
+      this.closureDate = event;
+  }
+  else if (event == 0) {
+      this.expectedRevenueQtrYr = { FiscalYear:  this.expectedRevenueQtr + " - " + this.expectedRevenueFY, Qtr: this.expectedRevenueQtr, Fyr: this.expectedRevenueFY };
+  }
+  this.expectedRevenueQtrYrList = [];
+
+  if (this.closureDate != undefined) {
+     
+      if (this.closureDate.date.month >= 1 && this.closureDate.date.month <= 3) {
+          qtr = 4;
+      }
+      else if (this.closureDate.date.month >= 4 && this.closureDate.date.month <= 6) {
+          qtr = 1;
+      }
+      else if (this.closureDate.date.month >= 7 && this.closureDate.date.month <= 9) {
+          qtr = 2;
+      }
+      else if (this.closureDate.date.month >= 10 && this.closureDate.date.month <= 12) {
+          qtr = 3;
+      }
+      if (qtr == 4) {
+          fys = Number(this.closureDate.date.year) - 1;
+          fye = Number(this.closureDate.date.year);
+      }
+      else {
+          fys = Number(this.closureDate.date.year);
+          fye = Number(this.closureDate.date.year) + 1;
+      }
+     
+      let k = 0
+      while (k < 8) {
+          for (var j = 0; j < 4; j++) {
+              this.expectedRevenueQtrYrList.push({ FiscalYear: "Q" + qtr + " - FY " + fys.toString().substring(2) + '-' + fye.toString().substring(2), Qtr: qtr, Fyr: "FY " + fys.toString().substring(2) + '-' + fye.toString().substring(2) });
+              if (qtr == 4) {
+                  qtr = 1;
+                  k++;
+                  break;
+              }
+              else {
+                  qtr++;
+                  k++;
+              }
+              if (k > 7) {
+                  break;
+              }
+          }
+          fys++;
+          fye++;
+      }
+  }
+ 
+}
+  GetStage9()
+  {
+    this.onHoldService.GetStage9(this.strOppId,this.strStage).subscribe(
+      resultArray => {
+       this.stage9List=resultArray
+       if(this.stage9List.length>0)
+       {
+        if(this.stage9List[0].ActualCloseDate!="")
+        {
+          var check = moment( this.stage9List[0].ActualCloseDate, 'DD-MMM-YYYY');
+          this.month = check.format('M');
+          this.date = check.format('D');
+          this.year   = check.format('YYYY');
+  
+          this.actualclosedate = { date: { day: this.date, month: this.month, year: this.year } };
+         
+        }
+        if(this.stage9List[0].DealClosureReason!="")
+        {
+            this.dealClosureReason=this.stage9List[0].DealClosureReason;
+        }
+         if (this.stage9List[0].ISU_MAIN != "") 
+         {
+          this.ISUComp.isu = parseInt(this.stage9List[0].ISU_MAIN);
+          this.GetIOU(this.ISUComp.isu);
+         }
+         if (this.stage9List[0].ISU_CD != "") 
+         {
+          this.DdlIOU.iou = this.stage9List[0].ISU_CD;
+          this.GetsatgeGetSubIOU(this.stage9List[0].ISU_CD);
+         }   
+         if (this.stage9List[0].SUB_IOU != "") 
+         {
+          this.SubIouComp.subiou = parseInt(this.stage9List[0].SUB_IOU);
+         }
+         if (this.stage9List[0].OPP_TYPE != "") {
+
+          if (this.stage9List[0].OPP_TYPE.trim() == "1") {           
+              $('#TrackedByYes').removeClass('btn-default');
+              $('#TrackedByYes').addClass('btn-primary active');
+              $('#TrackedByNo').removeClass('btn-primary active');
+              $('#TrackedByNo').addClass('btn-default');
+          }
+          else if (this.stage9List[0].OPP_TYPE.trim() == "2") {            
+              $('#TrackedByNo').removeClass('btn-default');
+              $('#TrackedByNo').addClass('btn-primary active');
+              $('#TrackedByYes').removeClass('btn-primary active');
+              $('#TrackedByYes').addClass('btn-default');
+          }
+
+        }
+        if (this.stage9List[0].PROACTIVE_PROPOSAL != "") {
+          if (this.stage9List[0].PROACTIVE_PROPOSAL.trim() == "Yes") {             
+              $('#proactiveProposalY').removeClass('btn-default');
+              $('#proactiveProposalY').addClass('btn-primary active');
+              $('#proactiveProposalN').removeClass('btn-primary active');
+              $('#proactiveProposalN').addClass('btn-default');
+          }
+          else if (this.stage9List[0].PROACTIVE_PROPOSAL.trim() == "No") {
+           
+              $('#proactiveProposalN').removeClass('btn-default');
+              $('#proactiveProposalN').addClass('btn-primary active');
+              $('#proactiveProposalY').removeClass('btn-primary active');
+              $('#proactiveProposalY').addClass('btn-default');
+          }
+
+         }
+          if (this.stage9List[0].Quarter != "") {
+              this.expectedRevenueQtr = this.stage9List[0].Quarter;
+          }
+          if (this.stage9List[0].FISCAL_YEAR != "") {
+              this.expectedRevenueFY = this.stage9List[0].FISCAL_YEAR;
+          }
+          if (this.stage9List[0].SERVICE_ID != "") 
+          {
+            this.DdlService.service = parseInt(this.stage9List[0].SERVICE_ID);
+            this.service = parseInt(this.stage9List[0].SERVICE_ID);
+          }
+          if (this.stage9List[0].BPS_OFFERING_ID != "") 
+          {
+            this.GetBPSOffering();
+            this.DdlBpsoffering.bpsoffering = parseInt(this.stage9List[0].BPS_OFFERING_ID);
+          }
+          if (this.stage9List[0].BUSINESS_ID != "") 
+          {
+            this.DdlVertical.vertical = this.stage9List[0].BUSINESS_ID;
+          }
+          if (this.stage9List[0].PIBS != "") {
+         
+            if (this.stage9List[0].PIBS.trim()== "Yes") {
+               
+                $('#yesPIBS').removeClass('btn-default');
+                $('#yesPIBS').addClass('btn-primary active');
+                $('#noPIBS').removeClass('btn-primary active');
+                $('#noPIBS').addClass('btn-default');
+            }
+            else if (this.stage9List[0].PIBS.trim()== "No") {
+               
+                $('#noPIBS').removeClass('btn-default');
+                $('#noPIBS').addClass('btn-primary active');
+                $('#yesPIBS').removeClass('btn-primary active');
+                $('#yesPIBS').addClass('btn-default');
+
+            }
+
+         }
+
+         if (this.stage9List[0].OfferingType != 0) {
+          this.OfferingTypeID = this.stage9List[0].OfferingType;
+      }												
+         if (this.stage9List[0].MULTITOWER_DEAL != "") {        
+            if (this.stage9List[0].MULTITOWER_DEAL.trim() == 'Yes') {
+              
+                $('#YMultitowerDeal').removeClass('btn-default');
+                $('#YMultitowerDeal').addClass('btn-primary active');
+                $('#NMultitowerDeal').removeClass('btn-primary active');
+                $('#NMultitowerDeal').addClass('btn-default');
+            }
+            else if (this.stage9List[0].MULTITOWER_DEAL.trim() == 'No') {
+                
+                $('#NMultitowerDeal').removeClass('btn-default');
+                $('#NMultitowerDeal').addClass('btn-primary active');
+                $('#YMultitowerDeal').removeClass('btn-primary active');
+                $('#YMultitowerDeal').addClass('btn-default');
+            }
+         }
+         if (this.stage9List[0].LAST_UPDATE != "") {
+          this.lastUpdatedby = this.stage9List[0].LAST_UPDATE;
+         }
+         if (this.stage9List[0].TataGroupAccount != "") {       
+          if (this.stage9List[0].TataGroupAccount  == "Yes") {
+            
+              $('#yesTGA').removeClass('btn-default');
+              $('#yesTGA').addClass('btn-primary active');
+              $('#noTGA').removeClass('btn-primary active');
+              $('#noTGA').addClass('btn-default');
+
+          }
+          else if (this.stage9List[0].TataGroupAccount  == "No") {            
+              $('#noTGA').removeClass('btn-default');
+              $('#noTGA').addClass('btn-primary active');
+              $('#yesTGA').removeClass('btn-primary active');
+              $('#yesTGA').addClass('btn-default');
+
+          }
+
+         }
+         if(this.stage9List[0].CRM_ID!="")
+         {
+           this.cRMid=this.stage9List[0].CRM_ID;
+         }
+         if (this.stage9List[0].CRM_STAGE != "") 
+         {
+              this.cRMStage = this.stage9List[0].CRM_STAGE;
+         }
+          if (this.stage9List[0].CRM_TCV != "") 
+          {
+              this.cRMTCV = this.stage9List[0].CRM_TCV;
+              this.cRMTCV = Number(this.cRMTCV);
+              this.cRMTCV = ((this.cRMTCV)).toString();
+          }
+         if (this.stage9List[0].CRM_Beacon != "" ) 
+         {
+            this.cRMBeacon = this.stage9List[0].CRM_Beacon;
+            this.cRMBeacon = Number(this.cRMBeacon);
+            this.cRMBeacon = ((this.cRMBeacon) / 1000000.00).toString();
+
+         }
+         if (this.stage9List[0].subSPId != "") 
+         {
+          this.subSPId = Number(this.stage9List[0].subSPId);
+         }
+        //  if (this.stage9List[0].ClusterId != 0) 
+        //  {
+        //   this.DdlCluster.cluster = this.stage9List[0].ClusterId;
+        //  }
+         if (this.stage9List[0].IsContractRenewal != "") 
+         {
+          if (this.stage9List[0].IsContractRenewal.trim() == "Yes") 
+          {             
+              $('#ContractRenewalActive').removeClass('btn-default');
+              $('#ContractRenewalActive').addClass('btn-primary active');
+              $('#ContractRenewalInActive').removeClass('btn-primary active');
+              $('#ContractRenewalInActive').addClass('btn-default');
+              if (this.stage9List[0].ContractRenewalValue != "") {
+                  this.ContractRenewalValue = this.stage9List[0].ContractRenewalValue;
+              }
+              else {
+                  this.ContractRenewalValue = null;
+
+              }
+              
+          }
+          else if (this.stage9List[0].IsContractRenewal.trim() == "No") {
+              $('#ContractRenewalInActive').removeClass('btn-default');
+              $('#ContractRenewalInActive').addClass('btn-primary active');
+              $('#ContractRenewalActive').removeClass('btn-primary active');
+              $('#ContractRenewalActive').addClass('btn-default');
+
+          }
+        }
+        if (this.stage9List[0].DT_ID != "") 
+        {
+          this.getDigitalTransformation.getDigital = parseInt(this.stage9List[0].DT_ID);
+        }
+        if (this.stage9List[0].strDigitalTcv != "") 
+        {
+          this.digitalTcv = this.stage9List[0].strDigitalTcv;
+          this.digitalTcv = Number(this.digitalTcv);
+          this.digitalTcv = ((this.digitalTcv));
+        }
+        if (this.stage9List[0].Other_DT != "") 
+        {
+          this.otherDigitalTransformationValue = this.stage9List[0].Other_DT;
+        }
+         if (this.stage9List[0].ItisScope != "") 
+         {
+          if (this.stage9List[0].ItisScope.trim()== "Yes") 
+          {            
+              $('#ITISScopeActive').removeClass('btn-default');
+              $('#ITISScopeActive').addClass('btn-primary active');
+              $('#ITISScopeInActive').removeClass('btn-primary active');
+              $('#ITISScopeInActive').addClass('btn-default');
+          }
+          else if (this.stage9List[0].ItisScope.trim()== "No") 
+          {
+              $('#ITISScopeInActive').removeClass('btn-default');
+              $('#ITISScopeInActive').addClass('btn-primary active');
+              $('#ITISScopeActive').removeClass('btn-primary active');
+              $('#ITISScopeActive').addClass('btn-default');
+
+          }
+
+         }
+         this.opportunityDescription=this.stage9List[0].OPPORTUNITY_DESC;
+         this.GeographyComponent.geography=this.stage9List[0].GEOGRAPHY_ID
+         this.customer=this.stage9List[0].CUST_ID
+         this.CustomerType.custType=this.stage9List[0].CUST_TYPE_ID
+         this.IndustryPractice.ip=this.stage9List[0].INDUSTRY_PRACTICE_ID
+         this.DealStagecomp.DealStage=this.stage9List[0].StageID
+         this.FTEsize=this.stage9List[0].ESTIMATED_FTE_SIZE
+         this.FTEOffshore=this.stage9List[0].FTE_OFFSHORE
+         this.FTEonsite=this.stage9List[0].FTE_ONSITE
+         this.GeographySalesOwner.geographySalesOwner=this.stage9List[0].GEOGRAPHY_SALES_OWNER_ID
+         this.offshorePracticeOwner=this.stage9List[0].PRACTICE_SALES_OWNER_ID
+         this.OffshorePresalesLeadHorizontal.OffShoreHorz=this.stage9List[0].ONSITE_OWNER_ID
+         this.OffshorePresalesLeadVertical.OffShoreverti=this.stage9List[0].OFFSHORE_BD_LEAD_ID
+         this.ISUOwner=this.stage9List[0].ISU_OWNER_ID
+         this.probofWin=this.stage9List[0].PROBABILITY_OF_WIN
+         this.remarks=this.stage9List[0].REMARK
+         if(!isNullOrUndefined(this.stage9List[0].OPPORTUNITY_DATE)&& this.stage9List[0].OPPORTUNITY_DATE!="")
+         {
+           this.opportunityDate= this.stage9List[0].OPPORTUNITY_DATE;
+           var check = moment( this.opportunityDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.opportunityDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.opportunityDate=null;
+         }  
+         if(!isNullOrUndefined(this.stage9List[0].RFI_ReceivedDate)&&this.stage9List[0].RFI_ReceivedDate!="")
+         {
+           this.RFIReceivedDate=this.stage9List[0].RFI_ReceivedDate
+           var check = moment( this.RFIReceivedDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.RFIReceivedDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.RFIReceivedDate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].RFI_ProbableSubmissionDate)&&this.stage9List[0].RFI_ProbableSubmissionDate!="")
+         {
+           this.RFIProbableSubmissionDate=this.stage9List[0].RFI_ProbableSubmissionDate
+           var check = moment( this.RFIProbableSubmissionDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.RFIProbableSubmissionDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.RFIProbableSubmissionDate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].RFI_ActualSubmissionDate)&&this.stage9List[0].RFI_ActualSubmissionDate!="")
+         {
+           this.actualRFISubmissiondate=this.stage9List[0].RFI_ActualSubmissionDate
+           var check = moment( this.actualRFISubmissiondate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.actualRFISubmissiondate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.actualRFISubmissiondate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].RFP_ReceivedDate)&&this.stage9List[0].RFP_ReceivedDate!="")
+         {
+           this.RFPReceiveddate=this.stage9List[0].RFP_ReceivedDate
+           var check = moment( this.RFPReceiveddate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.RFPReceiveddate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.RFPReceiveddate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].RFP_ProbableSubmissionDate)&&this.stage9List[0].RFP_ProbableSubmissionDate!="")
+         {
+           this.probableRFPsubmissiondate=this.stage9List[0].RFP_ProbableSubmissionDate
+           var check = moment( this.probableRFPsubmissiondate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.probableRFPsubmissiondate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.probableRFPsubmissiondate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].RFP_ActualSubmissionDate)&&this.stage9List[0].RFP_ActualSubmissionDate!="")
+         {
+           this.actualRFPsubmissiondate=this.stage9List[0].RFP_ActualSubmissionDate
+           var check = moment( this.actualRFPsubmissiondate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.actualRFPsubmissiondate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.actualRFPsubmissiondate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].SHORTLIST_DT)&&this.stage9List[0].SHORTLIST_DT!="")
+         {
+           this.shortlistDate=this.stage9List[0].SHORTLIST_DT
+           var check = moment( this.shortlistDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.shortlistDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.shortlistDate=null;
+         }
+         if(!isNullOrUndefined(this.stage9List[0].SELECTION_DT)&&this.stage9List[0].SELECTION_DT!="")
+         {
+           this.selectionDate=this.stage9List[0].SELECTION_DT
+           var check = moment( this.selectionDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.selectionDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.selectionDate=null;
+         }
+        
+         if(!isNullOrUndefined(this.stage9List[0].CONTRACT_NEGOTIATION_DT)&&this.stage9List[0].CONTRACT_NEGOTIATION_DT!="")
+         {
+           this.contractNegotiationdate=this.stage9List[0].CONTRACT_NEGOTIATION_DT
+           var check = moment( this.contractNegotiationdate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.contractNegotiationdate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.contractNegotiationdate=null;
+         }
+         this.dealTerm=this.stage9List[0].ContractLength
+         this.currency=this.stage9List[0].CURRENCY_ID
+         let tcv=(this.stage9List[0].TOTAL_CONTRACT_VALUE).toString();
+         this.TCV=this.NewFomattedInput(tcv);
+         this.BCPorDRPLocation=this.stage9List[0].BCP_DRP_LOCATION
+         this.pricingType=this.stage9List[0].PRICING_TYPE_ID
+         this.onsiteTraining=this.stage9List[0].ONSITE_TRAINING_NOS
+         this.durationofTraining=this.stage9List[0].TRAINING_DURATION
+         this.noofdaysStage=this.stage9List[0].DAYS_IN_THIS_STAGE
+         if(!isNullOrUndefined(this.stage9List[0].DEAL_CLOSURE_EXP_DATE)&& this.stage9List[0].DEAL_CLOSURE_EXP_DATE!="")
+         {
+           this.closureDate= this.stage9List[0].DEAL_CLOSURE_EXP_DATE;
+           var check = moment( this.closureDate, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.closureDate = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.closureDate=null;
+         }  
+         this.opportunityWindow=this.stage9List[0].OPERATION_WINDOW
+         this.area=this.stage9List[0].AREA
+         this.typesofseat=this.stage9List[0].TYPES_OF_SEAT
+         this.PCRequired=this.stage9List[0].PCS_REQUIRED
+         this.desksRequired=this.stage9List[0].DESKS_REQUIRED
+         this.phonesRequired=this.stage9List[0].PHONES_REQUIRED
+         this.cabinsRequired=this.stage9List[0].CABINS_REQUIRED
+         this.laptopsRequired=this.stage9List[0].LAPTOPS_REQUIRED
+         if(this.stage9List[0].PLATFORM=="Yes")
+         {
+            this.platform=true;
+         }
+         else if(this.stage9List[0].PLATFORM=="No")
+         {
+            this.nonPlatform=true;
+         }
+         this.nextStep=this.stage9List[0].NEXT_STEP
+         if(!isNullOrUndefined(this.stage9List[0].NEXT_STEP_DUE_DT)&& this.stage9List[0].NEXT_STEP_DUE_DT!="")
+         {
+           this.nextStepDueDT= this.stage9List[0].NEXT_STEP_DUE_DT;
+           var check = moment( this.nextStepDueDT, 'DD-MMM-YYYY');
+           this.month = check.format('M');
+           this.date = check.format('D');
+           this.year   = check.format('YYYY');
+   
+           this.nextStepDueDT = { date:{ day: this.date, month:this.month, year :this.year }};
+         }
+         else{
+           this.nextStepDueDT=null;
+         }  
+         this.productorDomain=this.stage9List[0].PRODUCT_ID
+         this.opportunityFlag=this.stage9List[0].Category_Id
+         this.DdlCountry.country=this.stage9List[0].COUNTRY_ID
+         this.AccountSalesOwner.accountSalesOwner=this.stage9List[0].ACCOUNT_SALES_OWNER_ID
+         this.statusUpdate=this.stage9List[0].STATUS_UPDATE
+         this.DdlDealOwner1.dealOwner1=this.stage9List[0].DEAL_BD_LEAD_ID
+         this.DdlDealOwner2.dealOwner2=this.stage9List[0].DEAL_BD_LEAD_ID2
+         this.ExecutiveSponsor.executivesponsor=this.stage9List[0].EXECUTIVE_SPONSOR
+         this.stage9List[0].OPP_AGE
+         this.SetFYQtr();
+         this.ChangeFYQTR(0);
+       }
+      },
+       error =>{ throw error;},
+      )
+  }
+  SetFYQtr() 
+  {
+    this.expectedRevenueQtrYr = this.expectedRevenueQtr + " - " + this.expectedRevenueFY;
+  }
+  GetStage()
+  {
+    if(this.strStage=="10")
+    {
+      this.PopulateLostCompetitor();
+      this.PopulateLossReason();
+      this.PopulateProactiveProposal();
+      this.PopulateLossFeedback();
+      this.loss1=true;
+      this.loss2=true;
+      this.loss3=true;
+      this.loss4=true;
+    }
+    else
+    {
+      this.loss1=false;
+      this.loss2=false;
+      this.loss3=false;
+      this.loss4=false;
+    }
+  }
+  GetRemarks()
+  {
+    if(this.strStage=="10")
+    {
+      this.loss1=true;
+      this.loss2=true;
+      this.loss3=true;
+      this.loss4=true;
+    }
+    else
+    {
+      this.loss1=false;
+      this.loss2=false;
+      this.loss3=false;
+      this.loss4=false;
+    }
+    this.onHoldService.GetRemarkLastStage(this.strOppId).subscribe(
+      resultArray => {
+          this.reason=resultArray[0].Remark;
+          if(!isNullOrUndefined(resultArray[0].LOST_SCRAPPED_SHELVED_DT)&&resultArray[0].LOST_SCRAPPED_SHELVED_DT!="")
+          {
+            this.FYDate=resultArray[0].LOST_SCRAPPED_SHELVED_DT;
+            var check = moment( this.FYDate, 'DD-MMM-YYYY');
+            this.month = check.format('M');
+            this.date = check.format('D');
+            this.year   = check.format('YYYY');
+    
+            this.FYDate = { date:{ day: this.date, month:this.month, year :this.year }};
+          }
+          else{
+            this.FYDate=null;
+          }
+          
+          //this.LostCompetition=resultArray[0].LostToCompetition;
+          this.lossFeedback=resultArray[0].RFPLostFeedback;
+          this.leasonLearnt=resultArray[0].LessonsLearnt;
+          this.lossVerbatim=resultArray[0].WinLossVerbatum;
+          this.reason1=resultArray[0].DEALREASON1;
+          this.reason2=resultArray[0].DEALREASON2;
+          this.reason3=resultArray[0].DEALREASON3;
+          if(resultArray[0].LostOption.trim()=="Yes")
+          {
+            this.competitionVisible=true;
+            this.PopulateLostCompetitor();
+            $('#LossCompActive').removeClass('btn-default');
+            $('#LossCompActive').addClass('btn-primary active');
+            $('#LossCompInActive').removeClass('btn-primary active');
+            $('#LossCompInActive').addClass('btn-default');           
+          }
+          else if(resultArray[0].LostOption.trim()=="No"){
+            this.competitionVisible=false;
+            $('#LossCompInActive').removeClass('btn-default');
+            $('#LossCompInActive').addClass('btn-primary active');
+            $('#LossCompActive').removeClass('btn-primary active');
+            $('#LossCompActive').addClass('btn-default');           
+          }
+          if(resultArray[0].ProposalFactory.trim()=="Yes")
+          {
+            $('#PFActive').removeClass('btn-default');
+            $('#PFActive').addClass('btn-primary active');
+            $('#PFInActive').removeClass('btn-primary active');
+            $('#PFInActive').addClass('btn-default'); 
+            this.proactiveProposalVisible=true;
+          }
+          else if(resultArray[0].ProposalFactory.trim()=="No")
+          {
+            $('#PFInActive').removeClass('btn-default');
+            $('#PFInActive').addClass('btn-primary active');
+            $('#PFActive').removeClass('btn-primary active');
+            $('#PFActive').addClass('btn-default'); 
+            this.proactiveProposalVisible=false;
+          }
+          if(!isNullOrUndefined(resultArray[0].ProposalFactoryOptions)||resultArray[0].ProposalFactoryOptions.trim()!="")
+          {
+            this.proactiveProposal=resultArray[0].ProposalFactoryOptions;
+          }
+          else
+          {
+            this.proactiveProposal="0";
+          }
+          this.comments=resultArray[0].ProposalFactoryComments;
+          if(this.lostCompetition.find(x=>x.id==143))
+          {
+             this.othersVisible=true;
+             this.others=resultArray[0].LostOthers;
+          }
+          else{
+            this.othersVisible=false;
+          }
+      },
+       error =>{ throw error;},
+      )
+  }
+  Submit()
+  {
+    if(!isNullOrUndefined(this.DealStage)&&this.DealStage!=-1)
+    {
+      this.strGoToStage=this.DealStage.toString();
+    }
+    else
+    {
+      this.validationMessage ="Select the Deal Stage";
+      this.messageType="Danger"; 
+      return false;
+    }
+    if(!isNullOrUndefined(this.reason)&&this.reason!="")
+    {
+      this.strReason=this.reason;
+    }
+    else
+    {
+      this.strReason=null;
+    }
+    if(this.strGoToStage=="13")
+    {
+      this.validationMessage ="Opportunity " + this.strOppId + " is already on 13th stage";
+      this.messageType="Danger";        
+    }
+    else
+    {
+      this.onHoldService.GetOpportunityChkCRM(this.strOppId).subscribe(
+        resultArray => {
+              // this.strCRMChk=resultArray[0].StageID;
+              // if(this.strCRMChk!=null)
+              // {
+              //   this.intCRMChk=parseInt(this.strCRMChk);
+              // }
+              // if(!isNullOrUndefined(this.DealStagecomp.DealStage))
+              // {
+              //   this.intNextStageCRM=this.DealStagecomp.DealStage;
+              // }
+              // if ((this.strCRMChk !=null) && (this.intCRMChk < this.intNextStageCRM))
+              // {
+              //   this.validationMessage ="Opportunity is at stage " + this.strCRMChk + " in CRM, it cannot be moved to stage " + this.DealStagecomp.DealStage + " in RPM. Please move the stage in CRM to Proceed further";
+              //   this.messageType="Danger";    
+              //   return false;    
+              // }
+              // else
+              // {
+                let obj:any={
+                  OpportunityID:this.strOppId,
+                  StageID:this.strGoToStage,
+                  Remark:this.strReason,
+                  EmployeeID:this.userId
+                }
+                this.onHoldService.PostOpportunitySendTostage(obj)
+                .subscribe(resultArray => {
+                    this.intResult=resultArray;
+                    if (this.strGoToStage=="8" || this.strGoToStage=="9")
+                    {
+                       let objTron:any={
+                        OpportunityID:this.strOppId,
+                        StageID:"13"
+                       }
+                       this.onHoldService.PostTRONData(obj)
+                       .subscribe(resultArray=>{
+                         this.intResultTRON=resultArray;
+                          if (this.intResultTRON > 0)
+                          {
+                            this.validationMessage ="Opportunity details successfully updated in TRON";
+                            this.messageType="Success";                        
+                          }
+                          else
+                          {
+                            this.validationMessage ="Errors occured while updating Opportunity details in TRON";
+                            this.messageType="Danger";    
+                          }
+                       },
+                        error =>{ throw error;},
+                      )
+                    }
+                    if(this.intResult==1)
+                    {
+                      this.validationMessage ="Opportunity " + this.strOppId + " has been restored to stage " + this.strGoToStage;
+                      this.messageType="Success";  
+                      this.disableStage13=true;
+                      this.disableList=false;
+                      this.disableSubmit=true;
+                      if(this.userUnit=="2")
+                      {}
+                      else{
+                        this.onHoldService.GetOpportunityDetails(this.strOppId,this.strGoToStage)
+                        .subscribe(resultArray=>{
+                          if(resultArray.length>0)
+                          {              
+                            this.strIPvalue=resultArray[0].IndustryPracticeID;
+                            this.strCustomerId=resultArray[0].CustomerID;
+                            this.strGeographyValue=resultArray[0].GeographyID;
+                          }
+                          //Getting User Details from Employee Current
+                          this.onHoldService.GetEmpDetailsMail(this.userId)
+                          .subscribe(resultArray=>{
+                            if(resultArray.length>0)
+                            {
+                              this.strEmpName=resultArray[0].FullName;
+                              this.strEmpMail=resultArray[0].EmpEmail;
+                              this.strEventType = "StageMoved";
+                            }
+                          },
+                           error =>{ throw error;},
+                        )
+                        //End
+                        },
+                         error =>{ throw error;},
+                       )
+                        // For OppCount Report 
+                       this.onHoldService.GetOpportunityDetails(this.strOppId,"13")
+                       .subscribe(resultArray=>{ 
+                         if(resultArray.length>0)
+                         {
+                            this.intIP=resultArray[0].IndustryPracticeID;
+                         }
+                        let objstagecount:any={
+                          CurrentStageID:13,
+                          NextStageID:parseInt(this.strGoToStage),
+                          INDUSTRY_PRACTICE_ID:this.intIP
+                        }
+                        this.onHoldService.OpportunityStageChangeCount(objstagecount)
+                        .subscribe(resultArray=>{
+
+                        },
+                         error =>{ throw error;},
+                        )
+                       },
+                        error =>{ throw error;},
+                      )
+                      }
+                    }
+                },
+                 error =>{ throw error;},
+                )
+              //}
+              
+        },
+         error =>{ throw error;},
+        )
+      }
+    }
+    BlockSpecialChar(event) {
+      var k = event.keyCode;
+      return ((k > 64 && k < 91) || (k > 96 && k < 123) || k == 8 || k == 32 || (k >= 48 && k <= 57));
+    }
+    ActivePF(e:number)
+    {
+      if(e==1)
+      {
+        this.PFSelect="Yes";
+        this.proactiveProposalVisible=true;
+        $('#PFActive').removeClass('btn-default');
+        $('#PFActive').addClass('btn-primary active');
+        $('#PFInActive').removeClass('btn-primary active');
+        $('#PFInActive').addClass('btn-default'); 
+      }
+    }
+    InActivePF(e:number)
+    {
+      if(e==0)
+      {
+        this.PFSelect="No";
+        this.proactiveProposalVisible=false;
+        $('#PFInActive').removeClass('btn-default');
+        $('#PFInActive').addClass('btn-primary active');
+        $('#PFActive').removeClass('btn-primary active');
+        $('#PFActive').addClass('btn-default'); 
+      }
+    }
+    ActiveLossComp(e:number)
+    {
+      if(e==1)
+      {
+        this.lossComp="Yes";
+        this.competitionVisible=true;
+        $('#LossCompActive').removeClass('btn-default');
+        $('#LossCompActive').addClass('btn-primary active');
+        $('#LossCompInActive').removeClass('btn-primary active');
+        $('#LossCompInActive').addClass('btn-default'); 
+
+      }
+    }
+    InActiveLossComp(e:number)
+    {
+      if(e==0)
+      {
+        this.lossComp="No";
+        this.competitionVisible=false;
+        $('#LossCompInActive').removeClass('btn-default');
+        $('#LossCompInActive').addClass('btn-primary active');
+        $('#LossCompActive').removeClass('btn-primary active');
+        $('#LossCompActive').addClass('btn-default'); 
+      }
+    }
+    Save()
+    {
+      if(this.strStage=="10")
+      {  
+      if(this.dealClosureReason=="")
+      {
+        this.validationMessage= "Please enter Deal Closure Reason";
+        this.messageType="Danger";
+        return false;
+      }
+        if(this.FYDate==null)
+        {
+          this.validationMessage="Please Select Date Field Tab";
+          this.messageType="Danger";
+          return false;
+        }             
+        if(isNullOrUndefined(this.lossFeedback)||this.lossFeedback=="0")
+        {
+          this.validationMessage="Please select Loss Feedback Tab";
+          this.messageType="Danger";
+          return false;
+        }
+        else
+        {
+          this.strRPFFeedback =this.lossFeedback;
+        }
+        if(this.lossComp=="Yes" && this.lostCompetition.length==0)
+        {
+          this.validationMessage="Please select the Lost To Competition Tab";
+          this.messageType="Danger";
+          return false;
+        }  
+        if(this.lossReason.length==0)
+        {
+          this.validationMessage="Please Select Loss Reason Tab";
+          this.messageType="Danger";
+          return false;
+        }
+        if(isNullOrUndefined(this.leasonLearnt)||this.leasonLearnt=="")
+        {
+          if(this.userUnit=="2")
+          {
+          this.validationMessage="Please Enter LeasonLearnt Tab";
+          }
+          else
+          {
+            this.validationMessage="Please Enter Mitigation Plan";
+          }
+          this.messageType="Danger";
+          return false;
+        }
+        else
+        {
+          this.strLessonsLearnt = this.leasonLearnt;
+        }
+       
+        if(isNullOrUndefined(this.lossVerbatim)||this.lossVerbatim=="")
+        {
+          if(this.userUnit=="2")
+          {
+          this.validationMessage="Please Enter LossVerbatim Tab";
+          }
+          else
+          {
+            this.validationMessage="Please Enter Detailed Reason Tab";
+          }
+          this.messageType="Danger";
+          return false;
+        }
+        else
+        {
+          this.strLossVerbatim = this.lossVerbatim;
+        }
+        if(this.PFSelect==null)
+        {
+          this.validationMessage="Please select Proposal Yes/No - Win /Loss tab";
+          this.messageType="Danger";
+          return false;
+        }
+        if(this.PFSelect=="Yes" && (isNullOrUndefined(this.proactiveProposal)||this.proactiveProposal=="0"))
+        {
+          this.validationMessage="Please select the Proposal Options -  Win /Loss Tab";
+          this.messageType="Danger";
+          return false;
+        }
+        else{
+          this.strProposalfactory=this.PFSelect;
+          if(this.PFSelect=="Yes")
+          {
+            this.strProposalfactoryOptions=this.proactiveProposal;
+          }
+          else if(this.PFSelect=="No")
+          {
+            this.strProposalfactoryOptions=null;
+          }
+         
+        }
+        if(this.userUnit=="2")
+        {
+        if(isNullOrUndefined(this.reason1)||this.reason1==0)
+        {
+          this.validationMessage="Please select Reason 1 - WIN/Loss Info tab";
+          this.messageType="Danger"
+          return false;
+        }
+        else{
+          this.strDealReason1=this.reason1.toString();
+        }
+        if(isNullOrUndefined(this.reason2)||this.reason2==0)
+        {
+          this.validationMessage="Please select Reason 2 - WIN/Loss Info tab";
+          this.messageType="Danger"
+          return false;
+        }
+        else{
+          this.strDealReason2=this.reason2.toString();
+        }
+        if(isNullOrUndefined(this.reason3)||this.reason3==0)
+        {
+          this.validationMessage="Please select Reason 3 - WIN/Loss Info tab";
+          this.messageType="Danger"
+          return false;
+        }
+        else{
+          this.strDealReason3=this.reason3.toString();
+        }
+      }
+        this.strProposalComments=this.comments;       
+       
+      } 
+      else{
+        this.strRPFFeedback =null;
+        this.strLessonsLearnt =null;
+        this.strLossVerbatim = null;
+        this.strDealReason1=null;
+        this.strDealReason2=null;
+        this.strDealReason3=null;
+        if(this.FYDate==null)
+        {
+          this.validationMessage="Please Select Date Field Tab";
+          this.messageType="Danger";
+          return false;
+        }   
+        if(this.PFSelect==null)
+        {
+          this.validationMessage="Please select Proposal Yes/No - Win /Loss tab";
+          this.messageType="Danger";
+          return false;
+        }
+        if(this.PFSelect=="Yes" && (isNullOrUndefined(this.proactiveProposal)||this.proactiveProposal=="0"))
+        {
+          this.validationMessage="Please select the Proposal Options -  Win /Loss Tab";
+          this.messageType="Danger";
+          return false;
+        }
+        else
+        {
+          this.strProposalfactory=this.PFSelect;
+          if(this.PFSelect=="Yes")
+          {
+            this.strProposalfactoryOptions=this.proactiveProposal;
+          }
+          else if(this.PFSelect=="No")
+          {
+            this.strProposalfactoryOptions=null;
+          }
+        }
+        this.strProposalComments=this.comments;
+      }
+      let day=this.FYDate.date.day;
+      if(day<10)
+      {
+        day="0"+day
+      }
+      let month=this.FYDate.date.month;
+      if(month<10)
+      {
+        month="0"+month
+      }
+      this.intFYDate=this.FYDate.date.year+month+day;
+
+      
+      let days:any=this.actualclosedate.date.day;
+      if (days < 10) {
+          days = "0" + days;
+      }
+      let months:any=this.actualclosedate.date.month;
+      if (months < 10) {
+          months = "0" + months;
+      }
+      this.stractualclosedate=this.actualclosedate.date.year+months+days;
+
+      let obj:any={
+        OpportunityID:this.strOppId,
+        StageID:this.strStage,
+        Remark:this.reason,
+        EmployeeID:this.userId,
+        LOST_SCRAPPED_SHELVED_DT:this.intFYDate,
+        RFPLostFeedback:this.strRPFFeedback,
+        LostToCompetition:null,
+        LessonsLearnt:this.strLessonsLearnt,
+        WinLossVerbatum:this.strLossVerbatim,
+        DEALREASON1:this.strDealReason1,
+        DEALREASON2:this.strDealReason2,
+        DEALREASON3:this.strDealReason3,
+        LostOption:this.lossComp,
+        LostOthers:this.others,
+        ProposalFactory:this.strProposalfactory,
+        ProposalFactoryOptions:this.strProposalfactoryOptions,
+        ProposalFactoryComments:this.strProposalComments,
+        ActualCloseDate:this.stractualclosedate,
+        DealClosureReason:this.dealClosureReason,
+        
+      }
+      this.onHoldService.GetOpportunityDetails1(this.strOppId).subscribe(
+        resultArray=>{
+          if(resultArray.length>0)
+          {
+            this.intIP =resultArray[0].INDUSTRY_PRACTICE_ID
+            this.intCustomerId =resultArray[0].CUST_ID
+            this.intGeography =resultArray[0].GEOGRAPHY_ID
+            this.intCurrentStageId =resultArray[0].StageID
+            this.strISUCD =resultArray[0].ISU_CD
+          }
+          this.onHoldService.PostOpportunityLost(obj)
+          .subscribe(resultArray=>{
+            if (resultArray == 1)
+            {
+                 this.disableSubmit=true;
+                 this.disableList=false;
+                this.SaveLossReasons();
+                if(this.lossComp=="Yes")
+                {
+                  this.SaveCompetitors();
+                }
+                this.SendMailBFS_StageMoved();
+                this.SendMail_StageMoved_GroupMail();
+                if (this.strStage == "10" || this.strStage == "13")
+                {
+                  this.SendMail_StageMoved_Leaders();
+                  if ((this.strISUCD == "951") || (this.strISUCD == "941") || (this.strISUCD == "942"))
+                  {
+                      this.SendMail_StageMoved_Leaders_Citi();
+                  }
+                }
+                if (this.strStage=="10")
+                {
+                  this.validationMessage="Opportunity " + this.strOppId + " has been marked as LOST";
+                  this.messageType="Success";  
+                  let objstagecount:any={
+                    CurrentStageID:this.intCurrentStageId,
+                    NextStageID:10,
+                    INDUSTRY_PRACTICE_ID:this.intIP
+                  }
+                  this.onHoldService.OpportunityStageChangeCount(objstagecount)
+                  .subscribe(resultArray=>{
+    
+                  },
+                   error =>{ throw error;},
+                  )           
+                
+                }
+                else if (this.strStage=="11")
+                {
+                  this.validationMessage="Opportunity " + this.strOppId + " has been marked as SCRAPPED";
+                  this.messageType="Success";  
+                  let objstagecount:any={
+                    CurrentStageID:this.intCurrentStageId,
+                    NextStageID:11,
+                    INDUSTRY_PRACTICE_ID:this.intIP
+                  }
+                  this.onHoldService.OpportunityStageChangeCount(objstagecount)
+                  .subscribe(resultArray=>{
+    
+                  },
+                   error =>{ throw error;},
+                  )           
+                  
+                }
+                else if (this.strStage=="12")
+                {
+                  this.validationMessage="Opportunity " + this.strOppId + " has been marked as SHELVED";
+                  this.messageType="Success";  
+                  let objstagecount:any={
+                    CurrentStageID:this.intCurrentStageId,
+                    NextStageID:12,
+                    INDUSTRY_PRACTICE_ID:this.intIP
+                  }
+                  this.onHoldService.OpportunityStageChangeCount(objstagecount)
+                  .subscribe(resultArray=>{
+    
+                  },
+                   error =>{ throw error;},
+                  )           
+                 
+                }
+                else if (this.strStage=="13")
+                {
+                  this.validationMessage="Opportunity " + this.strOppId + " has been put On-Hold";
+                  this.messageType="Success"; 
+                  let objstagecount:any={
+                    CurrentStageID:this.intCurrentStageId,
+                    NextStageID:13,
+                    INDUSTRY_PRACTICE_ID:this.intIP
+                  }
+                  this.onHoldService.OpportunityStageChangeCount(objstagecount)
+                  .subscribe(resultArray=>{
+    
+                  },
+                   error =>{ throw error;},
+                  )           
+               
+                }
+    
+          
+               
+            }
+    
+          },
+           error =>{ throw error;},
+          )
+        },
+         error =>{ throw error;},
+      )
+    }    
+    SendMail_StageMoved_GroupMail()
+    {
+      let strOpportID:string=null;
+      let strCustomerName:string=null;
+      let strOppDesc:string=null;
+      let strTCV:string=null;
+      let strExpectedClosure:string=null;
+      let strEstimatedFTE:string=null;
+      let strStatus:string="";
+      let strDealstage:string=null;
+      let strDealTerm1:string=null;
+      let strEventType:string = "StageMoved_Leaders";
+      let strNextStage:string = "";
+      let strTemplateType:string = "StageMoved_Leaders";
+      let intApplicationId:number = 1;
+      let strSendMailEmpID:any;
+      let strSendMailName:any;
+      let strSendMailEmail:any;
+      let strUserLoginFullName:string;
+       //When the stage is moved to stage 8 and beyond Email triggers are sent to senior leadership.
+      if (!isNullOrUndefined(this.strOppId) && this.strOppId!="")
+      {
+          strOpportID = this.strOppId;
+      }
+
+      if (!isNullOrUndefined(this.strCustName) && this.strCustName!="")
+      {
+          strCustomerName = this.strCustName;
+      }
+
+      if (!isNullOrUndefined(this.strOppDesc) && this.strOppDesc!="")
+      {
+          strOppDesc =this.strOppDesc;
+      }
+
+      if (!isNullOrUndefined(this.strTCV) && this.strTCV!="")
+      {
+          strTCV = this.strTCV;
+      }
+
+      if (!isNullOrUndefined(this.strExpectedDate) && this.strExpectedDate!="")
+      {
+          strExpectedClosure = this.strExpectedDate;
+      }
+      if (!isNullOrUndefined(this.strEstimatedFTE) && this.strEstimatedFTE!="")
+      {
+          strEstimatedFTE = this.strEstimatedFTE;
+      }
+      else
+      {
+          strEstimatedFTE = "0";
+      }
+      this.onHoldService.GetStatusLost(strOpportID)
+      .subscribe(resultArray=>{
+        if(resultArray.length>0)
+        {
+          if (!isNullOrUndefined(resultArray[0].StatusUpdate) && resultArray[0].StatusUpdate!="")
+          {
+            strStatus=resultArray[0].StatusUpdate;
+          }      
+        }     
+      },
+       error =>{ throw error;},
+      )
+      if (!isNullOrUndefined(this.strPrevStage) && this.strPrevStage!="")
+      {
+        strDealstage = this.strPrevStage;
+      }
+
+      if (!isNullOrUndefined(this.strDealterm) && this.strDealterm!="")
+      {
+        strDealTerm1 = this.strDealterm;
+      }
+      else
+      {
+        strDealTerm1 = "0";
+      }
+      if (this.strStage == "10")
+      {
+          strNextStage = "10 - LOST";
+      }
+      if (this.strStage == "11")
+      {
+          strNextStage = "11 - Scrapped";
+      }
+      if (this.strStage == "12")
+      {
+          strNextStage = "12 - Shelved";
+      }
+      if (this.strStage == "13")
+      {
+          strNextStage = "13 - ON HOLD";
+      } 
+      this.onHoldService.GetOpportunityDetails1(strOpportID).subscribe(
+        resultArray=>{
+          if(resultArray.length>0)
+          {
+            this.intIP =resultArray[0].INDUSTRY_PRACTICE_ID
+            this.intCustomerId =resultArray[0].CUST_ID
+            this.intGeography =resultArray[0].GEOGRAPHY_ID           
+          }
+          this.onHoldService.GetEmpDetailsMail(this.userId)
+          .subscribe(resultArray=>{
+            if(resultArray.length>0)
+            {
+              strUserLoginFullName=resultArray[0].FullName; 
+              this.createNewOpportunityService.GetEmailLeaders(this.userUnit,"GROUPMAIL")
+              .subscribe(resultArray=>{
+                  if(resultArray.length>0)
+                  {
+                     for(let i=0;i<resultArray.length;i++)
+                     {
+                         if(!isNullOrUndefined(resultArray[i].Emp_Id))
+                         {
+                              strSendMailEmpID=resultArray[i].Emp_Id;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Name))
+                         {
+                              strSendMailName=resultArray[i].Emp_Name;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Email))
+                         {
+                              strSendMailEmail=resultArray[i].Emp_Email;
+                         }
+                         if(!isNullOrUndefined(strSendMailEmail)||strSendMailEmail!="")
+                         {
+                              let obj:any={
+                                 strEventType:strEventType,
+                                 strTemplateType:strTemplateType,
+                                 intApplicationId:intApplicationId,
+                                 strSendMailEmpID:strSendMailEmpID,
+                                 strSendMailName:strSendMailName,
+                                 strSendMailEmail:strSendMailEmail,
+                                 strUserLoginFullName:strUserLoginFullName,
+                                 strOppId:strOpportID,
+                                 strOppDesc:strOppDesc,
+                                 strCustomerName:strCustomerName,
+                                 strDealstage:strDealstage,
+                                 strNextStage:strNextStage,                            
+                                 strUserLoginEmpNo:this.userId,
+                                 strTCVMail:strTCV,
+                                 strDealTerm:strDealTerm1,
+                                 strFTE:strEstimatedFTE
+                              }
+                              this.onHoldService.EmailAlertLeaders(obj)
+                              .subscribe(ObjNewOpportunity => {  
+  
+                              },  
+                               error =>{ throw error;},
+                              )
+                         }
+                     }
+                  }
+                  },
+                   error =>{ throw error;},
+              )
+            }
+          },
+           error =>{ throw error;},
+        )
+        },
+         error =>{ throw error;},
+      )
+    }
+    SendMail_StageMoved_Leaders()
+    {
+      let strOpportID:string=null;
+      let strCustomerName:string=null;
+      let strOppDesc:string=null;
+      let strTCV:string=null;
+      let strExpectedClosure:string=null;
+      let strEstimatedFTE:string=null;
+      let strStatus:string="";
+      let strDealstage:string=null;
+      let strDealTerm1:string=null;
+      let strEventType:string = "StageMoved_Leaders";
+      let strNextStage:string = "";
+      let strTemplateType:string = "StageMoved_Leaders";
+      let intApplicationId:number = 1;
+      let strSendMailEmpID:any;
+      let strSendMailName:any;
+      let strSendMailEmail:any;
+      let strUserLoginFullName:string;
+       //When the stage is moved to stage 8 and beyond Email triggers are sent to senior leadership.
+      if (!isNullOrUndefined(this.strOppId) && this.strOppId!="")
+      {
+          strOpportID = this.strOppId;
+      }
+
+      if (!isNullOrUndefined(this.strCustName) && this.strCustName!="")
+      {
+          strCustomerName = this.strCustName;
+      }
+
+      if (!isNullOrUndefined(this.strOppDesc) && this.strOppDesc!="")
+      {
+          strOppDesc =this.strOppDesc;
+      }
+
+      if (!isNullOrUndefined(this.strTCV) && this.strTCV!="")
+      {
+          strTCV = this.strTCV;
+      }
+
+      if (!isNullOrUndefined(this.strExpectedDate) && this.strExpectedDate!="")
+      {
+          strExpectedClosure = this.strExpectedDate;
+      }
+      if (!isNullOrUndefined(this.strEstimatedFTE) && this.strEstimatedFTE!="")
+      {
+          strEstimatedFTE = this.strEstimatedFTE;
+      }
+      else
+      {
+          strEstimatedFTE = "0";
+      }
+      this.onHoldService.GetStatusLost(strOpportID)
+      .subscribe(resultArray=>{
+        if(resultArray.length>0)
+        {
+          if (!isNullOrUndefined(resultArray[0].StatusUpdate) && resultArray[0].StatusUpdate!="")
+          {
+            strStatus=resultArray[0].StatusUpdate;
+          }      
+        }     
+      },
+       error =>{ throw error;},
+      )
+      if (!isNullOrUndefined(this.strPrevStage) && this.strPrevStage!="")
+      {
+        strDealstage = this.strPrevStage;
+      }
+
+      if (!isNullOrUndefined(this.strDealterm) && this.strDealterm!="")
+      {
+        strDealTerm1 = this.strDealterm;
+      }
+      else
+      {
+        strDealTerm1 = "0";
+      }
+      if (this.strStage == "10")
+      {
+          strNextStage = "10 - LOST";
+      }
+      if (this.strStage == "11")
+      {
+          strNextStage = "11 - Scrapped";
+      }
+      if (this.strStage == "12")
+      {
+          strNextStage = "12 - Shelved";
+      }
+      if (this.strStage == "13")
+      {
+          strNextStage = "13 - ON HOLD";
+      } 
+      this.onHoldService.GetOpportunityDetails1(strOpportID).subscribe(
+        resultArray=>{
+          if(resultArray.length>0)
+          {
+            this.intIP =resultArray[0].INDUSTRY_PRACTICE_ID
+            this.intCustomerId =resultArray[0].CUST_ID
+            this.intGeography =resultArray[0].GEOGRAPHY_ID           
+          }
+          this.onHoldService.GetEmpDetailsMail(this.userId)
+          .subscribe(resultArray=>{
+            if(resultArray.length>0)
+            {
+              strUserLoginFullName=resultArray[0].FullName; 
+              this.createNewOpportunityService.GetEmailLeaders(this.userUnit,"LEADER")
+              .subscribe(resultArray=>{
+                  if(resultArray.length>0)
+                  {
+                     for(let i=0;i<resultArray.length;i++)
+                     {
+                         if(!isNullOrUndefined(resultArray[i].Emp_Id))
+                         {
+                              strSendMailEmpID=resultArray[i].Emp_Id;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Name))
+                         {
+                              strSendMailName=resultArray[i].Emp_Name;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Email))
+                         {
+                              strSendMailEmail=resultArray[i].Emp_Email;
+                         }
+                         if(!isNullOrUndefined(strSendMailEmail)||strSendMailEmail!="")
+                         {
+                              let obj:any={
+                                 strEventType:strEventType,
+                                 strTemplateType:strTemplateType,
+                                 intApplicationId:intApplicationId,
+                                 strSendMailEmpID:strSendMailEmpID,
+                                 strSendMailName:strSendMailName,
+                                 strSendMailEmail:strSendMailEmail,
+                                 strUserLoginFullName:strUserLoginFullName,
+                                 strOppId:strOpportID,
+                                 strOppDesc:strOppDesc,
+                                 strCustomerName:strCustomerName,
+                                 strDealstage:strDealstage,
+                                 strNextStage:strNextStage,                            
+                                 strUserLoginEmpNo:this.userId,
+                                 strTCVMail:strTCV,
+                                 strDealTerm:strDealTerm1,
+                                 strFTE:strEstimatedFTE
+                              }
+                              this.onHoldService.EmailAlertLeaders(obj)
+                              .subscribe(ObjNewOpportunity => {  
+  
+                              },  
+                               error =>{ throw error;},
+                              )
+                         }
+                     }
+                  }
+                  },
+                   error =>{ throw error;},
+              )
+            }
+          },
+           error =>{ throw error;},
+        )
+        },
+         error =>{ throw error;},
+      )
+    }
+    SendMail_StageMoved_Leaders_Citi()
+    {
+      let strOpportID:string=null;
+      let strCustomerName:string=null;
+      let strOppDesc:string=null;
+      let strTCV:string=null;
+      let strExpectedClosure:string=null;
+      let strEstimatedFTE:string=null;
+      let strStatus:string="";
+      let strDealstage:string=null;
+      let strDealTerm1:string=null;
+      let strEventType:string = "StageMoved_Leaders";
+      let strNextStage:string = "";
+      let strTemplateType:string = "StageMoved_Leaders";
+      let intApplicationId:number = 1;
+      let strSendMailEmpID:any;
+      let strSendMailName:any;
+      let strSendMailEmail:any;
+      let strUserLoginFullName:string;
+       //When the stage is moved to stage 8 and beyond Email triggers are sent to senior leadership.
+      if (!isNullOrUndefined(this.strOppId) && this.strOppId!="")
+      {
+          strOpportID = this.strOppId;
+      }
+
+      if (!isNullOrUndefined(this.strCustName) && this.strCustName!="")
+      {
+          strCustomerName = this.strCustName;
+      }
+
+      if (!isNullOrUndefined(this.strOppDesc) && this.strOppDesc!="")
+      {
+          strOppDesc =this.strOppDesc;
+      }
+
+      if (!isNullOrUndefined(this.strTCV) && this.strTCV!="")
+      {
+          strTCV = this.strTCV;
+      }
+
+      if (!isNullOrUndefined(this.strExpectedDate) && this.strExpectedDate!="")
+      {
+          strExpectedClosure = this.strExpectedDate;
+      }
+      if (!isNullOrUndefined(this.strEstimatedFTE) && this.strEstimatedFTE!="")
+      {
+          strEstimatedFTE = this.strEstimatedFTE;
+      }
+      else
+      {
+          strEstimatedFTE = "0";
+      }
+      this.onHoldService.GetStatusLost(strOpportID)
+      .subscribe(resultArray=>{
+        if(resultArray.length>0)
+        {
+          if (!isNullOrUndefined(resultArray[0].StatusUpdate) && resultArray[0].StatusUpdate!="")
+          {
+            strStatus=resultArray[0].StatusUpdate;
+          }      
+        }     
+      },
+       error =>{ throw error;},
+      )
+      if (!isNullOrUndefined(this.strPrevStage) && this.strPrevStage!="")
+      {
+        strDealstage = this.strPrevStage;
+      }
+
+      if (!isNullOrUndefined(this.strDealterm) && this.strDealterm!="")
+      {
+        strDealTerm1 = this.strDealterm;
+      }
+      else
+      {
+        strDealTerm1 = "0";
+      }
+      if (this.strStage == "10")
+      {
+          strNextStage = "10 - LOST";
+      }
+      if (this.strStage == "11")
+      {
+          strNextStage = "11 - Scrapped";
+      }
+      if (this.strStage == "12")
+      {
+          strNextStage = "12 - Shelved";
+      }
+      if (this.strStage == "13")
+      {
+          strNextStage = "13 - ON HOLD";
+      } 
+      this.onHoldService.GetOpportunityDetails1(strOpportID).subscribe(
+        resultArray=>{
+          if(resultArray.length>0)
+          {
+            this.intIP =resultArray[0].INDUSTRY_PRACTICE_ID
+            this.intCustomerId =resultArray[0].CUST_ID
+            this.intGeography =resultArray[0].GEOGRAPHY_ID           
+          }
+          this.onHoldService.GetEmpDetailsMail(this.userId)
+          .subscribe(resultArray=>{
+            if(resultArray.length>0)
+            {
+              strUserLoginFullName=resultArray[0].FullName; 
+              this.createNewOpportunityService.GetEmailLeaders(this.userUnit,"CITI")
+              .subscribe(resultArray=>{
+                  if(resultArray.length>0)
+                  {
+                     for(let i=0;i<resultArray.length;i++)
+                     {
+                         if(!isNullOrUndefined(resultArray[i].Emp_Id))
+                         {
+                              strSendMailEmpID=resultArray[i].Emp_Id;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Name))
+                         {
+                              strSendMailName=resultArray[i].Emp_Name;
+                         }
+                         if(!isNullOrUndefined(resultArray[i].Emp_Email))
+                         {
+                              strSendMailEmail=resultArray[i].Emp_Email;
+                         }
+                         if(!isNullOrUndefined(strSendMailEmail)||strSendMailEmail!="")
+                         {
+                              let obj:any={
+                                 strEventType:strEventType,
+                                 strTemplateType:strTemplateType,
+                                 intApplicationId:intApplicationId,
+                                 strSendMailEmpID:strSendMailEmpID,
+                                 strSendMailName:strSendMailName,
+                                 strSendMailEmail:strSendMailEmail,
+                                 strUserLoginFullName:strUserLoginFullName,
+                                 strOppId:strOpportID,
+                                 strOppDesc:strOppDesc,
+                                 strCustomerName:strCustomerName,
+                                 strDealstage:strDealstage,
+                                 strNextStage:strNextStage,                            
+                                 strUserLoginEmpNo:this.userId,
+                                 strTCVMail:strTCV,
+                                 strDealTerm:strDealTerm1,
+                                 strFTE:strEstimatedFTE
+                              }
+                              this.onHoldService.EmailAlertLeaders(obj)
+                              .subscribe(ObjNewOpportunity => {  
+  
+                              },  
+                               error =>{ throw error;},
+                              )
+                         }
+                     }
+                  }
+                  },
+                   error =>{ throw error;},
+              )
+            }
+          },
+           error =>{ throw error;},
+        )
+        },
+         error =>{ throw error;},
+      )
+    }
+    SendMailBFS_StageMoved()
+    {
+      let obj:any;
+      let strOpportID:string=null;
+      let strCustomerName:string=null;
+      let strOppDesc:string=null;
+      let strTCV:string=null;
+      let strExpectedClosure:string=null;
+      let strStatus:string="";
+      let strDealstage:string=null;
+      let strEventType:string = "Stage9Above";
+      let strNextStage:string = "";
+      let strTemplateType:string = "Stage9Above";
+      let intApplicationId:number = 1;
+      let strSendMailEmpID:any;
+      let strSendMailName:any;
+      let strSendMailEmail:any;
+      let strUserLoginFullName:string;
+      if (!isNullOrUndefined(this.strOppId) && this.strOppId!="")
+      {
+          strOpportID = this.strOppId;
+      }
+
+      if (!isNullOrUndefined(this.strCustName) && this.strCustName!="")
+      {
+          strCustomerName = this.strCustName;
+      }
+
+      if (!isNullOrUndefined(this.strOppDesc) && this.strOppDesc!="")
+      {
+          strOppDesc =this.strOppDesc;
+      }
+
+      if (!isNullOrUndefined(this.strTCV) && this.strTCV!="")
+      {
+          strTCV = this.strTCV;
+      }
+
+      if (!isNullOrUndefined(this.strExpectedDate) && this.strExpectedDate!="")
+      {
+          strExpectedClosure = this.strExpectedDate;
+      }
+      this.onHoldService.GetStatusLost(strOpportID)
+      .subscribe(resultArray=>{
+        if(resultArray.length>0)
+        {
+          if (!isNullOrUndefined(resultArray[0].StatusUpdate) && resultArray[0].StatusUpdate!="")
+          {
+            strStatus=resultArray[0].StatusUpdate;
+          }      
+        }     
+      },
+       error =>{ throw error;},
+      )
+      if (this.strStage == "10")
+      {
+          strNextStage = "Stage 10 - LOST";
+      }
+      if (this.strStage == "11")
+      {
+          strNextStage = "Stage 11 - Scrapped";
+      }
+      if (this.strStage == "12")
+      {
+          strNextStage = "Stage 12 - Shelved";
+      }
+      if (this.strStage == "13")
+      {
+          strNextStage = "Stage 13 - ON HOLD";
+      }
+      //Getting User Details from Employee Current
+      this.onHoldService.GetEmpDetailsMail(this.userId)
+      .subscribe(resultArray=>{
+        if(resultArray.length>0)
+        {
+          strUserLoginFullName=resultArray[0].FullName;
+          this.createNewOpportunityService.GetEmpStatus(strOpportID)
+            .subscribe(resultArray=>{
+                if(!isNullOrUndefined(resultArray[0]))
+                {
+                   for(let i=0;i<resultArray[0].length;i++)
+                   {
+                       if(!isNullOrUndefined(resultArray[0][i].Employee_Id))
+                       {
+                            strSendMailEmpID=resultArray[0][i].Employee_Id;
+                       }
+                       if(!isNullOrUndefined(resultArray[0][i].Emp_Name))
+                       {
+                            strSendMailName=resultArray[0][i].Emp_Name;
+                       }
+                       if(!isNullOrUndefined(resultArray[0][i].Emp_Email))
+                       {
+                            strSendMailEmail=resultArray[0][i].Emp_Email;
+                       }
+                       if(!isNullOrUndefined(strSendMailEmail)||strSendMailEmail!="")
+                       {
+                             obj={
+                               strEventType:strEventType,
+                               strTemplateType:strTemplateType,
+                               intApplicationId:intApplicationId,
+                               strSendMailEmpID:strSendMailEmpID,
+                               strSendMailName:strSendMailName,
+                               strSendMailEmail:strSendMailEmail,
+                               strUserLoginFullName:strUserLoginFullName,
+                               strOppId:strOpportID,
+                               strOppDesc:strOppDesc,
+                               strCustomerName:strCustomerName,
+                               strDealstage:strDealstage,  
+                               strNextStage:strNextStage,                           
+                               strUserLoginEmpNo:this.userId,
+                               strTCVMail:strTCV,
+                               strStatusUpdateMail:strStatus,
+                               strExpectedClosuredateMail:strExpectedClosure
+                            }
+                            this.onHoldService.EmailAlertStage9Above(obj)
+                            .subscribe(ObjNewOpportunity => {  
+
+                            },  
+                             error =>{ throw error;},
+                            )
+                       }
+                   }
+                }
+                if(!isNullOrUndefined(resultArray[1]))
+                {
+                   for(let i=0;i<resultArray[1].length;i++)
+                   {
+                       if(!isNullOrUndefined(resultArray[1][i].Employee_Id))
+                       {
+                            strSendMailEmpID=resultArray[1][i].Employee_Id;
+                       }
+                       if(!isNullOrUndefined(resultArray[1][i].Emp_Name))
+                       {
+                            strSendMailName=resultArray[1][i].Emp_Name;
+                       }
+                       if(!isNullOrUndefined(resultArray[1][i].Emp_Email))
+                       {
+                            strSendMailEmail=resultArray[1][i].Emp_Email;
+                       }
+                       if(!isNullOrUndefined(strSendMailEmail)||strSendMailEmail!="")
+                       {
+                             obj={
+                               strEventType:strEventType,
+                               strTemplateType:strTemplateType,
+                               intApplicationId:intApplicationId,
+                               strSendMailEmpID:strSendMailEmpID,
+                               strSendMailName:strSendMailName,
+                               strSendMailEmail:strSendMailEmail,
+                               strUserLoginFullName:strUserLoginFullName,
+                               strOppId:strOpportID,
+                               strOppDesc:strOppDesc,
+                               strCustomerName:strCustomerName,
+                               strDealstage:strDealstage,  
+                               strNextStage:strNextStage,                          
+                               strUserLoginEmpNo:this.userId,
+                               strTCVMail:strTCV,
+                               strStatusUpdateMail:strStatus,
+                               strExpectedClosuredateMail:strExpectedClosure
+                            }
+                            this.onHoldService.EmailAlertStage9Above(obj)
+                            .subscribe(ObjNewOpportunity => {  
+
+                            },  
+                             error =>{ throw error;},
+                            )
+                       }
+                   }
+                }
+                strNextStage=this.DealStage.toString();
+                if (strNextStage == "4" || strNextStage == "6" || strNextStage == "8" || strNextStage == "9")
+                {
+                  let strInfraHead:string = "";
+                  let strInfraname:string = "";
+                  let strInfraEmail:string = "";
+                  //Mailing to Infrastructure
+                  this.onHoldService.GetHeadInfraQualityDtls(this.userUnit).subscribe(
+                    resultArray => {
+                      if(!isNullOrUndefined(resultArray[0]))
+                      {
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_ID)&&resultArray[0][0].INFRA_HEAD_EMP_ID!="")
+                        {
+                          strInfraHead=resultArray[0][0].INFRA_HEAD_EMP_ID;     
+                        }
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_NAME)&&resultArray[0][0].INFRA_HEAD_EMP_NAME!="")
+                        {
+                          strInfraname=resultArray[0][0].INFRA_HEAD_EMP_NAME;     
+                        }
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_EMAIL)&&resultArray[0][0].INFRA_HEAD_EMP_EMAIL!="")
+                        {
+                          strInfraEmail=resultArray[0][0].INFRA_HEAD_EMP_EMAIL;     
+                        }
+                        if(!isNullOrUndefined(strInfraHead)&&strInfraHead!=""&&!isNullOrUndefined(strInfraEmail)&&strInfraEmail!="")
+                        {
+                          this.onHoldService.EmailAlertStage9Above(obj)
+                          .subscribe(ObjNewOpportunity => {  
+
+                          },  
+                           error =>{ throw error;},
+                          )
+                        }
+                      }
+                    },
+                     error =>{ throw error;},
+                    )
+                } 
+                if(strNextStage == "4")
+                {
+                  let strQualityHead:string = "";
+                  let strQualname:string = "";
+                  let strQualEmail:string = "";
+                  let strInfraHead:string = "";
+                  let strInfraname:string = "";
+                  let strInfraEmail:string = "";
+
+                  //Mailing to Infrastructure
+                  this.onHoldService.GetHeadInfraQualityDtls(this.userUnit).subscribe(
+                    resultArray => {
+                      if(!isNullOrUndefined(resultArray[0]))
+                      {
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_ID)&&resultArray[0][0].INFRA_HEAD_EMP_ID!="")
+                        {
+                          strInfraHead=resultArray[0][0].INFRA_HEAD_EMP_ID;     
+                        }
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_NAME)&&resultArray[0][0].INFRA_HEAD_EMP_NAME!="")
+                        {
+                          strInfraname=resultArray[0][0].INFRA_HEAD_EMP_NAME;     
+                        }
+                        if(!isNullOrUndefined(resultArray[0][0].INFRA_HEAD_EMP_EMAIL)&&resultArray[0][0].INFRA_HEAD_EMP_EMAIL!="")
+                        {
+                          strInfraEmail=resultArray[0][0].INFRA_HEAD_EMP_EMAIL;     
+                        }
+                        if(!isNullOrUndefined(strInfraHead)&&strInfraHead!=""&&!isNullOrUndefined(strInfraEmail)&&strInfraEmail!="")
+                        {
+                          this.onHoldService.EmailAlertStage9Above(obj)
+                          .subscribe(ObjNewOpportunity => {  
+
+                          },  
+                           error =>{ throw error;},
+                          )
+                        }
+                      }
+                      //Mailing to Quality
+                      if(!isNullOrUndefined(resultArray[1]))
+                      {
+                        if(!isNullOrUndefined(resultArray[1][0].INFRA_HEAD_EMP_ID)&&resultArray[1][0].INFRA_HEAD_EMP_ID!="")
+                        {
+                          strInfraHead=resultArray[1][0].INFRA_HEAD_EMP_ID;     
+                        }
+                        if(!isNullOrUndefined(resultArray[1][0].INFRA_HEAD_EMP_NAME)&&resultArray[1][0].INFRA_HEAD_EMP_NAME!="")
+                        {
+                          strInfraname=resultArray[1][0].INFRA_HEAD_EMP_NAME;     
+                        }
+                        if(!isNullOrUndefined(resultArray[1][0].INFRA_HEAD_EMP_EMAIL)&&resultArray[1][0].INFRA_HEAD_EMP_EMAIL!="")
+                        {
+                          strInfraEmail=resultArray[1][0].INFRA_HEAD_EMP_EMAIL;     
+                        }
+                        if(!isNullOrUndefined(strInfraHead)&&strInfraHead!=""&&!isNullOrUndefined(strInfraEmail)&&strInfraEmail!="")
+                        {
+                          this.onHoldService.EmailAlertStage9Above(obj)
+                          .subscribe(ObjNewOpportunity => {  
+
+                          },  
+                           error =>{ throw error;},
+                          )
+                        }
+                      }
+                    },
+                     error =>{ throw error;},
+                    )
+                }
+                },
+                error =>{ throw error;},
+            )
+        }
+      },
+       error =>{ throw error;},
+      )
+      //End
+
+    }
+    GetofferingType() {
+
+      this.onHoldService.GetOfferingType().subscribe(
+  
+          resultArray => this.iOfferingType = resultArray,
+  
+           error =>{ throw error;},
+  
+      )
+  }
+
+  NewFomattedInput(input:any){
+
+    var input = input.replace(/[\D\s\._\-]+/g, "");
+    input = input ? parseInt( input, 10 ) : 0;
+   
+    return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
+   
+
+}
+}
