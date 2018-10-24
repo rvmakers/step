@@ -1,0 +1,336 @@
+
+
+<nav *ngIf="showNavBar" class="navbar navbar-fixed-top" role="navigation">
+    
+         <div *ngIf="showNavBar" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pad-55">
+             <div class="navbar-header">
+                 <a class="navbar-brand"  ><img [src]="logo" class="img-responsive" /></a>
+             </div>
+  
+             <div>
+                 <ul class="nav navbar-nav navbar-right cdk">
+                     <li class="pad-15">
+                         <p>Welcome ! {{userName}},{{roleName}}<a title="Change Role" (click)="GoToRoleSelection()"><img [src]="user"></a> <a title="logout" (click)="GoToLogin()"><img [src]="logout"></a></p>
+                     </li>
+                 </ul>
+             </div>
+         </div>
+         <div *ngIf="showNavBar" class="pad-55 col-lg-12 col-md-12 col-sm-12 col-xs-12 bg_logo_nav">
+           <ul class="nav navbar-nav abc mar-left-7">
+             <li class="dropdown skewP slaint" *ngFor="let parentMenu of Menu">
+               <a *ngIf="IsChildNotPresent(parentMenu)" [routerLink]="['/'+parentMenu.LinkText,{}]"><div class="skewC">{{parentMenu.MenuText}}</div></a>
+               <a *ngIf="IsChildPresent(parentMenu)" class="dropdown-toggle"><div class="skewC">{{parentMenu.MenuText}}</div></a>
+               <ul *ngIf="IsChildPresent(parentMenu)" class="dropdown-menu">
+                 <li *ngFor="let childMenu of Menu |childmenufilter:parentMenu">
+                   <a [routerLink]="['/'+childMenu.LinkText,{}]" style="padding-bottom: 10px;
+                             padding-top: 10px;"><span class="icon"><i class="fa fa-1x fa-file"></i></span><span class="text">{{childMenu.MenuText}}</span></a>
+                 </li>
+               </ul>
+             </li>
+           </ul>
+         </div>
+    
+  </nav>
+
+
+.ts
+
+import { Component, OnInit,Input,ViewChild  } from '@angular/core';
+import { IMenu } from '../../Interface/Menu';
+import {MenuFilterPipe} from '../../Filters/MenuFilter.Pipe'
+import {MenuService } from '../../Services/Menu.Service'
+import { GlobalEventsManager } from '../../GlobalEventsManager';
+import { Router} from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { error } from 'util';
+import { Constant } from './../../Constant';
+import { isNullOrUndefined } from 'util';
+declare var $:any;
+
+@Component({
+  selector: 'app-menu-component',
+  templateUrl: './Menu.Component.html',
+  styleUrls: ['./Menu.Component.css']
+})
+
+export class MenuComponent implements OnInit {
+  Menu=[];
+  showNavBar: boolean = false;
+  logo="./assets/RPM_logo.png";
+  createNew="./assets/CreateNew.png";
+
+  user="./assets/user.png";
+  logout="./assets/logout.png";
+  userName:string;
+  roleName:string;
+  
+  constructor(private menu: MenuService,private globalEventsManager:GlobalEventsManager,
+    private router: Router, private cookieService: CookieService, private constant: Constant) {
+    
+      
+
+    this.globalEventsManager.showNavBarEmitter.subscribe((mode)=>{
+
+      if (mode == true) {
+        let sessionStorageRole:any = sessionStorage.getItem('userRole');
+        this.showNavBar = mode;
+        if (this.cookieService.get('userId') && this.cookieService.get('userUnit')
+          && this.cookieService.get('userRole') && this.showNavBar == true && !isNullOrUndefined(sessionStorageRole) && sessionStorageRole != "") {
+          // logged in so return true
+          this.GetMenu();
+          this.showNavBar = true;
+          if (this.cookieService.get('userRole') != null && this.cookieService.get('userRole') != undefined) {
+            this.roleName = atob(this.cookieService.get('userRole'));
+          }
+          this.userName = atob(this.cookieService.get('userName'));
+        }
+        else {
+          this.showNavBar = false;
+
+        }
+      }
+      })
+  }
+  
+  ngOnInit() {
+    
+    $('ul.abc li').click(function(){
+      
+       $('ul.abc li').removeClass('active');
+       $(this).addClass('active');
+      
+  });
+
+  }
+
+  GetMenu(): void {
+    this.menu.GetMenu().subscribe(resultArray => {
+      if (resultArray != null && resultArray != undefined) {
+        this.Menu = resultArray;
+      } else {
+
+        this.cookieService.deleteAll();
+        this.cookieService.delete("userRole");
+        this.cookieService.delete("userId");
+        this.cookieService.delete("userName");
+        this.cookieService.delete("unitText");
+        this.cookieService.delete("userUnit");
+        
+        sessionStorage.removeItem("userRole");
+        sessionStorage.removeItem("auth-token");
+
+       window.location.href = this.constant.session;
+      }
+    
+    } ,
+    error  =>{ throw error;}
+  )}
+
+GoToRoleSelection():void{
+  
+    
+  	    this.router.navigate(['']);
+      
+      
+    }
+
+GoToLogin():void{
+  
+  this.cookieService.delete("userRole");
+  this.cookieService.delete("userId");
+  this.cookieService.delete("userName");
+  this.cookieService.delete("unitText");
+  this.cookieService.delete("userUnit");
+
+  sessionStorage.removeItem("userRole");
+  sessionStorage.removeItem("auth-token");
+       window.location.href = this.constant.logout;
+      
+      
+  }
+
+  IsChildPresent(menu:IMenu): any {
+
+    if (menu.ChildPresent == true) {
+      return true;
+    }
+    else { return false;}
+  }
+
+  IsChildNotPresent(menu: IMenu): any {
+
+    if (menu.ChildPresent == true) {
+      return false;
+    }
+    else if (menu.ChildPresent == false && menu.ParentMenuId != 0)
+    { return false; }
+    else  { return true; }
+  }
+
+
+
+  }
+     
+
+    
+.css
+
+.navbar-right {
+    float: right!important;
+    margin-right: 0px;
+}
+
+.pad-55{
+    padding-left:5% !important;
+    padding-right:5% !important;
+}
+.navbar-right li p a,.navbar-right li p a:hover{
+   text-decoration:none;
+   cursor:pointer;
+   color:#ff6600;
+}
+
+.cdk li p a:first-child{
+    margin: 0 10px;
+}
+.cdk li p a img{
+  vertical-align: bottom;
+}
+
+.main_content {
+    padding-top: 95px;
+}
+
+li.slaint:hover .dropdown-menu{
+     display:block;
+     transform: skewX(20deg);
+}
+
+li.main:hover .dropdown-menu{
+     display:block;
+    
+}
+
+
+li.slaint .dropdown-menu li a span.icon{
+   margin-right:15px;
+  
+}
+
+li.slaint .dropdown-menu li a span.text{
+    position: relative;
+    /* bottom: 15px; */
+}
+
+
+li.slaint .dropdown-menu li a:hover {
+    background:#bfb8b8;
+}
+
+li.slaint .dropdown-menu li{
+   background:#ffd938;
+   margin-bottom:1px;
+}
+
+li.slaint .dropdown-menu li:last-child{
+   margin-bottom:0px !important;
+}
+
+
+li.slaint .dropdown-menu {
+  padding:0px;
+}
+.navbar-brand {
+    padding: 15px 0px 15px 20px;
+}
+
+.navbar-toggle {
+    padding: 9px 4px;
+    margin-right: 0px;
+}
+
+.pad-top-3 {
+    padding-top: 3px;
+}
+
+.navbar {
+    margin-bottom: 0px;
+    background:#fff;
+}
+
+.back-to-top {
+    cursor: pointer;
+    position: fixed;
+    bottom: 50px;
+    right: 15px;
+    display: none;
+}
+
+.span_font{
+    background: #1670de;
+    color: #fff;
+    padding: 6px;
+}
+
+.navbar-nav>li>a {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+
+.mar-left-7{
+    margin-left:7px !important;
+}
+
+.abc>li>a {
+   padding:12px 20px !important;
+   color:#fff;
+   border-right: 1px solid rgba(255,255,255, .3);
+}
+.abc>li.active>a {
+   background:#ffd938;
+   color:#333;
+}
+
+.abc>li>a:focus, .abc>li>a:hover,.abc>li>a:active {
+      background:#ffd938 !important;
+      color:#333;
+}
+
+.skewP{
+    -ms-transform: skewX(-20deg); /* IE 9 */
+    -webkit-transform: skewX(-20deg); /* Safari */
+    transform: skewX(-20deg);
+}
+
+.skewC{
+    -ms-transform: skewX(20deg); /* IE 9 */
+    -webkit-transform: skewX(20deg); /* Safari */
+    transform: skewX(20deg);
+}
+
+.nav>li>a:focus, .nav>li>a:hover,.nav>li>a:active {
+    background-color:transparent;
+}
+
+.nav .open>a, .nav .open>a:focus, .nav .open>a:hover {
+    background-color: transparent;
+    border-color: #337ab7;
+}
+
+.pad-15{
+    padding:15px 0px;
+}
+
+.bg_logo_nav{
+    background:#234e70;
+    color:rgba(255,255,255,.8);
+}
+
+.page-header {
+    padding-bottom: 12px;
+    margin: 8px 0 10px 0;
+    font-size: 24px;
+    color: #234e70;
+    border-bottom: 1px solid #eee;
+}
