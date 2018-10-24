@@ -1,0 +1,3053 @@
+<style id="antiClickjack">body{display:none !important;}</style>
+  <script type="text/javascript">
+    if (self === top) {
+        var antiClickjack = document.getElementById("antiClickjack");
+        antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+        top.location = self.location;
+    }
+    </script>
+<div class="wraper">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <div class="posr">
+                <ol class="breadcrumb">
+                    <li class="active">
+                        <a routerLink="/Home" class="color-compact">Home</a>
+                    </li>
+                    <li class="font-14">{{unitText}}</li>
+                </ol>
+                <p class="page-header">Create New Opportunity</p>
+                <div class="abs stage">
+                    <div>
+                        <p>Deal</p>
+                        <img [src]="deal" class="center-block img-responsive">
+                    </div>
+                    <div class="posr" id="stagetog">
+                        <span>Stage</span>
+                        <span>
+                            <img [src]="downarrow" class="img-responsive">
+                        </span>
+                        <div class="stages">
+                            <span id="stagenumber">
+
+                            </span>
+                            <span id="stagename">
+
+                            </span>
+                        </div>
+                        <ul id="name" class="enterleave">
+                            <div *ngIf="noOfStageInDomain">
+                            <li *ngFor="let item of dealStageList|slice:0:9; let first = first;" [ngClass]="{active: first}" (click)="DealStageChange(item)">
+                                <span>{{item.StageID}}</span>
+                                <p>{{item.STAGE_NAME|slice:2}}</p>
+                            </li>
+                        </div>
+                        <div *ngIf="noOfStageInBFSI">
+                                <li *ngFor="let item of dealStageList|slice:0:8; let first = first;" [ngClass]="{active: first}" (click)="DealStageChange(item)">
+                                    <span>{{item.StageID}}</span>
+                                    <p>{{item.STAGE_NAME|slice:2}}</p>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <div class="posr" id="categorytog">
+                        <span style="top:11px;">Category</span>
+                        <span>
+                            <img [src]="downarrow" class="img-responsive">
+                        </span>
+                        <div class="stages">
+                            <span id="categorynumber">
+
+                            </span>
+                        </div>
+
+
+                        <ul id="catname" class="enterleave">
+                            <li *ngFor="let item of dealCategoryList" (click)="DealCategoryChange(item)">
+                                <p [hidden]="true">{{item.DealCategoryId}}</p>
+                                <p>{{item.DealCategoryName}}</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div [hidden]="messageType =='' ">
+        <div style="margin-left:-1%" [ngClass]="messageType=='Success'?'alert alert-success':messageType=='Danger'?'alert alert-danger':''">
+            <p class="text-center" [innerHtml]='validationMessage' for="messages">{{validationMessage}}</p>
+        </div>
+    </div>
+
+    <!-- page content start -->
+    <div class="row mar-top-20">
+        <div class="col-md-3">
+            <label>Opportunity ID:: </label>
+            <span style="color:green;font-size:16px;">{{opportunityId}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 width20">
+            <div class="form-group">
+                <label for="name">Select Customer Name
+                    <sup>*</sup>
+                </label>
+                <select [(ngModel)]="customer" (change)="CustomerChange()" class="form-control">
+                    <option [value]=0>--Select--</option>
+                    <option *ngFor="let item of customerNameList" value={{item.CustomerId}}>
+                        {{item.CustomerName}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-3  width20" >
+            <div class="form-group">
+                <label for="name">Opportunity Scope
+                    <sup>*</sup>
+                </label>
+                <textarea [(ngModel)]="opportunityDescription" style="width:100%;" class="form-control"
+                    id="OpportunityDesc" maxlength="500" rows="1"></textarea>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+
+            <div class="form-group">
+                <label for="createdby">Opportunity Tracked By
+                    <sup>*</sup>
+                </label>
+                <div class="btn-group btn-toggle pull-left" id="divCreatedBy">
+                    <button class="btn btn-default" id="CreatedActive" (click)="ActiveCreated()">Presales</button>
+                    <button class="btn btn-default" id="CreatedInActive" (click)="InActiveCreated()">Delivery</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3 width20">
+            <div class="form-group posr">
+                <label for="createdby" class="disb">Contract Renewal</label>
+                <div class="btn-group btn-toggle">
+                    <button [disabled]="disableContractRenewal" (click)="ActiveContractRenewal()" id="ContractRenewalActive" class="btn btn-default">Yes</button>
+                    <button [disabled]="disableContractRenewal" (click)="InActiveContractRenewal()" id="ContractRenewalInActive" class="btn btn-default">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20" *ngIf="contractRenewal=='Yes'">
+            <div class="form-group posr">
+                <label>Renewal TCV(USD)</label>
+                <input type="text" placeholder="TCV(USD)" (keypress)="AllowDecimal($event)" maxlength="13" [(ngModel)]="ContractRenewalValue"
+                    [disabled]="disabledContractRenewal" id="ContractRenewalValue" class="form-control" (keyup)="FormatInputTCV($event)">
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 width20">
+            <div class="form-group">
+                <label for="date">Opp Recieved Date </label>
+                <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="oppReceivedDate" required></my-date-picker>
+            </div>
+        </div>
+        <div class="col-md-3 width20">
+            <div class="form-group">
+                <label for="date">Deal Closure On / After</label>
+                <my-date-picker name="ToDate" [options]="myDatePickerOptions" [(ngModel)]="expectedDealClosure" (ngModelChange)="ChangeFYQTR($event)"
+                  required></my-date-picker>    
+            </div>
+        </div>
+
+        <div class="col-md-3  width20" >
+            <div class="form-group">
+                <label for="name">RPM TCV(USD)</label>
+                <input type="text" [(ngModel)]="totalContractValue" id="TotalContractValue" placeholder="TCV(USD)" (keypress)="AllowDecimal($event)"
+                    maxlength="13" class="form-control" (keyup)="FormatInputTCV($event)"/>
+
+                <label style="color: #ff0000;font-size: 12px;">Mandatory above Stage 2</label>
+            </div>
+        </div>
+        <div class="col-md-3  width20" >
+            <div class="form-group">
+                <label for="name">Potential FTE</label>
+                <input type="text" [(ngModel)]="potentialFTE" maxlength="5" (keypress)="AllowNumeric($event)" id="PotentialFTE" class="form-control"
+                />
+                <label style="color: #ff0000;font-size: 12px;">Mandatory above Stage 2</label>
+            </div>
+        </div>
+        <div class="col-md-3  width20">
+                <div class="form-group">
+                    <label> Deal Term(In Months)
+                    </label>
+                    <input width="7%" type="text" maxlength="3" [(ngModel)]="dealTerm" name="dealTerm" placeholder="Months" class="form-control"
+                        (keypress)="AllowNumeric($event)" />
+                </div>
+            </div>
+
+
+
+
+    </div>
+
+
+    <div class="row">
+        
+
+
+
+        <div class="col-md-3 width20" >
+            <div class="form-group">
+                <label for="name">Expected Revenue Qtr - FY
+                    <sup>*</sup>
+                </label>
+
+                <select [(ngModel)]="expectedRevenueQtrYr" class="form-control">
+                    <option value="0">--Select--</option>
+                    <option *ngFor="let item of expectedRevenueQtrYrList" value={{item.FiscalYear}}>{{item.FiscalYear}}</option>
+                </select>
+
+            </div>
+        </div>
+
+        <div class="col-md-3  width20">
+
+            <div class="form-group">
+                <label for="createdby">Proactive Proposal
+                    <sup>*</sup>
+                </label>
+                <div class="btn-group btn-toggle">
+                    <button (click)="ActiveProactiveProposal(1)" id="PPActive" value="Yes" class="btn btn-default">Proactive</button>
+                    <button (click)="InActiveProactiveProposal(0)" id="PPInActive" value="No" class="btn btn-default">Reactive</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 width20">
+
+            <div class="form-group posr" >
+                <label for="name">IOU
+                    <sup>*</sup>
+                </label>
+                <app-ddliou [(ngModel)]="iou" [iou]="iou" [disableIOU]="disableIOU" [iouList]="iouList" (ngModelChange)="GetSubIOU()"></app-ddliou>
+            </div>
+
+        </div>
+        <div class="col-md-3 width20" >
+            <div class="form-group posr">
+                <label for="name">SUB IOU</label>
+                <app-ddl-sub-iou [subiou]="subiou" [disableSubIOU]="disableSubIOU" [subiouList]="subiouList"></app-ddl-sub-iou>
+            </div>
+
+        </div>
+
+        <div class="col-md-3 width20">
+                <div class="form-group posr">
+                    <label for="name">Vertical
+                        <sup>*</sup>
+                    </label>
+                    <app-ddl-vertical [(ngModel)]="vertical" [vertical]="vertical" [verticalList]="verticalList"></app-ddl-vertical>
+                </div>
+            </div>
+
+
+    </div>
+
+
+    <div class="row">
+
+        
+
+        <div class="col-md-3 width20" >
+            <div class="form-group posr">
+                <label for="name">Services
+                    <sup>*</sup>
+                </label>
+                <app-ddl-service [(ngModel)]="service" ></app-ddl-service>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20" >
+            <div class="form-group posr">
+                <label for="name">BPS Offering
+                    <sup>*</sup>
+                </label>
+            
+                <div *ngIf="userUnit=='2'">
+                    <select [(ngModel)]="bpsoffering" class="form-control" >
+                      <option [value]=0>--Select--</option>
+                      <option *ngFor="let item of bpsofferingList" value={{item.id}}>
+                        {{item.itemName}}
+                      </option>
+                    </select>
+                  </div>
+                  <div *ngIf="userUnit=='1'">
+                    <angular2-multiselect [data]="itemList" [(ngModel)]="bpsofferingDomain"  [settings]="dropdownSettingOffering" 
+                    name="skills">
+                        
+                    </angular2-multiselect>
+                  </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+            <div class="form-group posr">
+                <label for="name">Geography
+                    <sup>*</sup>
+                </label>
+                <app-ddl-geography [(ngModel)]="geography" [geography]="geography" [disabledgeo]="disabledgeo"(ngModelChange)="GetCountry()"></app-ddl-geography>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+            <div class="form-group posr">
+                <label for="name">Country
+                    <sup>*</sup>
+                </label>
+                <app-ddl-country [(ngModel)]="country" [country]="country" ></app-ddl-country>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20" >
+                <div class="form-group posr">
+                    <label for="name">Executive Sponsor
+                        <sup>*</sup>
+                    </label>
+                    <app-executive-sponsor></app-executive-sponsor>
+                </div>
+            </div>
+
+
+
+    </div>
+
+    <div class="row">
+
+        
+
+        <div class="col-md-3  width20">
+            <div class="form-group posr">
+                <label for="name">Geography Sales Owner
+                    <sup>*</sup>
+                </label>
+                <app-geography-sales-owner></app-geography-sales-owner>
+            </div>
+        </div>
+
+        <div class="col-md-3  width20" >
+            <div class="form-group posr">
+                <label for="name">Account/Sales Owner
+                    <sup>*</sup>
+                </label>
+                <app-account-sales-owner></app-account-sales-owner>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20" >
+            <div class="form-group posr">
+                <label for="name"> Presales Lead-Vertical
+                    <sup>*</sup>
+                </label>
+                <app-ddl-offshore-presales-lead-vertical></app-ddl-offshore-presales-lead-vertical>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+            <div class="form-group posr">
+                <label for="name">Presales Lead-Horizontal
+                    <sup>*</sup>
+                </label>
+                <app-ddl-offshore-presales-lead-horizontal></app-ddl-offshore-presales-lead-horizontal>
+            </div>
+        </div>
+        <div class="col-md-3 width20">
+                <div class="form-group posr">
+                    <label for="name">Deal Owner 1
+                        <sup>*</sup>
+                    </label>
+                    <app-ddl-deal-owner1 [(ngModel)]="dealOwner1" (ngModelChange)="ValidateDealOwner()"></app-ddl-deal-owner1>
+                </div>
+            </div>
+
+
+
+
+    </div>
+
+
+
+    <div class="row">
+        
+
+        <div class="col-md-3 width20" >
+            <div class="form-group posr">
+                <label for="name">Deal Owner 2
+                    <sup>*</sup>
+                </label>
+                <app-ddl-deal-owner2 [(ngModel)]="dealOwner2" (ngModelChange)="ValidateDealOwner()"></app-ddl-deal-owner2>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+            <div class="form-group">
+                <label for="createdby" class="disb">PIBS</label>
+                <div class="btn-group btn-toggle">
+                    <button (click)="ActivePIBS(1)" id="PIBSActive" value="Yes" class="btn btn-default">Yes</button>
+                    <button (click)="InActivePIBS(0)" id="PIBSInActive" value="No" class="btn btn-default">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 width20">
+
+            <div class="form-group">
+                <label for="createdby" class="disb">Digital Transformation</label>
+                <div class="btn-group btn-toggle">
+                    <button (click)="DTChange(1)" id="DTActive" class="btn btn-default">Yes</button>
+                    <button (click)="DTChange(0)" id="DTInActive" class="btn btn-default">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" *ngIf="digitalTransformation">
+
+            <div class="form-group posr" style="width: 58%;">
+                <label for="name">Digital Transformation Scope
+                    <sup>*</sup>
+                </label>
+                <app-ddl-get-digital-transformation [(ngModel)]="getDigital" (ngModelChange)="ChangeDT()" [getDigital]="getDigital" ></app-ddl-get-digital-transformation>
+            </div>
+
+        </div>
+        
+    </div>
+   
+
+    <div class="row"> 
+
+            <div class="col-md-3 width20">
+                    <div class="form-group">
+                        <label for="name" class="disb">
+                            Multi-tower Deal
+                            <span style="color: #ff0000">*</span>
+                        </label>
+                        <div class="btn-group btn-toggle">
+                            <button (click)="YesMultitowerDeal()" id='YMultitowerDeal' class="btn btn-default">Yes</button>
+                            <button (click)="NoMultitowerDeal()" id='NMultitowerDeal' class="btn btn-default">No</button>
+                        </div>
+                        <label *ngIf="IfYes" style="color:#ff0000">Please Update Additional Information Screen</label>
+                             
+                    </div>
+                </div>
+        <div class="col-md-3  width20" *ngIf="isCheckUserUnitID=='0'">
+
+            <div class="form-group posr">
+                <label for="name">Cluster
+                </label>
+                <app-ddl-cluster [(ngModel)]="cluster"></app-ddl-cluster>
+            </div>
+        </div>
+        <div class="col-md-3 width20" *ngIf="isCheckUserUnitID=='1'">
+            <div class="form-group posr">
+                <label for="createdby" class="disb">IT IS Scope 
+                    <span style="color: #ff0000">*</span>
+                </label>
+                <div class="btn-group btn-toggle">
+                    <button (click)="CheckItIsScope(1)" id="ITISScopeActive" class="btn btn-default">Yes</button>
+                    <button (click)="CheckItIsScope(0)" id="ITISScopeInActive" class="btn btn-default">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row"> 
+        <div class="col-md-3  width20" *ngIf="userUnit !='1' && digitalTransformation && getDigital !='0' ">
+            <div class="form-group">
+                <label for="name">Digital TCV(MM USD)
+                </label>
+                <input type="text" [(ngModel)]="digitalTcv" id="digitalTcv" placeholder="TCV(MM USD)" (keypress)="AllowDecimal($event)" maxlength="13"
+                    class="form-control" (keyup)="FormatInputTCV($event)"/>
+            </div>
+        </div>
+        </div>
+    <div class="row">
+
+           
+        <div class="col-md-3 width100">
+            <div class="form-group">
+   
+                <fieldset>
+                    <legend>CRM<span style="color:red" *ngIf="crmMandatory">*</span></legend>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="name"> CRM ID<span style="color:red" *ngIf="crmMandatory">*</span></label>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="name"> CRM Stage<span style="color:red" *ngIf="crmMandatory">*</span></label>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="name"> CRM TCV(USD)<span style="color:red" *ngIf="crmMandatory">*</span></label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" (keypress)="AllowAlphaNumeric($event)" placeholder="CRM ID" [(ngModel)]="cRMid" maxlength="10" name="cRMid"
+                                id="cRMid" class="form-control width80" />
+        </div>
+        
+        <div class="col-md-3">
+            <app-ddl-crm-stage [(ngModel)]="cRMStage" ></app-ddl-crm-stage>            
+        </div>
+        <div class="col-md-3">
+            <input type="text" [(ngModel)]="cRMTCV" maxlength="13" placeholder="CRM TCV(USD)" name="cRMTCV" (keypress)="AllowDecimal($event)"
+                                id="cRMTCV" class="form-control width80" (keyup)="FormatInputTCV($event)"/>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group text-center mar-top-20">
+                <button class="btn btn-primary" id="Create" (click)="CreateId()">Create ID</button>
+                <button class="btn btn-primary" id="StageWise" *ngIf="stageWise" (click)="GotoTheStage()">Go to StageWise Data Capture</button>
+              
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style> .mydp {
+    width: 209px!important;
+}
+</style>
+
+.ts
+
+//************************************************************************
+//File Name	     : NewOpportunity.Component.ts 
+//Description    : It's Create a Opportunity ID for Customer 
+//Created By     : Vinoth,Gnanasigamani 
+//************************************************************************
+import { UnitStatusService } from './../Services/unit-status.service';
+import { Component, OnInit, ViewChild, Pipe, PipeTransform, Compiler } from '@angular/core';
+import { Router } from '@angular/router';
+import { DatePipe, SlicePipe } from '@angular/common';
+import { ISUService } from '../Services/ISU.Service';
+import { UserService } from '../Services/User.Service';
+import { OnHoldService } from '../Services/OnHold.service';
+import { ISU } from '../Interface/ISU/ISU';
+import { IVertical } from '../Interface/Vertical/vertical';
+import { VerticalService } from '../Services/Vertical.service';
+import { ICustomerType } from '../Interface/Customer/CustomerType';
+import { CreateNewOpportunityService } from '../Services/CreateNewOpportunity.service';
+import { DdlIOUComponent } from '../UserControls/DdlIOU/DdlIOU.Component';
+import { DdlSubIouComponent } from '../UserControls/DdlSubIOU/ddl-sub-iou.component';
+import { IFiscalYear } from '../Interface/FiscalYear/FiscalYear';
+import { IBPSOffering } from '../Interface/BPSOffering/BPSOffering';
+import { BpsofferingService } from '../Services/BPSOffering.service';
+import { INewOpportunity } from '../Interface/NewOpportunity/NewOpportunity';
+import { IGeographyIP } from '../Interface/Geography/Geographyip';
+import { Constant } from '../Constant'
+import { ValidationMessage } from '../ValidationMessage/validation-message'
+import { IGeography } from '../Interface/Geography/Geography';
+import { DdlISUComponent } from '../UserControls/ddlISU/ddlISU.Component';
+import { DdlGeographyComponent } from '../UserControls/DdlGeography/ddl-geography.component';
+import { AccountSalesOwnerComponent } from '../UserControls/DdlAccountSalesOwner/account-sales-owner.component'
+import { DdlGetDigitalTransformationComponent } from '../UserControls/DdlGetDigitalTransformation/ddl-get-digital-transformation.component'
+import { DdlOffshorePresalesLeadHorizontalComponent } from '../UserControls/Ddloffshorepresalesleadhorizontal/ddl-offshore-presales-lead-horizontal.component'
+import { DdlOffshorePresalesLeadVerticalComponent } from '../UserControls/Ddloffshorepresalesleadvertical/ddl-offshore-presales-lead-vertical.component'
+import { DdlValusBpsComponent } from '../UserControls/DdlValueBPS/ddl-valus-bps.component'
+import { DdlDealCategoryComponent } from '../UserControls/DdlDealCategory/ddl-deal-category.component'
+import { CustomerTypeComponent } from '../UserControls/DdlCustomerType/customer-type.component'
+import { DdlVerticalComponent } from '../UserControls/DdlVertical/ddl-vertical.component'
+import { DdlCountryComponent } from '../UserControls/DdlCountry/ddl-country.component'
+import { DdlDealOwner1Component } from '../UserControls/DdlDealOwner1/ddl-deal-owner1.component'
+import { GeographySalesOwnerComponent } from '../UserControls/DdlGeographySalesOwner/geography-sales-owner.component'
+import { DdlBpsofferingComponent } from '../UserControls/DdlBPSOffering/ddl-bpsoffering.component'
+import { IndustryPracticeComponent } from '../UserControls/DdlIndustryPractice/industry-practice.component'
+import { DdlClusterComponent } from '../UserControls/DdlCluster/ddl-cluster.component'
+import { DdlServiceComponent } from '../UserControls/DdlService/ddl-service.component'
+import { DdlDealOwner2Component } from '../UserControls/DdlDealOwner2/ddl-deal-owner2.component'
+import { ExecutiveSponsorComponent } from '../UserControls/DdlExecutiveSponsor/executive-sponsor.component'
+import { DdlDealStageComponent } from '../UserControls/DdlDealstage/ddl-deal-stage.component'
+import { ICluster } from '../Interface/Cluster/Cluster';
+import { IServiceName } from '../Interface/ServiceName/ServiceName';
+import { IExecutiveSponsor } from '../Interface/ExecutiveSponsor/ExecutiveSponsor';
+import { isNullOrUndefined } from 'util';
+import { CookieService } from 'ngx-cookie-service';
+import { IMyDrpOptions } from 'mydaterangepicker';
+import { IMyDpOptions } from 'mydatepicker';
+import { DdlDealStageService } from '../Services/DealStage.service';
+import { DealCategoryService } from '../Services/DealCategory.service';
+import { IDealCategory } from '../Interface/DealCategory/DealCategory';
+import { ConfigurationService } from '../Services/Configuration.service';
+import { IConfiguration } from '../Interface/Configuration/configuration';
+import { ICountry } from '../Interface/Country/Country';
+import { ICreateNewOpportunity } from '../Interface/CreateNewOpportunity/CreateNewOpportunity';
+import { CreateNewOppurtunityStage0Service } from '../Services/create-new-oppurtunity-stage0.service';
+import * as $ from 'jquery';
+//declare var $: any;
+
+@Component({
+    selector: 'app-newopportunity',
+    templateUrl: './newopportunity.component.html',
+    styleUrls: ['./newopportunity.component.css'],
+    providers: [DatePipe]
+})
+export class NewopportunityComponent implements OnInit {
+    
+    deal = "./assets/deal.png"
+    downarrow = "./assets/downarrow.png"
+
+    @ViewChild(DdlISUComponent) ISUComp: DdlISUComponent;
+    @ViewChild(DdlGeographyComponent) GeographyComponent: DdlGeographyComponent;
+    @ViewChild(DdlSubIouComponent) SubIouComp: DdlSubIouComponent;
+    @ViewChild(AccountSalesOwnerComponent) AccountSalesOwner: AccountSalesOwnerComponent
+    @ViewChild(DdlGetDigitalTransformationComponent) GetDigitalTransformation: DdlGetDigitalTransformationComponent
+    @ViewChild(DdlOffshorePresalesLeadHorizontalComponent) OffshorePresalesLeadHorizontal: DdlOffshorePresalesLeadHorizontalComponent
+    @ViewChild(DdlOffshorePresalesLeadVerticalComponent) OffshorePresalesLeadVertical: DdlOffshorePresalesLeadVerticalComponent
+    @ViewChild(DdlValusBpsComponent) ValusBps: DdlValusBpsComponent
+    @ViewChild(DdlDealCategoryComponent) DealCategory: DdlDealCategoryComponent
+    @ViewChild(CustomerTypeComponent) CustomerType: CustomerTypeComponent
+    @ViewChild(DdlVerticalComponent) DdlVertical: DdlVerticalComponent
+    @ViewChild(DdlDealOwner1Component) DdlDealOwner1: DdlDealOwner1Component
+    @ViewChild(GeographySalesOwnerComponent) GeographySalesOwner: GeographySalesOwnerComponent
+    @ViewChild(DdlBpsofferingComponent) DdlBpsoffering: DdlBpsofferingComponent
+    @ViewChild(IndustryPracticeComponent) IndustryPractice: IndustryPracticeComponent
+    @ViewChild(DdlClusterComponent) DdlCluster: DdlClusterComponent
+    @ViewChild(DdlServiceComponent) DdlService: DdlServiceComponent
+    @ViewChild(DdlDealOwner2Component) DdlDealOwner2: DdlDealOwner2Component
+    @ViewChild(DdlIOUComponent) DdlIOU: DdlIOUComponent
+    @ViewChild(DdlCountryComponent) DdlCountry: DdlCountryComponent
+    @ViewChild(DdlDealStageComponent) DealStagecomp: DdlDealStageComponent
+    @ViewChild(ExecutiveSponsorComponent) ExecutiveSponsor: ExecutiveSponsorComponent
+
+    defaultYear = new Date().getFullYear();
+    defaultMonth = new Date().getMonth() + 1;
+    defaultDate = new Date().getDate();
+
+    myDateRangePickerOptions: IMyDrpOptions = {
+        // other options...
+        dateFormat: 'dd.mm.yyyy',
+
+    };
+    myDatePickerOptions: IMyDpOptions = {
+        // other options...
+        dateFormat: 'dd.mm.yyyy',
+        editableDateField: false,
+        inline: false
+    };
+    dropdownSettingOffering = {};
+
+
+    public daterange: any = {};
+
+    bmonth: number;
+    countryList: ICountry[];
+
+    oppReceivedDate: any = { date: { day: this.defaultDate, month: this.defaultMonth, year: this.defaultYear } };
+    expectedDealClosure: any= { date: { day: this.defaultDate, month:  this.defaultMonth, year: this.defaultYear } };
+    dealTerm: number = null;
+    strEmpName: string;
+    strEmpEmail: string;
+    strCustomerName: string;
+    strUserLoginFullName: string;
+    strDealstage: string;
+    strOppDesc: string;
+    strSendMailEmpID: string = null;
+    strSendMailName: string = null;
+    strSendMailEmail: string = null;;
+    strEventType: string;
+    strOppId: string;
+    intApplicationId: number;
+    strTemplateType: string;
+    oppRevDate: any;
+    eDealClosure: any;
+    stage: number;
+    stageId: number = -1;
+    dealCategoryId: number = 0;
+    CRMId: string;
+    ContractRenewalValue: any;
+    messageType: string;
+    disableSubIOU: boolean;
+    disableIOU: boolean;
+    strTotalContractValue: number;
+    dealStageList: any;
+    dealCategoryList: IDealCategory[];
+    getDigital: number=0;
+    count: number=0;
+    newOpportunityList: INewOpportunity[];
+    checkStatus: string;
+    otherDT: string;
+    disabledODT: boolean=true;
+    horizontalSave: any;
+    checkHorizontal: any;
+    expectedRevenueQtr: number=0;
+    strYear: string = null;
+    strYear1: string = null;
+    a: number;
+    strFiscalYr: string = null;
+    year: any;
+    month: any;
+    country: number;
+    isuMain: number;
+    disabled: boolean;
+    disabledgeo: boolean;
+    disabledIP: boolean;
+    custType: number=0;
+    geography: number=0;
+    dealCategory: any= null;
+    ip: number=0;
+    isu: number=0;
+    iou: number=0;
+    subiou: number=0;
+    customer: number=0;
+    dealOwner1: number=0;
+    dealOwner2: number=0;
+    service: number;
+    vertical: number=0;
+    bpsoffering: number=0;
+    bpsofferingDomain: any[] = new Array();
+    expectedRevenueFY: any=0;
+    geographyList: IGeography[];
+    isuList: ISU[];
+    iouList: ISU[];
+    subiouList: ISU[];
+    bpsofferingList: IBPSOffering[];
+    verticalList: IVertical[];
+    configurationList: any = new Array();
+    customerNameList: ICustomerType[];
+    fiscalYearList: IFiscalYear[];
+    getGeographyList: IGeographyIP[];
+    validationMessage: string;
+    opportunityId: string="System Generated";
+    opportunityDescription: string;
+    proactiveProposal: string= null;;
+    validateoppReceivedDate: any;
+    validateClosureDate: any;
+    potentialFTE: string;
+    otherDigitalTransformationValue: string;
+    ITISScopeActive: any;
+    ITISScopeInActive: any;
+    ContractRenewalActive: any;
+    ContractRenewalInActive: any;
+    pibs: string= null;
+    strCluster: any
+    opportunityTrackedBy: any=0
+    totalContractValue: any
+    digitalTransformation: number
+    userUnit: any;
+    userRole: string;
+    userId: string;
+    currentUrl: string = window.location.href;
+    currentPageQuery: string;
+    reset: string;
+    hostAddress: string;
+    unitText: string = String(atob(this.cookieService.get(('unitText'))));
+    stageWise: boolean;
+    digitalTcv: number;
+    strDigitalTcv: any;
+    YMultitowerDeal: any;
+    NMultitowerDeal: any;
+    showMultiTower: any= null;
+    itIsScope: any= null;
+    disabledContractRenewal: any;
+    isCheckUserUnitID: any;
+    contractRenewal: any;
+    cRMStage: any;
+    cRMTCV: any;
+    strCRMTCV: string;
+    cRMid: string="0-Awaited";
+
+    expectedRevenueQtrYr: any;
+    expectedRevenueQtrYrList: any
+    IfYes:boolean=false;
+    noOfStageInDomain:boolean=true;
+    noOfStageInBFSI:boolean=false;
+    disableContractRenewal : any=0;
+    crmMandatory:boolean=false;
+
+    itemList = [];
+
+    constructor(private onHoldService: OnHoldService, private router: Router, private _compiler: Compiler,
+        private userService: UserService, private dealCategoryService: DealCategoryService,
+        private DealStageService: DdlDealStageService, private isuService: ISUService,
+        private cookieService: CookieService,
+        private createNewOpportunityService: CreateNewOpportunityService,
+        private verticalService: VerticalService, private bpsofferingService: BpsofferingService,
+        private constant: Constant, private datepipe: DatePipe,
+        private configurationService: ConfigurationService,private createNewOppurtunityStage0Service: CreateNewOppurtunityStage0Service) {
+        this._compiler.clearCache();
+        this.userId = this.cookieService.get('userId');
+        this.userUnit = this.cookieService.get('userUnit')
+        this.userRole = this.cookieService.get('userRole')
+
+        if (this.userUnit != null && this.userUnit != undefined && this.userRole != null && this.userRole != undefined)
+
+
+            this.userUnit = atob(this.userUnit);
+            this.userService.LogUserAccess(this.userId, btoa(this.currentUrl), btoa(this.currentPageQuery), btoa(this.hostAddress)).subscribe(resultArray => {
+
+
+        })
+    }
+
+
+    ngOnInit() {
+        this.reset = "Reset"
+        this.cookieService.set('StageId', btoa(""));
+        this.userRole = atob(this.userRole);
+        this.userId = atob(this.userId);
+        this.stageWise = false;
+
+        this.noOfStageInDomain=true;
+        this.noOfStageInBFSI=false;
+
+        this.disableContractRenewal=0;
+        this.getDigital = 0;
+        this.count = 0;
+        this.disabledODT = true;
+        this.opportunityId = "System Generated";
+        this.GetFiscalYear();
+        this.PopulateISU();
+        this.custType = 0;
+        this.isu = 0;
+        this.opportunityTrackedBy = 0;
+        this.expectedRevenueQtr = 0;
+        this.ip = 0;
+        this.vertical = 0;
+        this.subiou = 0;
+        this.customer = 0;
+        this.dealCategory = null;
+        this.geography = 0;
+        this.expectedRevenueFY = 0;
+        this.GetCustomerName();
+        this.proactiveProposal = null;
+        this.showMultiTower = null;
+        this.CheckUserUnitID();
+        this.itIsScope = null;
+        this.pibs = null;
+
+
+        $('.btn-toggle').click(function () {
+            $(this).find('.btn').toggleClass('active');
+
+            if ($(this).find('.btn-primary').length > 0) {
+                $(this).find('.btn').toggleClass('btn-primary');
+            }
+
+            if ($('#check').hasClass('active')) {
+                $('#checkdigi').show();
+            }
+            else {
+                $('#checkdigi').hide();
+            }
+        });
+
+        $('#name').hide();
+
+        $('#stagetog').click(function () {
+            $("#name").slideToggle();
+        });
+
+        $('#name li').click(function () {
+            $('#name li').removeClass('active');
+            $(this).addClass('active');
+            $('#stagenumber').text($(this).find('span').text());
+            $('#stagename').text($(this).find('p').text());
+        });
+
+        $('#catname').hide();
+        $('#categorytog').click(function () {
+            $("#catname").slideToggle();
+        });
+        $('#catname li').click(function () {
+            $('#categorynumber').text($(this).find('span').text());
+        });
+
+        $("ul.enterleave").on("mouseleave", function () {
+            $("#name").slideUp()
+            $("#catname").slideUp();
+        });
+
+        this.GetFiscalYear();
+        this.PopulateISU();
+        this.GetCustomerName();
+        this.CheckUserUnitID();
+        this.GetDealStage();
+        this.GetCategory();
+        this.GetVertical();
+        this.ChangeFYQTR(0);
+
+        this.dropdownSettingOffering = {
+            
+            singleSelection: false,
+            text: "Please Select the BPS Offering",
+            selectAllText: 'Select All',
+            unSelectAllText: 'UnSelect All',
+            enableSearchFilter: false,
+            classes: "myclass custom-class",
+            maxHeight: 200,
+            badgeShowLimit: 10
+        }
+        this.GetBPSOffering();
+        
+
+        this.dropdownSettingOffering =
+        {
+          singleSelection: false,
+          text: "--Select--",
+          selectAllText: 'Select All',
+          unSelectAllText: 'UnSelect All',
+          classes: "myclass multi-class",
+          badgeShowLimit: 1,
+          enableSearchFilter:true
+        };
+
+        
+    }
+
+    public selectedDate(value: any, datepicker?: any) {
+
+        // any object can be passed to the selected event and it will be passed back here
+        datepicker.start = value.start;
+        datepicker.end = value.end;
+
+        // or manupulate your own internal property
+        this.daterange.start = value.start;
+        this.daterange.end = value.end;
+        this.daterange.label = value.label;
+    }
+    
+  
+    PopulateISU() {
+        this.isuService.GetISUMain(this.userUnit).subscribe(
+
+            resultArray => this.isuList = resultArray,
+             error =>{ throw error;}
+        )
+    }
+    GetDealStage() {
+
+        this.DealStageService.GetDealStage().subscribe(
+            resultArray => {
+                this.dealStageList = resultArray
+            },
+            error =>{ throw error;},
+        )
+    }
+
+    GetIOU() {
+        if (this.userUnit == "2" || this.userUnit) {
+            this.isuMain = this.isu;
+        }
+        else {
+            this.isuMain = -1;
+        }
+        if (this.isuMain != 0) {
+
+            this.isuService.GetIOU(this.userUnit, this.isuMain).subscribe(
+                resultArray => {
+                    this.iouList = resultArray
+                },
+                 error =>{ throw error;},
+            )
+        }
+        else {
+            this.iouList = null;
+            this.iou = 0;
+            this.SubIouComp.subiouList = null;
+            this.SubIouComp.subiou = 0;
+        }
+    }
+    GetCategory() {
+
+        this.dealCategoryService.GetDealCategory().subscribe(
+
+            resultArray => { this.dealCategoryList = resultArray },
+            error =>{ throw error;},
+        )
+    }
+    GetSubIOU() {
+        if (this.iou != 0) {
+
+            this.isuService.GetSubIOU(this.iou).subscribe(
+                resultArray => { this.subiouList = resultArray },
+                 error =>{ throw error;},
+            )
+        }
+        else {
+            this.SubIouComp.subiouList = null;
+            this.SubIouComp.subiou = 0;
+        }
+
+    }
+    GetGeography() {
+        if (this.country != 0) {
+
+            this.createNewOpportunityService.GetGeography(this.country).subscribe(
+                resultArray => {
+                    this.getGeographyList = resultArray,
+                        this.geography = this.getGeographyList[0].GeographyId;
+
+                },
+                 error =>{ throw error;},
+            )
+        }
+        else {
+            this.geography = 0;
+        }
+    }
+
+
+    GetCountry(){
+        if (this.geography != 0) {
+            
+                        this.createNewOpportunityService.GetCountry(this.geography).subscribe(
+                            resultArray => {
+                                this.countryList = resultArray,
+                                this.DdlCountry.countryList =resultArray
+
+                                if(this.countryList.length==1)
+                                {
+                                    this.country= this.countryList[0].CountryID,
+                                    this.DdlCountry.country= this.countryList[0].CountryID
+                                }
+            
+                            },
+                            error => { console.log("Error :: " + error) },
+                        )
+                    }
+                    else {
+                        this.countryList=null;
+                        this.DdlCountry.country=0;
+                        this.country=0;
+                    }
+    }
+
+    
+    GetCustomerName() {
+
+        this.createNewOpportunityService.GetCustomerName(this.userUnit).subscribe(
+            resultArray => {
+                this.customerNameList = resultArray
+            },
+             error =>{ throw error;},
+        )
+    }
+    GetFiscalYear() {
+
+        this.createNewOpportunityService.GetFiscalYear().subscribe(
+
+            resultArray => {
+                this.fiscalYearList = resultArray;
+                this.PopulateQtrFiscalExpectedDate();
+            },
+            error =>{ throw error;},
+        )
+    }
+    GetVertical() {
+
+        this.verticalService.GetVerticalWithoutID(btoa(this.userUnit)).subscribe(
+
+
+            resultArray => { this.verticalList = resultArray },
+
+             error =>{ throw error;},
+
+        )
+    }
+    GetBPSOffering() {
+
+        if (this.service == undefined || this.service == -1 || this.service == 0) {
+            this.service = 1;
+
+        }
+        this.bpsofferingService.GetBPSOfferingName(this.service, this.userUnit).subscribe(
+
+            resultArray => {
+            this.bpsofferingList = resultArray
+                this.itemList = resultArray
+
+            },
+            error => { throw error; },
+
+        )
+
+    }
+
+    ChangeFYQTR(event: any) {
+        let qtr: number;
+        let fys: number;
+        let fye: number;
+        if (event != 0) {
+            this.expectedDealClosure = event;
+        }
+        else if (event == 0) {
+            this.expectedRevenueQtrYr = { FiscalYear: "Q" + this.expectedRevenueQtr + " - " + this.expectedRevenueFY, Qtr: this.expectedRevenueQtr, Fyr: this.expectedRevenueFY };
+        }
+        this.expectedRevenueQtrYrList = [];
+        this.expectedDealClosure = this.expectedDealClosure;
+        if (this.expectedDealClosure != undefined) {
+
+            if (this.expectedDealClosure.date.month >= 1 && this.expectedDealClosure.date.month <= 3) {
+                qtr = 4;
+            }
+            else if (this.expectedDealClosure.date.month >= 4 && this.expectedDealClosure.date.month <= 6) {
+                qtr = 1;
+            }
+            else if (this.expectedDealClosure.date.month >= 7 && this.expectedDealClosure.date.month <= 9) {
+                qtr = 2;
+            }
+            else if (this.expectedDealClosure.date.month >= 10 && this.expectedDealClosure.date.month <= 12) {
+                qtr = 3;
+            }
+
+            if (qtr == 4) {
+                fys = Number(this.expectedDealClosure.date.year) - 1;
+                fye = Number(this.expectedDealClosure.date.year);
+            }
+            else {
+                fys = Number(this.expectedDealClosure.date.year);
+                fye = Number(this.expectedDealClosure.date.year) + 1;
+            }
+            this.expectedRevenueQtrYr = "Q" + qtr + " - FY " + fys.toString().substring(2) + '-' + fye.toString().substring(2);
+            let k = 0;
+            let varUnit =0;
+            if(this.userUnit==1){
+                varUnit=4;
+            }
+            else if(this.userUnit==2){
+                varUnit=8;
+            }
+            while (k < varUnit) {
+                for (var j = 0; j < 4; j++) {
+                    this.expectedRevenueQtrYrList.push({ FiscalYear: "Q" + qtr + " - FY " + fys.toString().substring(2) + '-' + fye.toString().substring(2), Qtr: qtr, Fyr: "FY " + fys.toString().substring(2) + '-' + fye.toString().substring(2) });
+                    if (qtr == 4) {
+                        qtr = 1;
+                        k++;
+                        break;
+                    }
+                    else {
+                        qtr++;
+                        k++;
+                    }
+                    if (k > (varUnit-1)) {
+                        break;
+                    }
+                }
+                fys++;
+                fye++;
+            }
+        }
+       
+    }
+
+    //Populate other fields based on the Customer Field
+    CustomerChange() {
+
+        if (this.customer == 0) {
+            this.ip = 0;
+            this.isu = 0;
+            this.iouList = null;
+            this.subiouList = null;
+            this.subiou = 0;
+            this.iou = 0;
+            this.dealCategory = null;
+            this.geography = 0;
+            this.custType = 0;
+            this.disabled = false;
+            this.disabledIP = false;
+            this.disabledgeo = false;
+            this.disableIOU = false;
+            this.disableSubIOU = false;
+
+        }
+        else {
+
+            this.createNewOpportunityService.GetGeographyIP(this.customer).subscribe
+                (
+                response => {
+                    this.getGeographyList = response;
+                    if (this.getGeographyList[0].DealCategoryId != "") {
+                        if (!isNullOrUndefined(this.dealCategoryList)) {
+                            this.dealCategory = this.dealCategoryList.find(x => x.DealCategoryId == parseInt(this.getGeographyList[0].DealCategoryId)).DealCategoryName;
+                            $('#categorynumber').text(this.dealCategory.slice(0, 1));
+                            this.dealCategoryId = parseInt(this.getGeographyList[0].DealCategoryId);
+                            if(this.dealCategoryId==1 || this.dealCategoryId==2){
+                                this.ActiveCreated();
+                                this.disableContractRenewal=0;
+                            }
+                            else if(this.dealCategoryId==3 || this.dealCategoryId==4){
+                                this.InActiveCreated();
+                                this.disableContractRenewal=1;
+                                this.contractRenewal = "";                                
+                                $('#ContractRenewalInActive').removeClass('btn-default');
+                                $('#ContractRenewalActive').removeClass('btn-primary active');
+                                $('#ContractRenewalActive').removeClass('btn-default');
+                                $('#ContractRenewalInActive').removeClass('btn-primary active');
+                            }
+                        }
+
+                    }
+                    else {
+                        this.dealCategory = null;
+                    }
+                    if (this.getGeographyList[0].GeographyId != 0 && this.GeographyComponent.geographyList.find(x => x.id === this.getGeographyList[0].GeographyId)) {
+                        this.geography = this.getGeographyList[0].GeographyId;
+                        if (this.userUnit != "1") {
+                            this.disabledgeo = true;
+                        }
+
+                    }
+                    else {
+                        this.geography = 0
+                        this.disabledgeo = false;
+                    }
+                    if (this.getGeographyList[0].CustTypeId != 0) {
+                        this.custType = this.getGeographyList[0].CustTypeId;
+                        this.disabled = true;
+                    }
+                    else {
+                        this.custType = 0
+                        this.disabled = false;
+                    }
+                    if (this.getGeographyList[0].IndustryPracticeId != 0) {
+                        this.ip = this.getGeographyList[0].IndustryPracticeId;
+                        this.disabledIP = true;
+                    }
+                    else {
+                        this.ip = 0
+                        this.disabledIP = false;
+                    }
+                    if (this.getGeographyList[0].IsuCd != "" && this.isuList.find(x => x.id === parseInt(this.getGeographyList[0].IsuCd))) {
+                        this.isu = parseInt(this.getGeographyList[0].IsuCd);
+
+                    }
+                    else {
+                        this.isu = 0
+                    }
+                    if (this.userUnit == "2" || this.userUnit == "1") {
+                        if (this.userUnit == "2" || this.userUnit == "1") {
+                            this.isuMain = this.isu;
+                        }
+                        else {
+                            this.isuMain = -1;
+                        }
+
+                        if (this.isuMain != 0) {
+
+                            this.isuService.GetIOU(this.userUnit, this.isuMain).subscribe(
+                                resultArray => {
+                                    this.iouList = resultArray;
+                                    if (this.getGeographyList[0].IouId != "" && this.iouList.find(x => x.id === parseInt(this.getGeographyList[0].IouId))) {
+                                        this.iou = parseInt(this.getGeographyList[0].IouId);
+                                        this.disableIOU = true;
+                                    }
+                                    else {
+                                        this.disableIOU = false;
+                                        this.iou = 0;
+                                        this.iouList = null;
+                                    }
+                                    if (this.iou != 0) {
+                                        this.isuService.GetSubIOU(this.iou).subscribe(
+                                            resultArray => {
+                                                this.subiouList = resultArray;
+                                                if (this.getGeographyList[0].SubIouId != "" && this.subiouList.find(x => x.id === parseInt(this.getGeographyList[0].SubIouId))) {
+                                                    this.subiou = parseInt(this.getGeographyList[0].SubIouId);
+                                                    this.disableSubIOU = true;
+                                                }
+                                                else {
+
+                                                    this.subiou = 0;
+                                                    this.subiouList = null;
+                                                }
+
+
+                                            },
+                                             error =>{ throw error;},
+                                        )
+                                    }
+                                    else {
+                                        this.disableSubIOU = false;
+                                        this.subiouList = null;
+                                        this.subiou = 0;
+                                    }
+
+                                },
+                                 error =>{ throw error;},
+                            )
+                        }
+                        else {
+                            this.iouList = null;
+                            this.iou = 0;
+                            this.subiouList = null;
+                            this.subiou = 0;
+                        }
+                    }
+                    else {
+                        this.GetIOU();
+                    }
+                    this.GetCountry();
+
+
+                },
+                error =>{ throw error;}
+                )
+
+        }
+        
+    }
+
+
+
+
+    ActiveProactiveProposal(e: number) {
+        this.proactiveProposal = "Yes";
+
+        $('#PPInActive').removeClass('btn-default');
+        $('#PPInActive').addClass('btn-primary active');
+        $('#PPActive').removeClass('btn-primary active');
+        $('#PPActive').addClass('btn-default');
+
+    }
+    InActiveProactiveProposal(e: number) {
+        this.proactiveProposal = "No";
+
+        $('#PPActive').removeClass('btn-default');
+        $('#PPActive').addClass('btn-primary active');
+        $('#PPInActive').removeClass('btn-primary active');
+        $('#PPInActive').addClass('btn-default');
+
+    }
+
+
+
+    ActivePIBS() {
+
+        this.pibs = "Yes";
+        $('#PIBSInActive').removeClass('btn-default');
+        $('#PIBSInActive').addClass('btn-primary active');
+        $('#PIBSActive').removeClass('btn-primary active');
+        $('#PIBSActive').addClass('btn-default');
+
+
+    }
+    InActivePIBS() {
+
+        this.pibs = "No";
+        $('#PIBSActive').removeClass('btn-default');
+        $('#PIBSActive').addClass('btn-primary active');
+        $('#PIBSInActive').removeClass('btn-primary active');
+        $('#PIBSInActive').addClass('btn-default');
+
+
+    }
+    CreatedBy(e: number) {
+        if (e == 1) {
+            this.opportunityTrackedBy = 1;
+        }
+        else if (e == 2) {
+            this.opportunityTrackedBy = 2;
+        }
+    }
+    DTChange(e: number) {
+        if (e == 0) {
+            this.digitalTransformation = 0;
+            if (this.getDigital == 0) {
+            }
+            else {
+                this.getDigital = 0;
+            }
+
+            $('#DTActive').removeClass('btn-default');
+            $('#DTActive').addClass('btn-primary active');
+            $('#DTInActive').removeClass('btn-primary active');
+            $('#DTInActive').addClass('btn-default');
+        }
+        else if (e == 1) {
+            this.digitalTransformation = 1;
+            $('#DTInActive').removeClass('btn-default');
+            $('#DTInActive').addClass('btn-primary active');
+            $('#DTActive').removeClass('btn-primary active');
+            $('#DTActive').addClass('btn-default');
+        }
+    }
+
+
+
+    ChangeDT() {
+        if (this.GetDigitalTransformation.getDigital == 11) {
+
+            this.getDigital = this.GetDigitalTransformation.getDigital;
+        }
+        else {
+            this.getDigital = this.GetDigitalTransformation.getDigital;
+
+
+        }
+    }
+    CustomerTypeChange() {
+        if (this.custType > 0) {
+            let obj: any = {
+                CustomerName: "-1",
+                IndustryPracticeId: "-1",
+                CustTypeId: this.custType,
+                GeographyId: "-1",
+                IouId: "-1",
+                IsuCd: "-1",
+                SubIouId: "-1"
+            };
+            this.createNewOpportunityService.SearchClient(obj).subscribe(
+
+                resultArray => {
+                    this.customerNameList = resultArray;
+                    if (this.customerNameList != null || this.customerNameList != undefined) {
+                        this.customer = this.customerNameList[0].CustomerId;
+                    }
+                    else {
+                        this.customer = 0;
+                    }
+                    this.CustomerChange();
+                     error =>{ throw error;}
+                }
+
+            )
+        }
+    }
+
+
+    public PopulateQtrFiscalExpectedDate(): void {
+        this.month = this.expectedDealClosure.date.month
+        this.year = this.expectedDealClosure.date.year
+        this.month = parseInt(this.month);
+        this.year = parseInt(this.year);
+        if (this.month >= 4 && this.month <= 6) {
+            this.expectedRevenueQtr = 1;
+            this.strYear = this.year.toString();
+            this.strYear = this.strYear.substring(2);
+            this.a = this.year + 1;
+            this.strYear1 = this.a.toString();
+            this.strYear1 = this.strYear1.substring(2);
+            this.strFiscalYr = "FY " + this.strYear + "-" + this.strYear1;
+            for (let i = 0; i < this.fiscalYearList.length; i++) {
+                if (this.fiscalYearList[i].FiscalYear == this.strFiscalYr) {
+                    this.expectedRevenueFY = this.fiscalYearList[i].FiscalYearId;
+                }
+            }
+        }
+        else if (this.month >= 7 && this.month <= 9) {
+            this.expectedRevenueQtr = 2;
+            this.strYear = this.year.toString();
+            this.strYear = this.strYear.substring(2);
+            this.a = this.year + 1;
+            this.strYear1 = this.a.toString();
+            this.strYear1 = this.strYear1.substring(2);
+            this.strFiscalYr = "FY " + this.strYear + "-" + this.strYear1;
+            for (let i = 0; i < this.fiscalYearList.length; i++) {
+                if (this.fiscalYearList[i].FiscalYear == this.strFiscalYr) {
+                    this.expectedRevenueFY = this.fiscalYearList[i].FiscalYearId;
+                }
+            }
+        }
+        else if (this.month >= 10 && this.month <= 12) {
+            this.expectedRevenueQtr = 3;
+            this.strYear = this.year.toString();
+            this.strYear = this.strYear.substring(2);
+            this.a = this.year + 1;
+            this.strYear1 = this.a.toString();
+            this.strYear1 = this.strYear1.substring(2);
+            this.strFiscalYr = "FY " + this.strYear + "-" + this.strYear1;
+            for (let i = 0; i < this.fiscalYearList.length; i++) {
+                if (this.fiscalYearList[i].FiscalYear == this.strFiscalYr) {
+                    this.expectedRevenueFY = this.fiscalYearList[i].FiscalYearId;
+                }
+            }
+        }
+        else if (this.month >= 1 && this.month <= 3) {
+            this.expectedRevenueQtr = 4;
+            this.strYear = this.year.toString();
+            this.strYear = this.strYear.substring(2);
+            this.a = this.year + 1;
+            this.strYear1 = this.a.toString();
+            this.strYear1 = this.strYear1.substring(2);
+            this.strFiscalYr = "FY " + this.strYear + "-" + this.strYear1;
+            for (let i = 0; i < this.fiscalYearList.length; i++) {
+                if (this.fiscalYearList[i].FiscalYear == this.strFiscalYr) {
+                    this.expectedRevenueFY = this.fiscalYearList[i].FiscalYearId;
+                }
+            }
+        }
+    }
+    public CreateId(): any {
+        this.count = 0;
+        this.validationMessage = "";
+
+        //This is to check whether the batch run is in progress. 
+        //If yes then this message comes up else the user gets a error message.
+
+        this.createNewOpportunityService.GetJobStatus().subscribe(
+            resultArray => {
+
+                this.newOpportunityList = resultArray
+                this.checkStatus = this.newOpportunityList[0].Job_Status;
+                if (this.checkStatus.trim() == "Y") {
+                    this.validationMessage = ValidationMessage.BATCH_UPDATE_ERROR;
+                    this.messageType = ValidationMessage.DANGER;
+                    window.scrollTo(0, 0);
+                    return false;
+                }
+                else {
+                    this.checkStatus = null;
+                    let dates: string[];
+                    let oppDate: number;
+                    let closureDate: number;
+
+                    if (this.customer == 0) {
+                        this.validationMessage = ValidationMessage.CUSTOMER_NAME_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (isNullOrUndefined(this.opportunityDescription) || this.opportunityDescription == "") {
+                        this.validationMessage = ValidationMessage.OPPORTUNITY_DESCRIPTION_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.opportunityTrackedBy == 0) {
+                        this.validationMessage = ValidationMessage.OPPORTUNITY_TRACKED_BY_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+
+                    if (this.oppReceivedDate != undefined) {
+
+                        let day = this.oppReceivedDate.date.day;
+                        if (day < 10) {
+                            day = "0" + day
+                        }
+                        let month = this.oppReceivedDate.date.month;
+                        if (month < 10) {
+                            month = "0" + month
+                        }
+                        this.oppRevDate = this.oppReceivedDate.date.year + month + day;
+                        this.validateoppReceivedDate = month + '-' + day + '-' + this.oppReceivedDate.date.year;
+                    }
+
+                    if (isNullOrUndefined(this.validateoppReceivedDate)) {
+                        this.validationMessage = ValidationMessage.SELECT_OPPRECIEVEDDATE;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if (this.expectedDealClosure != undefined) {
+                        let cday = this.expectedDealClosure.date.day;
+                        if (cday < 10) {
+                            cday = "0" + cday
+                        }
+                        let cmonth = this.expectedDealClosure.date.month;
+                        if (cmonth < 10) {
+                            cmonth = "0" + cmonth
+                        }
+                        this.validateClosureDate = cmonth + '-' + cday + '-' + this.expectedDealClosure.date.year
+                        this.eDealClosure = this.expectedDealClosure.date.year + cmonth + cday;
+                    }
+
+
+                    if (isNullOrUndefined(this.validateClosureDate)) {
+                        this.validationMessage = ValidationMessage.SELECT_EXPECTEDDEALCLOSURE;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if (new Date() < new Date(this.oppReceivedDate)) {
+                        this.validationMessage = ValidationMessage.OPPORTUNITY_DATE_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.stageId == -1) {
+                        this.validationMessage = ValidationMessage.DEAL_STAGE_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.dealCategoryId == 0) {
+                        this.validationMessage = ValidationMessage.DEAL_CATEGORY_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if ((this.stageId == 3) || (this.stageId == 4) || (this.stageId == 5) || (this.stageId == 6) || (this.stageId == 7)) {
+                        if ((this.totalContractValue == 0) || (isNullOrUndefined(this.totalContractValue)) || this.totalContractValue.toString() == "") {
+                            this.validationMessage = ValidationMessage.TCV_ERROR;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                    }
+                    if (!isNullOrUndefined(this.totalContractValue)) {
+                        if (this.totalContractValue.toString().match(/^[0-9,]{0,13}(\.\d{0,2})?$/g) != null) {
+                            var oldvalue=this.totalContractValue;
+                            var newvalue=oldvalue.replace(/\,/g,"");
+                            this.strTotalContractValue = Number(newvalue); 
+                        }
+                        else {
+                            this.validationMessage = ValidationMessage.TCV_DECIMAL_ERROR;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                    }
+                    if ((this.stageId == 3) || (this.stageId == 4) || (this.stageId == 5) || (this.stageId == 6) || (this.stageId == 7)) {
+                        if ((this.potentialFTE == "") || (isNullOrUndefined(this.potentialFTE))) {
+                            this.validationMessage = ValidationMessage.FTE_ERROR;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                    }
+
+                    if (this.expectedRevenueQtrYr == 0) {
+                        this.validationMessage = ValidationMessage.EXPECTED_REVENUE_QTR_FY_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if (isNullOrUndefined(this.proactiveProposal)) {
+                        this.validationMessage = ValidationMessage.PROACTIVE_PROPOSAL_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if (isNullOrUndefined(this.showMultiTower)) {
+                        this.validationMessage = ValidationMessage.SELECT_MULTITOWER;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if ((this.iou == 0 || isNullOrUndefined(this.iou)) && this.DdlIOU.iou == 0) {
+                        this.validationMessage = ValidationMessage.IOU_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if ((this.subiou == 0 || isNullOrUndefined(this.subiou)) && this.SubIouComp.subiou == 0) {
+                        this.validationMessage = ValidationMessage.SUB_IOU_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.DdlCountry.country == 0) {
+                        this.validationMessage = ValidationMessage.COUNTRY_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.GeographyComponent.geography == 0) {
+                        this.validationMessage = ValidationMessage.GEOGRAPHY_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.DdlVertical.vertical == 0) {
+                        this.validationMessage = ValidationMessage.VERTICAL_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.DdlService.service == -1) {
+                        this.validationMessage = ValidationMessage.SERVICE_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if(this.userUnit=="2")
+                    {
+                    if (this.bpsoffering == 0) {
+                        this.validationMessage = ValidationMessage.BPS_OFFERING_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                      }
+                    if (this.DdlDealOwner1.dealOwner1 == 0) {
+                        this.validationMessage = ValidationMessage.DEAL_OWNER1_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.DdlDealOwner2.dealOwner2 == 0) {
+                        this.validationMessage = ValidationMessage.DEAL_OWNER2_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.DdlDealOwner1.dealOwner1 == this.DdlDealOwner2.dealOwner2) {
+                        this.validationMessage = ValidationMessage.DEALOWNER1_AND_2_NOTSAME_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.GeographySalesOwner.geographySalesOwner == 0) {
+                        this.validationMessage = ValidationMessage.GEOGRAPHY_SALESOWNER_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.AccountSalesOwner.accountSalesOwner == 0) {
+                        this.validationMessage = ValidationMessage.ACCOUNT_SALESOWNER_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.ExecutiveSponsor.executivesponsor == 0) {
+                        this.validationMessage = ValidationMessage.EXECUTIVE_SPONSOR_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.OffshorePresalesLeadHorizontal.OffShoreHorz == 0) {
+                        this.validationMessage = ValidationMessage.PRESALES_LEAD_HOR_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.OffshorePresalesLeadVertical.OffShoreverti == 0) {
+                        this.validationMessage = ValidationMessage.PRESALES_LEAD_VER_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.digitalTransformation == 1 && this.GetDigitalTransformation.getDigital == 0) {
+                        this.validationMessage = ValidationMessage.DIGITAL_TRANSFORMATION_ERROR;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    if (this.contractRenewal == 'Yes') {
+                        if (this.ContractRenewalValue == "" || this.ContractRenewalValue == null) {
+                            this.validationMessage = ValidationMessage.MSG_ERROR_CONTRACTRENEWAL;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                    }
+                    else {
+                        this.ContractRenewalValue = "";
+                    }
+
+                    if (this.userUnit == "1") {
+
+                        if (this.itIsScope == "" || this.itIsScope == null) {
+                            this.validationMessage = ValidationMessage.MSG_ERROR_ITISSCOPE;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                        }
+                        else {
+
+                            this.itIsScope = null;
+                        }
+                    
+                    if ((this.cRMid == "" || isNullOrUndefined(this.cRMid)) && this.stageId > 3) {
+                        this.validationMessage = ValidationMessage.CRM_ID;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+                    else if((this.cRMid == "" || isNullOrUndefined(this.cRMid)) && this.stageId <= 3)
+                    {
+                        this.cRMid ="0-Awaited"
+                    }
+
+                    if ((this.cRMStage == "" || isNullOrUndefined(this.cRMStage)) && this.stageId > 3) {
+                        this.validationMessage = ValidationMessage.VALID_CRM_STAGE;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+                    if ((this.cRMTCV == "" || isNullOrUndefined(this.cRMTCV)) && this.stageId > 3) {
+                        this.validationMessage = ValidationMessage.VALID_CRM_TCV;
+                        this.messageType = ValidationMessage.DANGER;
+                        window.scrollTo(0, 0);
+                        return false;
+                    }
+
+           
+                        if (this.digitalTransformation == 1 && this.userUnit == "2" && ((this.digitalTcv == 0) || (isNullOrUndefined(this.digitalTcv)) || this.digitalTcv.toString() == "")) {
+                            this.validationMessage = ValidationMessage.DIGITAL_TCV_ERROR;
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+                        }
+                        else if (this.digitalTransformation == 0) {
+                            this.strDigitalTcv = "";
+                        }
+                        else if (!isNullOrUndefined(this.digitalTcv)) {
+                            if (this.userUnit != "1") {
+                                if (this.digitalTcv.toString().match(/^[0-9,]{0,13}(\.\d{0,2})?$/g) != null) {
+                                    this.strDigitalTcv = ((this.digitalTcv) ).toString();
+                                }
+                                else {
+                                    this.validationMessage = ValidationMessage.DIGITAL_TCV_DECIMAL_ERROR;
+                                    this.messageType = ValidationMessage.DANGER;
+                                    window.scrollTo(0, 0);
+                                    return false;
+                                }
+
+                            }
+                        }
+                        if (this.cRMid != "" && this.cRMid != null && this.cRMid != undefined) {
+                            var regex = new RegExp("^[0-9a-zA-Z]{1}[-0-9a-zA-Z]*$");
+                            if (this.cRMid.match(regex)) {
+                                this.cRMid = this.cRMid.toString();
+                            }
+                            else {
+                                this.validationMessage += ValidationMessage.VALID_CRM_ID;
+                                this.messageType = ValidationMessage.DANGER;
+                                window.scrollTo(0, 0);
+                                return false;
+                            }
+                        }
+                        else {
+                            this.cRMid = null;
+                        }
+
+                        if (this.cRMStage == "" || this.cRMStage == null || isNullOrUndefined(this.cRMStage)) {
+                            this.cRMStage = 0;
+                        }
+                        if (this.cRMTCV != "" && !isNullOrUndefined(this.cRMTCV)) {
+                            if (this.cRMTCV.toString().match(/^[0-9,]{0,13}(\.\d{0,2})?$/g) != null) {
+                                let crmtcv=this.cRMTCV.replace(/\,/g,"");
+                                this.strCRMTCV = this.NewFomattedInput(crmtcv);
+                            }
+                            else {
+                                this.validationMessage += ValidationMessage.VALID_CRM_TCV;
+                                this.messageType = ValidationMessage.DANGER;
+                                window.scrollTo(0, 0);
+                                return false;
+                            }
+                        }
+                        else {
+                            this.strCRMTCV = null;
+                        }
+
+
+
+                        if (this.country == 0 || this.country == null) {
+                            this.country = 0;
+                        }
+
+                        for (let i = 0; i < this.OffshorePresalesLeadHorizontal.OffshorePresalesHorzList.length; i++) {
+                            if (this.OffshorePresalesLeadHorizontal.OffshorePresalesHorzList[i].OnsiteOwnerId == this.OffshorePresalesLeadHorizontal.OffShoreHorz) {
+                                this.checkHorizontal = this.OffshorePresalesLeadHorizontal.OffshorePresalesHorzList[i].OnsiteOwnerName
+                            }
+                        }
+                        this.GetQtrFY();
+                        if (this.userUnit != "1") {
+                            if (this.checkHorizontal == "A&I") {
+                                this.horizontalSave = "KPO";
+                            }
+                            else if (this.checkHorizontal == "CIM") {
+                                this.horizontalSave = "VOICE";
+                            }
+                            else if (this.checkHorizontal == "HRO") {
+                                this.horizontalSave = "HRO";
+                            }
+                            else if (this.checkHorizontal == "BPM") {
+                                this.horizontalSave = "BPM";
+                            }
+                            else if (this.checkHorizontal == "LPO") {
+                                this.horizontalSave = "LPO";
+                            }
+                            else if (this.checkHorizontal == "SCM") {
+                                this.horizontalSave = "SCM";
+                            }
+                            else if (this.checkHorizontal == "FAO") {
+                                this.horizontalSave = "FnA";
+                            }
+                            else if (this.checkHorizontal == "VERTICAL") {
+                                this.horizontalSave = "VERTICAL";
+                            }
+                            else {
+                                this.horizontalSave = this.checkHorizontal
+                            }
+
+                        }
+                        if (this.digitalTransformation == 1) {
+                            this.getDigital = this.GetDigitalTransformation.getDigital;
+                            this.otherDT = this.otherDigitalTransformationValue;
+                        }
+                        else {
+                            this.getDigital = 0;
+                            this.otherDT = null;
+                        }
+
+                        if(this.userUnit=="1")
+                        {
+                            if (this.ValidateBpsOffering() == false) {
+
+                            this.validationMessage = "";
+
+                            this.validationMessage = ValidationMessage.BpsOffering;
+
+                            this.messageType = ValidationMessage.DANGER;
+                            window.scrollTo(0, 0);
+                            return false;
+
+
+
+                           }
+
+                         }
+                        if (this.userUnit == "1") {
+
+                            this.createNewOpportunityService.GetISUStatus(this.isu).subscribe(
+                                resultArray => {
+                                    this.checkStatus = "",
+                                        this.newOpportunityList = null,
+                                        this.newOpportunityList = resultArray
+                                    if (this.newOpportunityList.length > 0) {
+                                        this.checkStatus = this.newOpportunityList[0].status;
+                                    }
+                                    this.count = this.count + 1;
+                                    if (this.checkStatus.trim() == "INACTIVE") {
+                                        this.count = this.count - 1;
+                                        this.validationMessage = ValidationMessage.ISU_NON_RETIRED_ERROR;
+                                        this.messageType = ValidationMessage.DANGER;
+                                        window.scrollTo(0, 0);
+                                        return false;
+
+                                    }
+                                    else {
+                                        this.createNewOpportunityService.GetISUSubStatus(this.DdlIOU.iou).subscribe(
+                                            resultArray => {
+                                                this.checkStatus = "",
+                                                    this.newOpportunityList = null,
+                                                    this.newOpportunityList = resultArray
+                                                if (this.newOpportunityList.length > 0) {
+                                                    this.checkStatus = this.newOpportunityList[0].status;
+                                                }
+                                                this.count = this.count + 1;
+                                                if (this.checkStatus.trim() == "INACTIVE") {
+                                                    this.count = this.count - 1;
+                                                    this.validationMessage = ValidationMessage.IOU_NON_RETIRED_ERROR;
+                                                    this.messageType = ValidationMessage.DANGER;
+                                                    window.scrollTo(0, 0);
+                                                    return false;
+                                                }
+                                                else {
+                                                    this.createNewOpportunityService.CheckClusterstatus('0').subscribe(
+                                                        resultArray => {
+                                                            this.checkStatus = "",
+                                                                this.newOpportunityList = null,
+                                                                this.newOpportunityList = resultArray
+                                                            if (this.newOpportunityList.length > 0) {
+                                                                this.checkStatus = this.newOpportunityList[0].status;
+                                                            }
+
+                                                            this.count = this.count + 1;
+                                                            if (this.checkStatus.trim() == "INACTIVE") {
+
+                                                            }
+
+                                                            else {
+                                                                this.createNewOpportunityService.CheckHorizontalstatus(this.DdlService.service, this.userUnit).subscribe(
+                                                                    resultArray => {
+                                                                        this.checkStatus = "",
+                                                                            this.newOpportunityList = null,
+                                                                            this.newOpportunityList = resultArray
+                                                                        if (this.newOpportunityList.length > 0) {
+                                                                            this.checkStatus = this.newOpportunityList[0].status;
+                                                                        }
+                                                                        this.count = this.count + 1;
+                                                                        if (this.checkStatus.trim() == "NAC") {
+                                                                            this.count = this.count - 1;
+                                                                            this.validationMessage = ValidationMessage.SERVICE_NON_RETIRED_ERROR;
+                                                                            this.messageType = ValidationMessage.DANGER;
+                                                                            window.scrollTo(0, 0);
+                                                                            return false;
+                                                                        }
+                                                                        else {
+                                                                            this.createNewOpportunityService.CheckExecutiveStatus(this.ExecutiveSponsor.executivesponsor).subscribe(
+                                                                                resultArray => {
+                                                                                    this.checkStatus = "",
+                                                                                        this.newOpportunityList = null,
+                                                                                        this.newOpportunityList = resultArray
+                                                                                    if (this.newOpportunityList.length > 0) {
+                                                                                        this.checkStatus = this.newOpportunityList[0].status;
+                                                                                    }
+                                                                                    this.count = this.count + 1;
+                                                                                    if (this.checkStatus.trim() == "INACTIVE") {
+                                                                                        this.count = this.count - 1;
+                                                                                        this.validationMessage = ValidationMessage.EXECUTIVE_SPONSOR_NON_RETIRED_ERROR;
+                                                                                        this.messageType = ValidationMessage.DANGER;
+                                                                                        window.scrollTo(0, 0);
+                                                                                        return false;
+                                                                                    }
+                                                                                    else if (this.count == 5 && this.userUnit == "1") {
+                                                                                        this.Save();
+
+                                                                                    }
+
+                                                                                },
+                                                                             error =>{ throw error;},
+                                                                            )
+                                                                        }
+
+                                                                    },
+                                                                 error =>{ throw error;},
+                                                                )
+                                                            }
+
+                                                        },
+                                                     error =>{ throw error;},
+                                                    )
+                                                }
+
+                                            },
+                                         error =>{ throw error;},
+                                        )
+                                    }
+                                    },
+                             error =>{ throw error;},
+                                )
+
+
+                                    
+
+
+                                
+                                }
+                                if (this.userUnit == "2" || this.userUnit == "3") {
+                                    this.Save();
+
+                                }
+                            
+                        }
+               
+            },
+             error =>{ throw error;},
+
+        )
+
+    }
+    //to get Qtr ID and FY ID
+    GetQtrFY() {
+        this.expectedRevenueQtr = this.expectedRevenueQtrYr.substring(0, 2);
+
+        this.expectedRevenueFY = this.expectedRevenueQtrYr.substring(5, this.expectedRevenueQtrYr.length);
+    }
+    //Create the Opportunity ID for Customer
+    public Save() {
+        
+        this.stage = this.stageId;
+        let objNewOpportunity: any =
+            {
+                strOpportunityId: '-1',
+                StrOppDesc: this.opportunityDescription,
+                strGeography: this.GeographyComponent.geography,
+                StrCustomer: this.customer,
+                StrCustType: this.custType,
+                strIP: this.ip,
+                strDealstage: this.stageId,
+                strGeosalesOwner: this.GeographySalesOwner.geographySalesOwner,
+                StrOffPracOwner: "0",
+                StrRDCrd: "0",
+                StrOffShoreBDLead: this.OffshorePresalesLeadVertical.OffShoreverti,
+                StrDealOwner: this.DdlDealOwner1.dealOwner1,
+                StrDealOwner2: this.DdlDealOwner2.dealOwner2,
+                strDealCat: this.dealCategoryId,
+                strOnsiteOwner: this.OffshorePresalesLeadHorizontal.OffShoreHorz,
+                StrEstFTE: this.potentialFTE,
+                StrStageDays: 2,
+                StrRemark: "0",
+                strOppDate: this.oppRevDate,
+                StrEmpNo: this.userId,
+                StrClosureDate: this.eDealClosure,
+                AdvisoryId: 1,
+                StrPlatform: "0",
+                StrNextStep: "0",
+                StrBusiness: this.DdlVertical.vertical,
+                StrProduct: 0,
+                StrCompetency: 0,
+                StrSubCompetency: 0,
+                StrAnnualSaleValue: 0,
+                strAccountSalesOwner: this.AccountSalesOwner.accountSalesOwner,
+                StrStatusUpdate: "0",
+                StrCategoryId: 0,
+                strCountryId: this.DdlCountry.country,
+                StrNextStepDueDt: "0",
+                Unit: this.userUnit,
+                StrISU: this.DdlIOU.iou,
+                Service: this.DdlService.service,
+                StrCRMId: this.cRMid,
+                strOppType: this.opportunityTrackedBy.toString(),
+                StrValueBPS: "0",
+                StrValueBPSTCV: "0",
+                BPSSubSPID: 1,
+                BPSOfferingID: this.bpsoffering,
+                strProactiveProposal: this.proactiveProposal,
+                StatusFlag: 1,
+                StrMultiTower: this.showMultiTower,
+                StrHorizontalSave: this.horizontalSave,
+                strSUBIOU: this.SubIouComp.subiou,
+                StrPlatformOption: "0",
+                ClusterId: "0",
+                strExecutivesponsor: this.ExecutiveSponsor.executivesponsor,
+                StrValBPSCon: "",
+                StrISUMAIN: this.isu,
+                strTCV: this.strTotalContractValue,
+                StrQuarter: this.expectedRevenueQtr,
+                StrFiscalYear: this.expectedRevenueFY,
+                StrDTValue: this.getDigital,
+                StrPibs: this.pibs,
+                strotherDT: this.otherDT,
+
+                ContractLength: this.dealTerm,
+                ItisScope: this.itIsScope,
+                IsContractRenewal: this.contractRenewal,
+                ContractRenewalValue: this.ContractRenewalValue,
+                CRM_ID: this.cRMid,
+                CRM_STAGE: this.cRMStage,
+                CRM_TCV: this.strCRMTCV,
+                strDigitalTcv: this.strDigitalTcv
+            };
+
+
+
+        this.createNewOpportunityService.CreateNewOpportunity(objNewOpportunity)
+            .subscribe(objNewOpportunity => {
+
+                if (objNewOpportunity[0].on_Result == "1" && (objNewOpportunity[0].Opportunity_id != "" || isNullOrUndefined(objNewOpportunity[0].Opportunity_id))) {
+                    this.opportunityId = objNewOpportunity[0].Opportunity_id
+                    this.validationMessage = "OpportunityID " + this.opportunityId + " Created Successfully";
+                    this.messageType = ValidationMessage.SUCCESS;
+                    if(this.userUnit=="1")
+                     {
+                         this.SaveOppBpsOffering();
+                     }
+                    this.reset = "Create New ID"
+                    $('#Create').hide();
+                    this.stageWise = true;
+                    if (this.stageId >= 5) {
+                        this.SendMailGROUP_StageMoved();
+                    }
+                    if (this.userUnit == "2") {
+                        this.SendMailBFS();
+                    }
+                    else {
+                        this.strOppDesc = this.opportunityDescription;
+                        this.strCustomerName = null;
+                        for (let i = 0; i < this.customerNameList.length; i++) {
+                            if (this.customerNameList[i].CustomerId == this.customer) {
+                                this.strCustomerName = this.customerNameList[i].CustomerName;
+                            }
+                        }
+                        this.strEventType = "New_Opp_Created";
+                        this.strTemplateType = "BD_SPOC_BFS";
+                        this.strDealstage = this.stageId.toString();
+                        this.intApplicationId = 1;
+                        this.strEmpName = null;
+                        this.strEmpEmail = null;
+
+                        this.onHoldService.GetEmpDetailsMail(this.userId)
+                            .subscribe(resultArray => {
+                                if (resultArray.length > 0) {
+                                    this.strEmpName = resultArray[0].FullName;
+                                    this.strEmpEmail = resultArray[0].EmpEmail;
+                                    let obj: any = {
+                                        strEventType: this.strEventType,
+                                        strTemplateType: this.strTemplateType,
+                                        intApplicationId: this.intApplicationId,
+                                        strSendMailEmpID: this.userId,
+                                        strSendMailName: this.strEmpName,
+                                        strSendMailEmail: this.strEmpEmail,
+                                        strUserLoginFullName: this.strUserLoginFullName,
+                                        strOppId: this.opportunityId,
+                                        strOppDesc: this.strOppDesc,
+                                        strCustomerName: this.strCustomerName,
+                                        strDealstage: this.strDealstage,
+                                        strUserLoginEmpNo: this.userId,
+                                        strTCVMail: "",
+                                        strStatusUpdateMail: "",
+                                        strExpectedClosuredateMail: ""
+                                    }
+
+                                    this.createNewOpportunityService.NewOppEmailAlertDomain(obj)
+                                        .subscribe(ObjNewOpportunity => {
+
+                                        },
+                                         error =>{ throw error;},
+                                    )
+                                }
+
+                            },
+                            error =>{ throw error;},
+                        )
+                    }
+                }
+                else {
+                    this.validationMessage = ValidationMessage.ISSUE_ON_SAVING;
+                    this.messageType = ValidationMessage.DANGER;
+                }
+                if (objNewOpportunity[0].Opportunity_id != "") {
+                    this.opportunityId = objNewOpportunity[0].Opportunity_id
+                }
+                if (objNewOpportunity[0].Opportunity_id == "") {
+                    this.validationMessage = ValidationMessage.ISSUE_ON_SAVING;
+                    this.messageType = ValidationMessage.DANGER;
+                }
+
+            },
+
+            error =>{ throw error;},
+        )
+    }
+
+    BlockSpecialChar(event) {
+       
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[A-Za-z0-9-&-() ]");
+        if (regex.test(key)) {
+            return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+
+    }
+    AllowDecimal(event) {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[0-9.]");
+        if (regex.test(key)) {
+            return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+
+        }
+    }
+    AllowAlphaNumeric(event) {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[0-9a-zA-Z-]");
+        if (regex.test(key)) {
+            return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+    }
+    AllowNumeric(event) {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[0-9]");
+        if (regex.test(key)) {
+            return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+    }
+    AllowPattern(event) {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        var regex = new RegExp("[-A-Za-z0-9&() ]");
+        if (regex.test(key)) {
+            return key;
+        }
+        else {
+            event.preventDefault();
+            return false;
+        }
+    }
+    //It navigate the Customer to based on the selected Stage Page
+    GotoTheStage() {
+        if (this.stage == 0) {
+
+            this.router.navigate(['Stage0', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 1) {
+
+            this.router.navigate(['Stage1', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 2) {
+
+            this.router.navigate(['Stage2', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 3) {
+
+            this.router.navigate(['Stage3', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 4) {
+
+            this.router.navigate(['Stage4', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 5) {
+
+            this.router.navigate(['Stage5', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 6) {
+
+            this.router.navigate(['Stage6', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 7) {
+
+            this.router.navigate(['Stage7', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 8) {
+
+            this.router.navigate(['Stage8', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 9) {
+
+            this.router.navigate(['Stage9', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 10) {
+
+            this.router.navigate(['Stage10', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 11) {
+
+            this.router.navigate(['Stage11', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 12) {
+
+            this.router.navigate(['Stage12', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+        else if (this.stage == 13) {
+
+            this.router.navigate(['Stage13', { strOppId: btoa(String(this.opportunityId)), strStage: btoa(String(this.stage)), strStake: btoa(this.constant.strStake) }]);
+        }
+    }
+   
+
+    DealCategoryChange(item) {
+
+
+        $('#categorynumber').text(item.DealCategoryName.slice(0, 1));
+        this.dealCategoryId = item.DealCategoryId;
+        if(this.dealCategoryId==1 || this.dealCategoryId==2){
+            this.ActiveCreated();
+            this.disableContractRenewal=0;
+        }
+        else if(this.dealCategoryId==3 || this.dealCategoryId==4){
+            this.InActiveCreated();
+            if(this.userUnit==1){
+            this.disableContractRenewal=1;
+            this.contractRenewal = "";                                
+            $('#ContractRenewalInActive').removeClass('btn-default');
+            $('#ContractRenewalActive').removeClass('btn-primary active');
+            $('#ContractRenewalActive').removeClass('btn-default');
+            $('#ContractRenewalInActive').removeClass('btn-primary active');
+            }
+        }
+    }
+
+    DealStageChange(item) {
+
+        $('#stagenumber').text(item.StageID);
+        if (item.StageID < 10) {
+            $('#stagename').text(item.STAGE_NAME.substring(2));
+        }
+        else if (item.StageID >= 10) {
+            $('#stagename').text(item.STAGE_NAME.substring(3));
+        }
+        this.stageId = item.StageID;
+
+        if(item.StageID>3)
+        {
+            this.cRMid="";
+            this.crmMandatory=true;
+        }
+        else
+        {
+            this.crmMandatory=false;
+        }
+
+    }
+    ValidateDealOwner() {
+        if (this.DdlDealOwner1.dealOwner1 == this.DdlDealOwner2.dealOwner2) {
+            this.validationMessage = ValidationMessage.DEALOWNER1_AND_2_NOTSAME_ERROR;
+            this.messageType = ValidationMessage.DANGER;
+
+            return false;
+        }
+        else {
+            this.messageType = "";
+        }
+    }
+    SendMailGROUP_StageMoved() {
+        this.strEventType = "New_Opp_Created";
+        this.strDealstage = "";
+        this.intApplicationId = 1;
+        this.strTemplateType = "BD_SPOC_BFS";
+        if (this.stageId != -1 || isNullOrUndefined(this.stageId)) {
+            for (let i = 0; i < this.dealStageList.length; i++) {
+                if (this.dealStageList[i].StageID == this.stageId) {
+                    this.strDealstage = this.dealStageList[i].STAGE_NAME;
+                }
+            }
+        }
+        this.strOppId = this.opportunityId;
+        for (let i = 0; i < this.customerNameList.length; i++) {
+            if (this.customerNameList[i].CustomerId == this.customer) {
+                this.strCustomerName = this.customerNameList[i].CustomerName;
+            }
+        }
+        this.strOppDesc = btoa(this.opportunityDescription);
+        this.onHoldService.GetEmpDetailsMail(this.userId)
+            .subscribe(resultArray => {
+                if (resultArray.length > 0) {
+                    this.strUserLoginFullName = resultArray[0].FullName;
+                    this.createNewOpportunityService.GetEmailLeaders(this.userUnit, "GROUPMAIL")
+                        .subscribe(resultArray => {
+                            if (resultArray.length > 0) {
+                                for (let i = 0; i < resultArray.length; i++) {
+                                    if (!isNullOrUndefined(resultArray[i].Emp_Id)) {
+                                        this.strSendMailEmpID = resultArray[i].Emp_Id;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[i].Emp_Name)) {
+                                        this.strSendMailName = resultArray[i].Emp_Name;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[i].Emp_Email)) {
+                                        this.strSendMailEmail = resultArray[i].Emp_Email;
+                                    }
+                                    if (!isNullOrUndefined(this.strSendMailEmail) || this.strSendMailEmail != "") {
+                                        let obj: any = {
+                                            strEventType: this.strEventType,
+                                            strTemplateType: this.strTemplateType,
+                                            intApplicationId: this.intApplicationId,
+                                            strSendMailEmpID: this.strSendMailEmpID,
+                                            strSendMailName: this.strSendMailName,
+                                            strSendMailEmail: this.strSendMailEmail,
+                                            strUserLoginFullName: this.strUserLoginFullName,
+                                            strOppId: this.strOppId,
+                                            strOppDesc: this.strOppDesc,
+                                            strCustomerName: this.strCustomerName,
+                                            strDealstage: this.strDealstage,
+                                            strUserLoginEmpNo: this.userId,
+                                            strTCVMail: "",
+                                            strStatusUpdateMail: "",
+                                            strExpectedClosuredateMail: ""
+                                        }
+                                        this.createNewOpportunityService.EmailAlertBFS(obj)
+                                            .subscribe(ObjNewOpportunity => {
+
+                                            },
+                                             error =>{ throw error;},
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        error =>{ throw error;},
+                    )
+                }
+            },
+            error =>{ throw error;},
+        )
+    }
+    SendMailBFS() {
+        this.strEventType = "New_Opp_Created";
+        this.strDealstage = "";
+        this.intApplicationId = 1;
+        this.strTemplateType = "BD_SPOC_BFS";
+        this.strOppId = null;
+        this.strOppId = this.opportunityId;
+        this.strCustomerName = null;
+        for (let i = 0; i < this.customerNameList.length; i++) {
+            if (this.customerNameList[i].CustomerId == this.customer) {
+                this.strCustomerName = this.customerNameList[i].CustomerName;
+            }
+        }
+        this.strUserLoginFullName = null;
+        this.strDealstage = null;
+        if (this.stageId != -1 || isNullOrUndefined(this.stageId)) {
+            for (let i = 0; i < this.dealStageList.length; i++) {
+                if (this.dealStageList[i].StageID == this.stageId) {
+                    this.strDealstage = this.dealStageList[i].STAGE_NAME;
+                }
+            }
+        }
+        this.strOppDesc = null;
+        this.strOppDesc = this.opportunityDescription;
+        this.strSendMailEmpID = null;
+        this.strSendMailName = null;
+        this.strSendMailEmail = null;
+        this.onHoldService.GetEmpDetailsMail(this.userId)
+            .subscribe(resultArray => {
+                if (resultArray.length > 0) {
+                    this.strUserLoginFullName = resultArray[0].FullName;
+                    this.createNewOpportunityService.GetEmpStatus(this.strOppId)
+                        .subscribe(resultArray => {
+                            if (!isNullOrUndefined(resultArray[0])) {
+                                for (let i = 0; i < resultArray[0].length; i++) {
+                                    if (!isNullOrUndefined(resultArray[0][i].Employee_Id)) {
+                                        this.strSendMailEmpID = resultArray[0][i].Employee_Id;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[0][i].Emp_Name)) {
+                                        this.strSendMailName = resultArray[0][i].Emp_Name;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[0][i].Emp_Email)) {
+                                        this.strSendMailEmail = resultArray[0][i].Emp_Email;
+                                    }
+                                    if (!isNullOrUndefined(this.strSendMailEmail) || this.strSendMailEmail != "") {
+                                        let obj: any = {
+                                            strEventType: this.strEventType,
+                                            strTemplateType: this.strTemplateType,
+                                            intApplicationId: this.intApplicationId,
+                                            strSendMailEmpID: this.strSendMailEmpID,
+                                            strSendMailName: this.strSendMailName,
+                                            strSendMailEmail: this.strSendMailEmail,
+                                            strUserLoginFullName: this.strUserLoginFullName,
+                                            strOppId: this.strOppId,
+                                            strOppDesc: this.strOppDesc,
+                                            strCustomerName: this.strCustomerName,
+                                            strDealstage: this.strDealstage,
+                                            strUserLoginEmpNo: this.userId,
+                                            strTCVMail: "",
+                                            strStatusUpdateMail: "",
+                                            strExpectedClosuredateMail: ""
+                                        }
+                                        this.createNewOpportunityService.EmailAlertBFS(obj)
+                                            .subscribe(ObjNewOpportunity => {
+
+                                            },
+                                             error =>{ throw error;},
+                                        )
+                                    }
+                                }
+                            }
+                            if (!isNullOrUndefined(resultArray[1])) {
+                                for (let i = 0; i < resultArray[1].length; i++) {
+                                    if (!isNullOrUndefined(resultArray[1][i].Employee_Id)) {
+                                        this.strSendMailEmpID = resultArray[1][i].Employee_Id;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[1][i].Emp_Name)) {
+                                        this.strSendMailName = resultArray[1][i].Emp_Name;
+                                    }
+                                    if (!isNullOrUndefined(resultArray[1][i].Emp_Email)) {
+                                        this.strSendMailEmail = resultArray[1][i].Emp_Email;
+                                    }
+                                    if (!isNullOrUndefined(this.strSendMailEmail) || this.strSendMailEmail != "") {
+                                        let obj: any = {
+                                            strEventType: this.strEventType,
+                                            strTemplateType: this.strTemplateType,
+                                            intApplicationId: this.intApplicationId,
+                                            strSendMailEmpID: this.strSendMailEmpID,
+                                            strSendMailName: this.strSendMailName,
+                                            strSendMailEmail: this.strSendMailEmail,
+                                            strUserLoginFullName: this.strUserLoginFullName,
+                                            strOppId: this.strOppId,
+                                            strOppDesc: this.strOppDesc,
+                                            strCustomerName: this.strCustomerName,
+                                            strDealstage: this.strDealstage,
+                                            strUserLoginEmpNo: this.userId,
+                                            strTCVMail: "",
+                                            strStatusUpdateMail: "",
+                                            strExpectedClosuredateMail: ""
+                                        }
+                                        this.createNewOpportunityService.EmailAlertBFS(obj)
+                                            .subscribe(ObjNewOpportunity => {
+
+                                            },
+                                             error =>{ throw error;},
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        error =>{ throw error;},
+                    )
+                }
+            },
+            error =>{ throw error;},
+        )
+    }
+
+
+    ActiveContractRenewal() {
+        if(this.userUnit=='2')
+        {
+        this.contractRenewal = "Yes";
+        }
+        this.disabledContractRenewal = false;
+        $('#ContractRenewalInActive').removeClass('btn-default');
+        $('#ContractRenewalInActive').addClass('btn-primary active');
+        $('#ContractRenewalActive').removeClass('btn-primary active');
+        $('#ContractRenewalActive').addClass('btn-default');
+    }
+    InActiveContractRenewal() {
+        this.contractRenewal = "No";
+        this.disabledContractRenewal = true;
+        $('#ContractRenewalActive').removeClass('btn-default');
+        $('#ContractRenewalActive').addClass('btn-primary active');
+        $('#ContractRenewalInActive').removeClass('btn-primary active');
+        $('#ContractRenewalInActive').addClass('btn-default');
+    }
+
+    ActiveCreated() {
+        this.opportunityTrackedBy = 1;
+        $('#CreatedInActive').removeClass('btn-default');
+        $('#CreatedInActive').addClass('btn-primary active');
+        $('#CreatedActive').removeClass('btn-primary active');
+        $('#CreatedActive').addClass('btn-default');
+    }
+    InActiveCreated() {
+        this.opportunityTrackedBy = 2;
+        $('#CreatedActive').removeClass('btn-default');
+        $('#CreatedActive').addClass('btn-primary active');
+        $('#CreatedInActive').removeClass('btn-primary active');
+        $('#CreatedInActive').addClass('btn-default');
+    }
+
+    CheckItIsScope(e: number) {
+        if (e == 0) {
+            this.itIsScope = "No";
+
+            $('#ITISScopeInActive').removeClass('btn-default');
+            $('#ITISScopeInActive').addClass('btn-primary active');
+            $('#ITISScopeActive').removeClass('btn-primary active');
+            $('#ITISScopeActive').addClass('btn-default');
+        }
+        else if (e == 1) {
+            this.itIsScope = "Yes";
+
+            $('#ITISScopeActive').removeClass('btn-default');
+            $('#ITISScopeActive').addClass('btn-primary active');
+            $('#ITISScopeInActive').removeClass('btn-primary active');
+            $('#ITISScopeInActive').addClass('btn-default');
+
+
+        }
+    }
+    CheckUserUnitID() {
+        if (this.userUnit == "1") {
+            this.isCheckUserUnitID = 1;
+        }
+
+    }
+
+
+    YesMultitowerDeal() {
+        this.showMultiTower = 'Yes';
+        this.IfYes=true;
+        $('#NMultitowerDeal').removeClass('btn-default');
+        $('#NMultitowerDeal').addClass('btn-primary active');
+        $('#YMultitowerDeal').removeClass('btn-primary active');
+        $('#YMultitowerDeal').addClass('btn-default');
+    }
+    NoMultitowerDeal() {
+        this.showMultiTower = 'No';
+        $('#YMultitowerDeal').removeClass('btn-default');
+        $('#YMultitowerDeal').addClass('btn-primary active');
+        $('#NMultitowerDeal').removeClass('btn-primary active');
+        $('#NMultitowerDeal').addClass('btn-default');
+    }
+
+    ValidateBpsOffering(): any {
+
+        let bFLag = true;
+        let strError = "";
+    
+    
+        if (this.bpsofferingDomain.length < 1) {
+            strError = ValidationMessage.BpsOffering;
+            bFLag = false;
+    
+        }
+    
+        return bFLag;
+    }
+    SaveOppBpsOffering(): any {
+        let bFLag = true;
+        let strError = "";
+        let Model = {};
+        var array=[];
+
+        for(var i=0;i<this.bpsofferingDomain.length;i++)
+        {
+            Model={
+                "BPSOfferingID":this.bpsofferingDomain[i].id,
+            "OpportunityId" : this.opportunityId,
+            "UserLogin" : this.userId,
+            "ServiceId":null}
+            array.push(Model);
+
+        }
+      
+    
+        this.createNewOppurtunityStage0Service.Stage1_Save_OppBpsOffering(array).subscribe(data => {
+            if (data != undefined) {
+
+            }
+
+        });
+        
+    
+    
+    }
+    
+    
+    
+    
+    Upd_BpsOffering() {
+    
+        this.createNewOppurtunityStage0Service.Get_SelectedOppBpsOffering(this.opportunityId).subscribe(
+    
+            resultArray => {
+                let selecteddatabaseList: any[] = new Array();
+                selecteddatabaseList = resultArray
+    
+                selecteddatabaseList.forEach(database => {
+                    this.bpsofferingDomain.forEach(selecteddrop => {
+                        if (database.id == selecteddrop.id) {
+    
+                            let Model = <ICreateNewOpportunity>{};
+                            Model.BPSOfferingID = selecteddrop.id;
+    
+                            Model.OpportunityId = this.opportunityId;
+                            Model.UserLogin = this.userId;
+                           
+                             this.createNewOppurtunityStage0Service.Upd_BpsOffering(this.opportunityId).subscribe(data => {
+                                if (data != undefined) {
+                                    this.validationMessage = ValidationMessage.SAVE_BPSOFFERING;
+                                    this.messageType = ValidationMessage.DANGER;
+
+
+                                   
+                                }
+    
+                            });
+                        }
+    
+                    });
+                });
+    
+    
+    
+            }, error => { throw error; },
+    
+        )
+    
+        this.SaveOppBpsOffering();
+    
+    
+    
+    }
+    FormatInputTCV(event:any)
+    {
+        
+        var $this = $( event.target );
+        var input=event.target.value;
+        var input = input.replace(/[\D\s\._\-]+/g, "");
+        input = input ? parseInt( input, 10 ) : 0;
+        $this.val( function() {
+            return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
+        } );
+    }
+
+    NewFomattedInput(input:any){
+
+        var input = input.replace(/[\D\s\._\-]+/g, "");
+        input = input ? parseInt( input, 10 ) : 0;
+       
+        return ( input === 0 ) ? "" : input.toLocaleString( "en-US" );
+       
+
+    }
+}
+
+.css
+
+.Error-message{
+    background-color: red;
+    width: 50px;
+    height: 50px;
+}
+.Sucsess-message{
+    background-color: green;
+    width: 50px;
+    height: 50px;
+}
+
+label.customer{
+    margin: 0 15px 7px;
+}
+
+.width20{
+    width: 20% !important;
+}
+.width21{
+    width: 21% !important;
+}
+.width15{
+    width: 15% !important;
+}
+
+.width43{
+    width: 43% !important;
+}
+
+.width100{
+    width: 100% !important;
+}
+
+.width80{
+    width: 80% !important;
+}
+
+.mydrp{width:200px!important;}
+
+input[type=radio] {
+    position: absolute;
+    visibility: hidden;
+    display: none;
+    margin:0
+    }
+    
+    label.rad {
+        color: #fff;
+        display: block;
+        cursor: pointer;
+        font-weight: bold;
+        width: 24%;
+        padding: 8px 8px;
+        position: relative;
+        font-size: 16px;
+        float: left;
+        margin-right: 1%;
+    }
+    
+    input[type=radio]:checked + label.rad{
+    background:#39b54a;
+    }
+    
+    input[type=radio]+ label.rad{
+    background:#cc7a00;
+    }
+    
+    
+    input[type=radio]:checked + label.rad::after{
+     opacity: 1;
+    
+    }
+    
+    .radio-group {
+    display: block;
+    margin: 0px;
+    border-radius: 0px;
+    overflow: hidden;
+    }
+    
+    label.rad:after {
+        content: '\F00C';
+        position: absolute;
+        opacity: 0;
+        top: 0px;
+        right: 8px;
+        transition: 0.5s;
+        font-family: "FontAwesome";
+        font-size: 14px;
+        width: auto;
+        height: 100%;
+        padding: 8px 0;
+    }
+    
+    .btn-primary.active, .btn-primary:active, .open>.dropdown-toggle.btn-primary {
+        color: #555;
+        background-color: #ffd938;
+        border-color: #ffd938;
+    }
+button.btn{
+    outline: none !important;
+}
+
+sup{
+    color:red;
+    position: absolute;
+    top: -1px;
+    right: -9px;
+}
+
+
+/* stage css */
+
+.stage{
+    height: 50px;
+    right: 0;
+    top: 15px;
+    display: inline-block;
+}
+
+.stage>div:first-child{
+ 
+     height: 40px;
+     width: 40px;
+     border-radius: 50%;
+     border:1px solid #ccc;
+     display: inline-block;
+     text-align: center;
+     margin-right: 10px;
+     float: left;
+     
+
+}
+.stage>div:first-child p{
+    
+    font-size: 12px;
+    padding: 6px 0px 2px;
+    line-height: 1;
+   
+   }
+
+
+.stage>div:nth-child(n+2){
+    
+        height: 40px;
+        width: 275px;
+        border:1px solid #ccc;
+        display: inline-block;
+        margin-right: 10px;
+        cursor: pointer;
+        
+   
+   }
+
+
+
+   .stage>div:nth-child(n+2)>div.stages span:first-child{
+    font-size: 32px;
+    line-height: 38px;
+    margin-left: 10px;
+   }  
+     
+   .stage>div:nth-child(2)>div.stages span:last-child{
+    font-size: 11px;
+    line-height: 20px;
+    margin-left: 6px;
+    margin-top: 17px;
+    display: inline-block;
+   }  
+
+   .stage>div:nth-child(n+2)>span:first-child{
+    font-size: 12px;
+    line-height: 15px;
+    position: absolute;
+    text-align: center;
+    top: 4px;
+    left: 42px;
+    opacity: .8;
+   }  
+
+   .stage>div:nth-child(n+2)>span:nth-child(2){
+    position: absolute;
+    right: 12px;
+    bottom: 15px;
+   }  
+
+
+   .stage>div:nth-child(n+2)>ul{
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    border: 1px solid #ccc;
+    /* background: #fff; */
+    z-index: 15;
+    width: 100%;
+   }  
+
+   
+   .stage>div:nth-child(n+2)>ul li{
+      cursor: pointer;
+      padding: 3px 5px;
+      background:#555;
+      color:#fff;
+      /* margin-bottom: 2px; */
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid grey;
+}  
+
+.stage>div:nth-child(n+2)>ul li span{
+        margin-right: 3px;
+        display: inline-block;
+        float: left;      
+}  
+.stage>div:nth-child(2)>ul li p{
+    display: inline-block;
+    text-transform: uppercase;
+} 
+
+.stage>div:nth-child(n+3)>ul li span{
+    float: unset !important;      
+}  
+.disb{
+    display: block;
+    
+}
+
+.wid-28{
+    width: 26%;
+}
+
+.wid-26{
+    width: 29%;
+}
+
+#checkdigi{
+    display: none;
+}
+
+/* fieldset{
+    border: 1px solid #ccc;
+    padding: 10px;
+} */
+
+fieldset { 
+    padding: 10px;
+    border: 1px solid #ccc;
+  
+}
+
+legend{
+    border-style: none;
+    border-width: 0;
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 0;
+    width: auto;
+}
+
+fieldset input{
+    display: inline-block;
+    width: 28%;
+}
+
+.mydp {
+    width: 209px!important;
+}
