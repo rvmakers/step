@@ -1,0 +1,199 @@
+//************************************************************************
+//File Name	     : CreateNewOpportunity.service.ts  
+//Created By     : Vinoth
+//************************************************************************
+import { Injectable } from '@angular/core';
+import {Http, Response,RequestOptions,Headers} from "@angular/http";
+import {Observable} from "rxjs/Observable";
+import "rxjs/Rx";
+import { ICustomerType } from '../Interface/Customer/CustomerType';
+import { IFiscalYear } from '../Interface/FiscalYear/FiscalYear';
+import {Apiroutes} from '../Services/Apiroutes';
+import {Constant} from '../Constant';
+import { IDealCategory } from '../Interface/DealCategory/DealCategory';
+import { ICluster } from '../Interface/Cluster/Cluster';
+import{IServiceName} from '../Interface/ServiceName/ServiceName';
+import { ICountry } from '../Interface/Country/Country';
+import{IGeography} from '../Interface/Geography/Geography';
+import{IGeographyIP} from '../Interface/Geography/Geographyip';
+import {INewOpportunity} from '../Interface/NewOpportunity/NewOpportunity';
+import { ISU } from '../Interface/ISU/ISU';
+import { IExecutiveSponsor } from '../Interface/ExecutiveSponsor/ExecutiveSponsor';
+import { IVertical } from '../Interface/Vertical/vertical';
+import { HttpInterCeptor } from './HttpInterCeptor.Service';
+
+@Injectable()
+export class CreateNewOpportunityService {
+  constructor(private http:Http,private apiroutes:Apiroutes,private constant:Constant) { }
+  
+  
+    GetCustomerName(unitID): Observable<ICustomerType[]> {
+      
+      return this.http.get(this.apiroutes.customernameapi+"?unitID="+unitID)
+                  .map((response: Response) => {
+                  return <ICustomerType[]>response.json();
+          })
+          .catch(this.handleError);
+  }
+
+  GetFiscalYear(): Observable<IFiscalYear[]> {
+      
+    return this.http.get(this.apiroutes.fiscalyearapi)
+                .map((response: Response) => {
+                return <IFiscalYear[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  GetGeographyIP(customerid): Observable<IGeographyIP[]> {
+      
+    return this.http.get(this.apiroutes.getgeographyipapi+"?CustomerId="+customerid)
+                .map((response: Response) => {
+                return <IGeographyIP[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  GetGeography(countryid):Observable<IGeographyIP[]>
+  {
+    return this.http.get(this.apiroutes.mapgeographyapi+"?CountryId="+countryid)
+    .map((response:Response)=>{
+      return <IGeographyIP[]>response.json();
+    })
+    .catch(this.handleError);
+  }
+
+  GetCountry(geographyid):Observable<ICountry[]>
+  {
+    return this.http.get(this.apiroutes.mapcountryapi+"?geographyId="+geographyid)
+    .map((response:Response)=>{
+      return <ICountry[]>response.json();
+    })
+    .catch(this.handleError);
+  }
+
+  SearchClient(obj:string):Observable<ICustomerType[]>
+  {
+    let body = JSON.stringify(obj);
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this.http.post(this.apiroutes.searchclientapi,body,options)
+    .map((response:Response)=>{
+      return <ICustomerType[]>response.json();
+    })
+    .catch(this.handleError);
+  }
+  CreateNewOpportunity(ObjNewOpportunity:string): Observable<INewOpportunity[]> {
+    let body = JSON.stringify(ObjNewOpportunity);
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.CreateNewOpportunity, body, options)
+        .map((response: Response) => <INewOpportunity[]>response.json())
+        .catch(this.handleError);
+  }
+
+  GetISUStatus(ISUMain): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.ISUMainapi+"?ISUMain="+ISUMain)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  
+  GetISUSubStatus(ISUSubMain): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.ISUSubMainapi+"?ISUSubMain="+ISUSubMain)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  CheckClusterstatus(ClusterID): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.CheckClusterstatus+"?ClusterID="+ClusterID)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+
+  CheckHorizontalstatus(ServiceID,unitID): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.CheckHorizontalstatus+ "?ServiceID="+ServiceID+"&unitID="+unitID)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  CheckExecutiveStatus(ExecutiveSponsorid): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.CheckExecutiveStatus+"?ExecutiveSponsorid="+ExecutiveSponsorid)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+
+  GetJobStatus(): Observable<INewOpportunity[]> {
+      
+    return this.http.get(this.apiroutes.GetJobStatus)
+                .map((response: Response) => {
+                return <INewOpportunity[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  GetEmailLeaders(unitID,GroupMail): Observable<any> {
+      
+    return this.http.get(this.apiroutes.GetEmailLeaders+ "?unitId="+unitID+"&groupMail="+GroupMail)
+                .map((response: Response) => {
+                return <any>response.json();
+        })
+        .catch(this.handleError);
+  }
+  GetEmpStatus(opportunityID): Observable<any> {
+      
+    return this.http.get(this.apiroutes.GetEmpStatus+ "?opportunityID="+opportunityID)
+                .map((response: Response) => {
+                return <any>response.json();
+        })
+        .catch(this.handleError);
+  }
+  EmailAlertBFS(ObjNewOpportunity:string): Observable<any> {
+    let body = JSON.stringify(ObjNewOpportunity);
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.EmailAlertBFS, body, options)
+        .map((response: Response) => <any>response.json())
+        .catch(this.handleError);
+  }
+  NewOppEmailAlertDomain(ObjNewOpportunity:string): Observable<any> {
+    let body = JSON.stringify(ObjNewOpportunity);
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+    return this.http.post(this.apiroutes.NewOppEmailAlertDomain, body, options)
+        .map((response: Response) => <any>response.json())
+        .catch(this.handleError);
+  }
+    GetVerticalName(unitId,clusterId): Observable<IVertical[]> {
+      
+    return this.http.get(this.apiroutes.GetVerticalName+ "?unitId="+unitId+"&clusterId="+clusterId)
+    
+                .map((response: Response) => {
+                return <IVertical[]>response.json();
+        })
+        .catch(this.handleError);
+  }
+  
+    GetSubSP(): Observable<INewOpportunity[]> {
+  return this.http.get(this.apiroutes.GetSubSP)
+              .map((response: Response) => {
+              return <INewOpportunity[]>response.json();
+      })
+      .catch(this.handleError);
+}
+  private handleError(error: Response) {
+      return Observable.throw(error.statusText);
+  }
+}
