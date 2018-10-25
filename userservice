@@ -1,0 +1,45 @@
+using RPM_API.MasterServices.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace RPM_API.Models
+{
+
+    public class UserService
+    {
+        private RPMModel db = new RPMModel();
+        public User ValidateUser(string loginid)
+        {
+            // loginid = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(loginid));
+            //  T_USER_ROLE_ACCESS usr = db.userrole_master.ToList().Where(x => x.USREMP_ID == loginid && (DateTime.Today >= x.FROM_DT && DateTime.Today <= x.TO_DT) && x.UNIT_ID == 1).FirstOrDefault();
+            User curruser = new User();
+            // if (usr!=null)
+            //{
+            curruser.Id = 11; //usr.USR_EMP_REC_ID;
+            curruser.LoginID = "TestRPM";//usr.USREMP_ID;
+            curruser.RoleName = "Administrator";//usr.USREMP_ROLE;
+                                                // }
+            return curruser;
+        }
+
+        public List<User> GetUserList(int unit_id)
+        {
+            // Create the list of user and return from database
+
+
+            var result = from s in db.userrole_master
+                         where ((DateTime.Today >= s.FROM_DT && DateTime.Today <= s.TO_DT) && s.UNIT_ID == unit_id)
+                         select new
+                         {
+                             s.USR_EMP_REC_ID,
+                             s.USREMP_ROLE,
+                             s.USREMP_ID
+                         };
+            List<User> users = result.Cast<User>().ToList();
+
+            return users;
+        }
+    }
+}
