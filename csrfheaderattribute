@@ -1,0 +1,35 @@
+using System;
+using System.Web;
+using System.Linq;
+using System.Web.Http.Controllers;
+
+namespace RPM_API.lib
+{
+    public class CsrfHeaderAttribute : System.Web.Http.Filters.ActionFilterAttribute
+    {
+
+        public override void OnActionExecuting(HttpActionContext context)
+        {
+            
+            var csrfToken = HttpContext.Current.Request.Cookies["XSRF-TOKEN"].Value;
+            var isCookieValid = false;
+            if (!String.IsNullOrEmpty(csrfToken))
+            {
+                //var authCookie = HttpContext.Current.Request.Cookies[".ASPXAUTH"];
+                var header = context.Request.Headers;
+                string authCookie = StringFunctions.Base64Decode(header.GetValues("at").First());
+                if (authCookie != null)
+                {
+                    var authToken = authCookie;
+
+                    isCookieValid = new CsrfHelper().DoesCsrfTokenMatchAuthToken(csrfToken, authToken);
+                }
+            }
+            if (isCookieValid == false)
+                throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+
+            base.OnActionExecuting(context);
+
+        }
+    }
+}
