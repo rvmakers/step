@@ -1,0 +1,224 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.Practices.EnterpriseLibrary.Data.Sql;
+using System.Data.Common;
+using System.Data;
+using RPM_Model.common;
+using RPM_Model;
+
+
+namespace RPM_Models
+{
+    public class EmailIntegration
+    {
+        public string strEventType { get; set; }
+        public string strTemplateType { get; set; }
+        public int intApplicationId { get; set; }
+        public string strMailEmpID { get; set; }
+        public string strSendMailEmpID { get; set; }
+        public string strSendMailName { get; set; }
+        public string strSendMailEmail { get; set; }
+        public string strUserLoginEmpNo { get; set; }
+        public string strOppId { get; set; }
+        public string strOppDesc { get; set; }
+        public string strCustomerName { get; set; }
+        public string strDealstage { get; set; }
+        public string strSubject { get; set; }
+        public string strContent { get; set; }
+        public string strRecipientId { get; set; }
+        public string strTCVMail { get; set; }
+        public string strStatusUpdateMail { get; set; }
+        public string strExpectedClosuredateMail { get; set; }
+        public string strUserLoginFullName { get; set; }
+        public string strNextStage { get; set; }
+        public int intBatchId { get; set; }
+        public string strDealTerm { get; set; }
+        public string strFTE { get; set; }
+
+        public List<EmailIntegration> EMICommon_Get_EmailTemplate(EmailIntegration objEmailIntegration)
+        {
+            List<EmailIntegration> emailList = new List<EmailIntegration>();
+            try
+            {
+                SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand(DataConstants.GetEmailTemplate);
+                db.AddInParameter(cd, "@in_EventType", SqlDbType.VarChar, objEmailIntegration.strEventType);
+                db.AddInParameter(cd, "@in_TemplateType", SqlDbType.VarChar, objEmailIntegration.strTemplateType);
+                DataSet ds = db.ExecuteDataSet(cd);
+                if (ds != null)
+                {
+                    if (ds.Tables.Count > 0)
+                    {
+                        int rowCount = ds.Tables[0].Rows.Count;
+
+                        for (int i = 0; i < rowCount; i++)
+                        {
+
+                           emailList.Add(MapEmailTemplate(ds.Tables[0].Rows[i]));
+                        }
+
+                    }
+                }
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            return emailList;
+        }
+        public List<EmailIntegration> Get_RecipientDetail_SingelUser(EmailIntegration objEmailIntegration)
+        {
+            List<EmailIntegration> emailList = new List<EmailIntegration>();
+            try
+            {
+                SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand(DataConstants.GetRecipientDetail);
+                db.AddInParameter(cd, "@in_ApplicationId", SqlDbType.Int, objEmailIntegration.intApplicationId);
+                db.AddInParameter(cd, "@iv_EventType", SqlDbType.VarChar, objEmailIntegration.strEventType);
+                db.AddInParameter(cd, "@iv_EmpId", SqlDbType.VarChar, objEmailIntegration.strSendMailEmpID);
+
+                DataSet ds = db.ExecuteDataSet(cd);
+                if (ds != null)
+                {
+                    if (ds.Tables.Count > 0)
+                    {
+                        int rowCount = ds.Tables[0].Rows.Count;
+
+                        for (int i = 0; i < rowCount; i++)
+                        {
+
+                            emailList.Add(MapEmailTemplate(ds.Tables[0].Rows[i]));
+                        }
+
+                    }
+                }
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            return emailList;
+        }
+        public int GetBatchID()
+        {
+            int result = 0;
+            try
+            {
+                SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand(DataConstants.GetBatchID);
+                db.AddOutParameter(cd, "@onNextBatchId", SqlDbType.Int, result);
+                db.ExecuteNonQuery(cd);
+                result = Convert.ToInt32(db.GetParameterValue(cd, "@onNextBatchId"));
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            return result;
+        }
+        
+        
+        public static EmailIntegration MapEmailTemplate(DataRow dr)
+        {
+            try
+            {
+                return new EmailIntegration()
+                {
+                    strSubject = (dr.Table.Columns.Contains("TEMPLATE_SUBJECT")? dr["TEMPLATE_SUBJECT"]==DBNull.Value?"":Convert.ToString(dr["TEMPLATE_SUBJECT"]):""),
+                    strContent = (dr.Table.Columns.Contains("TEMPLATE_CONTENT") ? dr["TEMPLATE_CONTENT"] ==DBNull.Value?"":Convert.ToString(dr["TEMPLATE_CONTENT"]):""),
+                    strRecipientId = (dr.Table.Columns.Contains("RECIPIENT_EMP_ID") ? dr["RECIPIENT_EMP_ID"] ==DBNull.Value?"":Convert.ToString(dr["RECIPIENT_EMP_ID"]):""),
+                     
+                };
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+        }
+
+
+        public int PostRecipientDetails(EmailIntegration objEmailIntegration)
+        {
+            int result = 0;
+            try
+            {
+               
+                SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand(DataConstants.PostRecipientDetails);
+                db.AddInParameter(cd, "@in_ApplicationID", SqlDbType.Int, objEmailIntegration.intApplicationId);
+                db.AddInParameter(cd, "@iv_EventType", SqlDbType.VarChar, objEmailIntegration.strEventType);
+                db.AddInParameter(cd, "@iv_Template_Type", SqlDbType.VarChar, objEmailIntegration.strTemplateType);
+                db.AddInParameter(cd, "@iv_EmpNo", SqlDbType.VarChar, objEmailIntegration.strSendMailEmpID);
+                db.AddInParameter(cd, "@iv_EmpName", SqlDbType.VarChar, objEmailIntegration.strSendMailName);
+                db.AddInParameter(cd, "@iv_RecipientEmail", SqlDbType.VarChar, objEmailIntegration.strSendMailEmail);
+                db.AddInParameter(cd, "@iv_UserName", SqlDbType.VarChar, objEmailIntegration.strUserLoginEmpNo);
+                db.AddOutParameter(cd, "@on_Result", SqlDbType.Int, result);
+                db.ExecuteNonQuery(cd);
+                result = Convert.ToInt32(db.GetParameterValue(cd, "@on_Result"));
+               
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            return result;
+        }
+
+        public int PostEmailTemplateDetail(EmailIntegration objEmailIntegration)
+        {
+            int result = 0;
+            try
+            {
+
+                SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand(DataConstants.PostEmailTemplateDetails);
+                db.AddInParameter(cd, "@in_ApplicationId", SqlDbType.Int, objEmailIntegration.intApplicationId);
+                db.AddInParameter(cd, "@iv_RecipientId", SqlDbType.Int, objEmailIntegration.strRecipientId);
+                db.AddInParameter(cd, "@iv_EventType", SqlDbType.VarChar, objEmailIntegration.strEventType);
+                db.AddInParameter(cd, "@iv_EmailSubject", SqlDbType.VarChar, objEmailIntegration.strSubject);
+                db.AddInParameter(cd, "@iv_EmailContent", SqlDbType.VarChar, objEmailIntegration.strContent);
+                db.AddInParameter(cd, "@iv_CreatedBy", SqlDbType.VarChar, objEmailIntegration.strUserLoginEmpNo);
+                db.AddInParameter(cd, "@in_Batch_Id", SqlDbType.VarChar, objEmailIntegration.intBatchId);
+                db.AddOutParameter(cd, "@on_Result", SqlDbType.Int, result);
+                db.ExecuteNonQuery(cd);
+                result = Convert.ToInt32(db.GetParameterValue(cd, "@on_Result"));
+                DataSet ds = db.ExecuteDataSet(cd);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new DatabaseException(ex);
+            }
+            return result;
+        }
+
+      
+
+    }
+}
