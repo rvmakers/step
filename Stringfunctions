@@ -1,0 +1,87 @@
+using System;
+using System.Text;
+using System.Web;
+using TCS.BPO;
+using System.Collections.Generic;
+namespace RPM_API.lib
+{
+    public class StringFunctions
+    {
+
+        public static int parseElementIntValue(string elementValue)
+        {
+            int intValue = 0;
+            if (!string.IsNullOrEmpty(elementValue))
+            {
+                string stringValue = Base64Decode(elementValue);
+                if (stringValue != null)
+                {
+                    int.TryParse(stringValue, out intValue);
+                }
+            }
+            return intValue;
+        }
+
+        public static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            return Convert.ToBase64String(plainTextBytes);
+        }
+
+
+        public static string Base64Decode(string base64EncodedData)
+        {
+            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+            return Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+
+        public static string Encrypt(string upwd)
+        {
+            return Encryption.AESEncrypt(upwd);
+        }
+
+        internal static string HTMLEncode(string p)
+        {
+            return HttpContext.Current.Server.HtmlEncode(p);
+        }
+
+        public static string Root()
+        {
+
+            if (HttpContext.Current.Request.Url.ToString() == "https://mumwsgpuap01.globe.tcs.com/FQDFApp/")
+            {
+                return "/FQDFApp";
+            }
+            else if (HttpContext.Current.Request.Url.ToString() == "https://mumwsgpuap01.globe.tcs.com/FQDFServer/")
+            {
+                return "/FQDFServer";
+            }
+            else
+            {
+                return "";
+            }
+        }
+    }
+
+
+    public static class CheckForNull
+    {
+        public static bool IsNull(this object obj)
+        {
+            return obj == null;
+        }
+
+        public static bool IsNullOrEmpty(string String)
+        {
+            return string.IsNullOrEmpty((String ?? "").Trim());
+        }
+
+        public static bool IsNullOrEmpty<T>(IList<T> List)
+        {
+            return (List == null || List.Count < 1);
+        }
+    }
+}
+
+
