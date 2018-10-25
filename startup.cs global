@@ -1,0 +1,11 @@
+using Owin;
+namespace RPM_API
+{
+    public partial class Startup
+    {
+        public void Configuration(IAppBuilder app)
+        {
+            ConfigureAuth(app);
+        }
+    }
+}
