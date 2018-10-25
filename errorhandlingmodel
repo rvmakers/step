@@ -1,0 +1,184 @@
+//-- Author:		Chandan/Subir
+//-- Description:	To log exception  model
+
+using RPM_Model.common;
+using Microsoft.Practices.EnterpriseLibrary.Data.Sql;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
+
+using System.Reflection;
+using System.Linq;
+
+namespace RPM_Model
+{
+    public class ExceptionHandlingModel
+    {
+
+        public string MachineName { get; set; }
+        public string IPAddress { get; set; }
+        public string ExceptionType { get; set; }
+        public string InnerException { get; set; }
+        public string Message { get; set; }
+        public string StakeTrace { get; set; }
+        public string Source { get; set; }
+        public DateTime ExceptionDate { get; set; }
+
+
+        public string controller { get; set; }
+        public string action { get; set; }
+        public string loggerName { get; set; }
+        public string exceptionMessage { get; set; }
+        public string ApplicationName { get; set; }
+        public string FileName { get; set; }
+        public string  Method { get; set; }
+        public string EncyLoginID { get; set; }
+        public string LineNo { get; set; }
+        
+        public void LogExceptionMessage(ExceptionHandlingModel errorModel)
+        {
+            SqlDatabase db = CommonModel.GetWebDatabase();
+           
+        }
+
+        public void LogException(Exception ex, string ExceptionType)
+        {
+            var machineName = Environment.MachineName;
+           
+            var innerException = Convert.ToString(ex.InnerException);
+            var message = Convert.ToString(ex.Message);
+            var stakeTrace = Convert.ToString(ex.StackTrace);
+            var source = Convert.ToString(ex.Source);
+            
+            var stack = new StackTrace(ex);
+            var thisAsm = Assembly.GetExecutingAssembly();
+            var methodName = stack.GetFrames().Select(f => f.GetMethod()).First(m => m.Module.Assembly == thisAsm).Name;
+            var fileName= stack.GetFrames().Select(f => f.GetFileName()).First();
+            var lineNo = stack.GetFrames().Select(f => f.GetFileLineNumber()).First();
+            SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+
+            DbCommand cd = db.GetStoredProcCommand(DataConstants.InsertErrorLogDB);
+            db.AddInParameter(cd, "@iv_APPLICATION_NAME", SqlDbType.VarChar, "RPMAPI");
+            db.AddInParameter(cd, "@iv_PAGE_NAME", SqlDbType.VarChar, fileName);
+            db.AddInParameter(cd, "@iv_FUNCTION_NAME", SqlDbType.VarChar, methodName);
+            db.AddInParameter(cd, "@iv_ERROR_MSG", SqlDbType.VarChar, innerException);
+            db.AddInParameter(cd, "@iv_EMP_NO", SqlDbType.VarChar, string.Empty);
+            db.AddInParameter(cd, "@isin_LINE_NO", SqlDbType.VarChar, lineNo);
+            db.AddInParameter(cd, "@iv_IP_ADDRESS", SqlDbType.VarChar, string.Empty);
+
+          
+            db.ExecuteNonQuery(cd);
+        }
+
+        public List<ExceptionHandlingModel> GetExceptionLog()
+        {
+            try
+            {
+                List<ExceptionHandlingModel> modelList = new List<ExceptionHandlingModel>();
+                SqlDatabase db = CommonModel.GetWebDatabase();
+                DbCommand cd = db.GetStoredProcCommand("usp_GetExceptionLog");
+                DataSet ds = db.ExecuteDataSet(cd);
+                if (ds != null)
+                {
+                    if (ds.Tables.Count > 0)
+                    {
+                        int rowCount = ds.Tables[0].Rows.Count;
+
+                        for (int i = 0; i < rowCount; i++)
+                        {
+                            modelList.Add(GetExceptionLogModel(ds.Tables[0].Rows[i]));
+                        }
+                    }
+                }
+                return modelList;
+
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException(ex);
+            }
+        }
+
+        private ExceptionHandlingModel GetExceptionLogModel(DataRow dr)
+        {
+            try
+            {
+                return new ExceptionHandlingModel()
+                {
+                    MachineName = (dr.Field<string>("MachineName")),
+                    IPAddress = (dr.Field<string>("IPAddress")),
+                    ExceptionType = (dr.Field<string>("ExceptionType")),
+                    InnerException = (dr.Field<string>("InnerException")),
+                    Message = dr.Field<string>("Message"),
+                    StakeTrace = dr.Field<string>("StakeTrace"),
+                    Source = dr.Field<string>("Source"),
+                    ExceptionDate = dr.Field<DateTime>("ExceptionDate")
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException(ex);
+            }
+        }
+
+        public void InsertError(ExceptionHandlingModel obj)
+        {
+
+           
+            try
+            {
+                if (obj != null)
+                {
+                    if(obj.ApplicationName==null)
+                    {
+                        obj.ApplicationName = "";
+                    }
+                    if (obj.FileName == null)
+                    {
+                        obj.FileName = "";
+                    }
+                    if (obj.Method == null)
+                    {
+                        obj.Method = "";
+                    }
+                    if (obj.exceptionMessage == null)
+                    {
+                        obj.exceptionMessage = "";
+                    }
+                    if (obj.EncyLoginID == null)
+                    {
+                        obj.EncyLoginID = "";
+                    }
+                    if (obj.LineNo == null)
+                    {
+                        obj.LineNo = "";
+                    }
+                    if (obj.IPAddress == null)
+                    {
+                        obj.IPAddress = "";
+                    }
+
+                    SqlDatabase db = RPM_Model.CommonModel.GetWebDatabase();
+                    DbCommand cd = db.GetStoredProcCommand(DataConstants.InsertErrorLogDB);
+                    db.AddInParameter(cd, "@iv_APPLICATION_NAME", SqlDbType.VarChar, obj.ApplicationName);
+                    db.AddInParameter(cd, "@iv_PAGE_NAME", SqlDbType.VarChar, obj.FileName);
+                    db.AddInParameter(cd, "@iv_FUNCTION_NAME", SqlDbType.VarChar, obj.Method);
+                    db.AddInParameter(cd, "@iv_ERROR_MSG", SqlDbType.VarChar, obj.exceptionMessage);
+                    db.AddInParameter(cd, "@iv_EMP_NO", SqlDbType.VarChar, obj.EncyLoginID);
+                    db.AddInParameter(cd, "@isin_LINE_NO", SqlDbType.VarChar, obj.LineNo);
+                    db.AddInParameter(cd, "@iv_IP_ADDRESS", SqlDbType.VarChar, obj.IPAddress);
+
+
+                    db.ExecuteNonQuery(cd);
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException(ex);
+            }      
+        }
+    }
+}
