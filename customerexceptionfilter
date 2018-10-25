@@ -1,0 +1,66 @@
+using System.Linq;
+using System.Web.Http.Filters;
+using RPM_Model;
+using System.Net.Http;
+using System.Net;
+using System.Net.Http.Headers;
+using RPM_Model.lib;
+
+namespace RPM_API.Models
+{
+    public class CustomExceptionFilter:ExceptionFilterAttribute
+    {
+        public override void OnException(HttpActionExecutedContext actionExecutedContext)
+        {
+
+            string UserID = "";
+            base.OnException(actionExecutedContext);
+            string exception = "";
+            if(actionExecutedContext.Exception.InnerException == null)
+            {
+                exception = actionExecutedContext.Exception.Message;
+            }
+            else
+            {
+                exception = actionExecutedContext.Exception.InnerException.Message;
+            }
+
+            var cookie = actionExecutedContext.Request.Headers.GetCookies("session").FirstOrDefault();
+            if(cookie!=null)
+            {
+                CookieState cookiestate = cookie["session"];
+                if(cookiestate["UserId"]!=null)
+                {
+                    UserID = StringFunctions.Base64Decode(cookiestate["UserId"]);
+                }
+               
+            }
+            ExceptionHandlingModel objError = new ExceptionHandlingModel();
+            objError.Message = exception;
+            objError.ApplicationName = "Replishment";
+            objError.FileName = actionExecutedContext.ActionContext.ControllerContext.ControllerDescriptor.ControllerName;
+            objError.Method = actionExecutedContext.ActionContext.ActionDescriptor.ActionName;
+            //Need to add cookie...
+            objError.EncyLoginID = UserID;
+            objError.LineNo = "";
+            objError.IPAddress = "";
+            new ExceptionHandlingModel().InsertError(objError);
+
+            var response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+            {
+                Content = new StringContent("An unhandled exception was thrown by service"),
+                ReasonPhrase = "Internal Server Error.Please Contact your Administrator."
+
+            };
+
+           // actionExecutedContext.Response = response;
+
+
+        }
+    }
+}
+
+
+
+
+
