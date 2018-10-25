@@ -1,0 +1,40 @@
+using System.Configuration;
+using System.Web.Configuration;
+
+namespace RPM_API.lib
+{
+    public class EncryptDecrypt
+    {
+        public EncryptDecrypt()
+        {
+
+        }
+
+        public static void EncryptconnectionString()
+        {
+
+            Configuration config = WebConfigurationManager.OpenWebConfiguration("~");
+            ConfigurationSection section = config.GetSection("connectionStrings");
+            if (!section.SectionInformation.IsProtected)
+            {
+                section.SectionInformation.ProtectSection("RSAProtectedConfigurationProvider");
+                section.SectionInformation.ForceSave = true;
+                section.CurrentConfiguration.Save();
+            }
+
+
+        }
+
+        public static void DecryptconnectionString()
+        {
+
+            Configuration config = WebConfigurationManager.OpenWebConfiguration("~");
+            ConfigurationSection section = config.GetSection("connectionStrings");
+            if (section.SectionInformation.IsProtected)
+            {
+                section.SectionInformation.UnprotectSection();
+            }
+
+        }
+    }
+}
