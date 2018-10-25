@@ -1,0 +1,31 @@
+using System;
+using System.Web.Mvc;
+using System.Linq;
+
+namespace RPM_API.lib
+{
+    public class ValidateControllerActionAttribute : AuthorizeAttribute
+    {
+
+        protected override bool AuthorizeCore(System.Web.HttpContextBase context)
+        {
+            var csrfToken = context.Request.Cookies["XSRF-Token"].Value;
+            var isCookieValid = false;
+            if (!String.IsNullOrEmpty(csrfToken))
+            {
+               
+                var header = context.Request.Headers;
+                string authCookie = StringFunctions.Base64Decode(header.GetValues("at").First());
+                if (authCookie != null)
+                {
+                    var authToken = authCookie;
+
+                    isCookieValid = new CsrfHelper().DoesCsrfTokenMatchAuthToken(csrfToken, authToken);
+                }
+            }
+            return isCookieValid;
+           
+
+        }
+    }
+}
