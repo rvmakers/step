@@ -1,0 +1,81 @@
+using System;
+using Microsoft.Owin.Security;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using RPM_API.Models;
+using Microsoft.Owin.Security.OAuth;
+
+namespace RPM_API
+{
+    public class OAuthProvider : OAuthAuthorizationServerProvider
+    {
+        #region[GrantResourceOwnerCredentials]
+        public override Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                var userName = context.UserName;
+                
+                
+               // var userService = new UserService(); 
+                
+                //var user = userService.ValidateUser(userName);
+              //  if (user != null && user.LoginID!=null)
+               // {
+                    var claims = new List<Claim>()
+                    {
+                        new Claim(ClaimTypes.Sid, Convert.ToString(userName)),
+                        //new Claim(ClaimTypes.Role, user.RoleName),
+                        //new Claim(ClaimTypes.PrimarySid, user.LoginID)
+                    };
+                    ClaimsIdentity oAuthIdentity = new ClaimsIdentity(claims,
+                                Startup.OAuthOptions.AuthenticationType);
+
+                    var properties = CreateProperties(userName);
+                    var ticket = new AuthenticationTicket(oAuthIdentity, properties);
+                    context.Validated(ticket);
+              //  }
+                //else
+                //{
+                //    context.SetError("invalid_grant", "Unauthorized.");
+                //}
+            });
+        }
+        #endregion
+
+        #region[ValidateClientAuthentication]
+        public override Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
+        {
+            if (context.ClientId == null)
+                context.Validated();
+
+            return Task.FromResult<object>(null);
+        }
+        #endregion
+
+        #region[TokenEndpoint]
+        public override Task TokenEndpoint(OAuthTokenEndpointContext context)
+        {
+            foreach (KeyValuePair<string, string> property in context.Properties.Dictionary)
+            {
+                context.AdditionalResponseParameters.Add(property.Key, property.Value);
+            }
+
+            return Task.FromResult<object>(null);
+        }
+        #endregion
+
+        #region[CreateProperties]
+        public static AuthenticationProperties CreateProperties(string userName)
+        {
+            IDictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "userName", userName }
+            };
+            return new AuthenticationProperties(data);
+        }
+        #endregion
+    }
+}
