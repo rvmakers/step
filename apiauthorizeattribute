@@ -1,0 +1,54 @@
+
+using System;
+using System.Linq;
+using System.Web;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
+
+namespace RPM_API.lib
+{
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ApiAuthorizeAttribute : ActionFilterAttribute
+    {
+
+        public override void OnActionExecuting(HttpActionContext filterContext)
+        {
+            bool isSessionValid = false;
+            var header = filterContext.Request.Headers;
+            if ( header.Contains("t"))
+            {
+                string AuthToken = StringFunctions.Base64Decode(header.GetValues("t").First());
+                int UserID = StringFunctions.parseElementIntValue(header.GetValues("u").First());
+                if (UserID != 0)
+                    //if (new TokenServices().ValidateTokenByUserIDToken(UserID, GetRequestIP(filterContext), AuthToken))
+                    //{
+                        isSessionValid = true;
+                    //}
+            }
+
+           
+            var csrfToken = HttpContext.Current.Request.Cookies["XSRF-TOKEN"].Value;
+            var isCookieValid = true;
+            if (!String.IsNullOrEmpty(csrfToken))
+            {
+
+                string authCookie = header.GetValues("t").First();
+                if (authCookie != null)
+                {
+                    var authToken = authCookie;
+
+                    isCookieValid = new CsrfHelper().DoesCsrfTokenMatchAuthToken(csrfToken, authToken);
+                }
+            }
+
+
+            if (isSessionValid == false || isCookieValid==false)
+                throw new System.Web.Http.HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+
+            base.OnActionExecuting(filterContext);
+        }
+
+       
+
+    }
+}
