@@ -1,0 +1,314 @@
+using RPM_Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Http;
+using RPM_API.common;
+using RPM_API.lib;
+
+namespace RPM_API.Controllers
+{
+   
+    public class EmailIntegrationController : ApiController
+    {
+        [HttpPost]
+        public void EmailAlert_Offering_Tref_Creation(EmailIntegration objEmail)
+        {
+
+            string strSubject = "", strContent = "";
+            //string strRecipientId = "";
+            //int intBatchId = 0;
+            List<EmailIntegration> emailList = new List<EmailIntegration>();
+            if(!CheckForNull.IsNull(objEmail))
+            {
+                if (objEmail.strEventType == "Offering_Added")
+                {
+                    emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                    if (emailList.Count() > 0)
+                    {
+
+                        strSubject = emailList[0].strSubject;
+                        strContent = emailList[0].strContent;
+                        strSubject = strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginEmpNo);
+                        strContent = strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginEmpNo).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc);
+                    }
+                }
+
+            }
+            else if (objEmail.strEventType == "Tref_Created")
+            {
+                emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                if (emailList.Count() > 0)
+                {
+                    strSubject = emailList[0].strSubject;
+                    strContent = emailList[0].strContent;
+                    strSubject = strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginEmpNo);
+                    strContent = strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginEmpNo).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc);
+                }
+
+            }
+            int result = new EmailIntegration().PostRecipientDetails(objEmail);
+            List<EmailIntegration> RecipientList = new List<EmailIntegration>();
+            RecipientList = new EmailIntegration().Get_RecipientDetail_SingelUser(objEmail);
+            int result1 = 0;
+            int batchID = 0;
+            if (RecipientList.Count() > 0)
+            {
+                batchID = new EmailIntegration().GetBatchID();
+
+                foreach (EmailIntegration obj in RecipientList)
+                {
+                    objEmail.strRecipientId = obj.strRecipientId;
+                    result1 = new EmailIntegration().PostEmailTemplateDetail(objEmail);
+                }
+            }
+        }
+        [HttpPost]
+        public void EmailAlert_BFS(EmailIntegration objEmail)
+
+        {
+            try
+            {
+
+                List<EmailIntegration> emailList = new List<EmailIntegration>();
+                if (!CheckForNull.IsNull(objEmail))
+                {
+                    if (objEmail.strEventType == "New_Opp_Created")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc);
+                        }
+
+
+                    }
+                    else if (objEmail.strEventType == "Opp_Updated_Stage")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|EXPECTED_CLOSURE_DATE|>", objEmail.strExpectedClosuredateMail).Replace("<|STATUS_UPDATE|>", objEmail.strStatusUpdateMail);
+                        }
+
+                    }
+                    else if (objEmail.strEventType == "StageMoved")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|NEXT_STAGE_ID|>", objEmail.strDealstage); ;
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|NEXT_STAGE_ID|>", objEmail.strDealstage).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|EXPECTED_CLOSURE_DATE|>", objEmail.strExpectedClosuredateMail).Replace("<|STATUS_UPDATE|>", objEmail.strStatusUpdateMail);
+                        }
+
+                    }
+
+                    else if (objEmail.strEventType == "OPP_UPDATED")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc);
+                        }
+
+
+                    }
+                    else if ((objEmail.strEventType == "Stage_Moved_Owners") && (objEmail.strTemplateType == "Stage_Moved_Owners"))
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|NEXT_STAGE_ID|>", objEmail.strDealstage); ;
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|NEXT_STAGE_ID|>", objEmail.strDealstage).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|EXPECTED_CLOSURE_DATE|>", objEmail.strExpectedClosuredateMail).Replace("<|STATUS_UPDATE|>", objEmail.strStatusUpdateMail);
+                        }
+
+                    }
+                    int result = new EmailIntegration().PostRecipientDetails(objEmail);
+                    //To get Recipients List
+                    List<EmailIntegration> RecipientList = new List<EmailIntegration>();
+                    RecipientList = new EmailIntegration().Get_RecipientDetail_SingelUser(objEmail);
+                    int result1 = 0;
+                    if (RecipientList.Count() > 0)
+                    {
+                        objEmail.intBatchId = new EmailIntegration().GetBatchID();
+
+                        foreach (EmailIntegration obj in RecipientList)
+                        {
+                            objEmail.strRecipientId = obj.strRecipientId;
+                            result1 = new EmailIntegration().PostEmailTemplateDetail(objEmail);
+                        }
+                    }
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+
+        }
+        [HttpPost]
+        public void NewOppEmailAlert_Domain(EmailIntegration objEmail)
+        {
+            try
+            {
+                if (!CheckForNull.IsNull(objEmail))
+                {
+                    List<EmailIntegration> emailList = new List<EmailIntegration>();
+                    if (objEmail.strEventType == "New_Opp_Created" || objEmail.strEventType == "Opp_Updated_Stage")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc);
+                        }
+
+                    }
+                    int result = new EmailIntegration().PostRecipientDetails(objEmail);
+
+                    //To get Recipients List
+                    List<EmailIntegration> RecipientList = new List<EmailIntegration>();
+                    RecipientList = new EmailIntegration().Get_RecipientDetail_SingelUser(objEmail);
+                    int result1 = 0;
+                    if (RecipientList.Count() > 0)
+                    {
+                        objEmail.intBatchId = new EmailIntegration().GetBatchID();
+
+                        foreach (EmailIntegration obj in RecipientList)
+                        {
+                            objEmail.strRecipientId = obj.strRecipientId;
+                            result1 = new EmailIntegration().PostEmailTemplateDetail(objEmail);
+                        }
+                    }
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+        }
+        [HttpPost]
+        public void EmailAlert_Leaders(EmailIntegration objEmail)
+        {
+            try
+            {
+                if (!CheckForNull.IsNull(objEmail))
+                {
+                    List<EmailIntegration> emailList = new List<EmailIntegration>();
+                    if (objEmail.strEventType == "StageMoved_Leaders")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|DEAL_TERM|>", objEmail.strDealTerm).Replace("<|FTE|>", objEmail.strFTE);
+                        }
+
+                    }
+                    if (objEmail.strEventType == "Stage_Leaders")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|CURRENT_STAGE_ID|>", objEmail.strDealstage).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|DEAL_TERM|>", objEmail.strDealTerm);
+                        }
+
+                    }
+                    int result = new EmailIntegration().PostRecipientDetails(objEmail);
+                    //To get Recipients List
+                    List<EmailIntegration> RecipientList = new List<EmailIntegration>();
+                    RecipientList = new EmailIntegration().Get_RecipientDetail_SingelUser(objEmail);
+                    int result1 = 0;
+                    if (RecipientList.Count() > 0)
+                    {
+                        objEmail.intBatchId = new EmailIntegration().GetBatchID();
+
+                        foreach (EmailIntegration obj in RecipientList)
+                        {
+                            objEmail.strRecipientId = obj.strRecipientId;
+                            result1 = new EmailIntegration().PostEmailTemplateDetail(objEmail);
+                        }
+                    }
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+
+        }
+        [HttpPost]
+        public void EmailAlert_Stage9Above(EmailIntegration objEmail)
+        {
+            try
+            {
+                if (!CheckForNull.IsNull(objEmail))
+                {
+                    List<EmailIntegration> emailList = new List<EmailIntegration>();
+                    if (objEmail.strEventType == "Stage9Above")
+                    {
+                        emailList = new EmailIntegration().EMICommon_Get_EmailTemplate(objEmail);
+                        if (emailList.Count() > 0)
+                        {
+                            objEmail.strSubject = emailList[0].strSubject;
+                            objEmail.strContent = emailList[0].strContent;
+                            objEmail.strSubject = objEmail.strSubject.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage);
+                            objEmail.strContent = objEmail.strContent.Replace("<|OPPORTUNITY_ID|>", objEmail.strOppId).Replace("<|CUSTOMER_NAME|>", objEmail.strCustomerName).Replace("<|USER_NAME|>", objEmail.strUserLoginFullName).Replace("<|OPPORTUNITY_DESC|>", objEmail.strOppDesc).Replace("<|NEXT_STAGE_ID|>", objEmail.strNextStage).Replace("<|TCV|>", objEmail.strTCVMail).Replace("<|EXPECTED_CLOSURE_DATE|>", objEmail.strExpectedClosuredateMail).Replace("<|STATUS_UPDATE|>", objEmail.strStatusUpdateMail);
+                        }
+                        int result = new EmailIntegration().PostRecipientDetails(objEmail);
+                        //To get Recipients List
+                        List<EmailIntegration> RecipientList = new List<EmailIntegration>();
+                        RecipientList = new EmailIntegration().Get_RecipientDetail_SingelUser(objEmail);
+                        int result1 = 0;
+                        if (RecipientList.Count() > 0)
+                        {
+                            objEmail.intBatchId = new EmailIntegration().GetBatchID();
+
+                            foreach (EmailIntegration obj in RecipientList)
+                            {
+                                objEmail.strRecipientId = obj.strRecipientId;
+                                result1 = new EmailIntegration().PostEmailTemplateDetail(objEmail);
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                throw new ExceptionHandler(ex);
+            }
+
+        }
+    }
+}
