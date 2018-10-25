@@ -1,0 +1,36 @@
+using System.Web.Mvc;
+using System.Web.Routing;
+
+namespace RPM_API.lib
+{
+    public class AppAuthorizeAttribute : AuthorizeAttribute
+    {
+        protected override bool AuthorizeCore(System.Web.HttpContextBase httpContext)
+        {
+            bool isAuth = false;
+            if(httpContext.Session["UserId"]!=null)
+            {                
+                if(httpContext.Session["UserRoleID"]!=null )
+                {
+                    int UserRoleID = 0;
+                    int.TryParse(httpContext.Session["UserRoleID"].ToString(), out UserRoleID);
+                    if ((RoleEnum)UserRoleID == RoleEnum.SuperAdmin)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return isAuth;
+        }
+
+
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {           
+            if (filterContext.HttpContext.Session["UserId"] == null)
+            {            
+                filterContext.Result = new RedirectToRouteResult(new
+                RouteValueDictionary(new { controller = "App", action = "Index" }));
+            }
+        }
+    }
+}
